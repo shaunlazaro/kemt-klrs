@@ -1,0 +1,1 @@
+# Auto detect the excersize a user is performing
