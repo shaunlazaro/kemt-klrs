@@ -7,3 +7,7 @@ Setup:
 1: Recommended to use venv `python -m venv venv`
 2: Install requirements `pip install requirements.txt`
 3: Run dev mode server using: `python manage.py runserver`
+
+
+Other:
+    Run Migrations: `python manage.py migrate`
