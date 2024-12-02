@@ -267,15 +267,14 @@ try:
 
                 # Grab frame from video stream
                 frame1 = videostream.read()
+                frame1 = cv2.flip(frame1, 0)
                 # Acquire frame and resize to expected shape [1xHxWx3]
                 frame = frame1.copy()
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 frame_resized = cv2.resize(frame_rgb, (width, height))
                 input_data = np.expand_dims(frame_resized, axis=0)
                 
-                # frame_resized = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
-                frame_resized = cv2.flip(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 0) # vertical flip for webcam
-
+                frame_resized = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
 
                 # Normalize pixel values if using a floating model (i.e. if model is non-quantized)
                 if floating_model:
