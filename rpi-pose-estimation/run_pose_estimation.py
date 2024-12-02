@@ -27,9 +27,25 @@ import pathlib
 from threading import Thread
 import importlib.util
 import datetime
+import serial
 
-import time
 import RPi.GPIO as GPIO
+
+# Set up the serial communication
+# TODO: Uncomment these lines to set up the serial communication
+#ser = serial.Serial('/dev/ttyUSB0', 115200)
+#ser.setRTS(False)
+#ser.setDTR(False)
+
+# Starting motor positions
+h_pos = 90
+v_pos = 90
+
+# Message sending interval
+SEND_INTERVAL = 1.5  # 1500ms between messages
+
+# Track the time when the last message was sent
+last_send_time = time.time()
 
 GPIO.setmode(GPIO.BCM)
 #led
@@ -251,6 +267,7 @@ try:
 
                 # Grab frame from video stream
                 frame1 = videostream.read()
+                frame1 = cv2.flip(frame1, 0)
                 # Acquire frame and resize to expected shape [1xHxWx3]
                 frame = frame1.copy()
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -331,7 +348,36 @@ try:
                     offset_x = detected_x - (256) / 2
                     offset_y = detected_y - (256) / 2
 
+                    # These values will span from -128 to 128
                     print(f"OFFSET- x: {offset_x}, y: {offset_y}")
+                    
+                    # Track the time when the last message was sent
+                    current_time = time.time()
+                    
+                    # If enough time has passed since the last send
+                    if current_time - last_send_time >= SEND_INTERVAL:
+                        # These values will span from -128 to 128
+                        print(f"OFFSET- x: {offset_x}, y: {offset_y}")
+                        
+                        if offset_x < -64 and h_pos >= 30:
+                            h_pos -= 30
+                        if offset_x > 64 and h_pos <= 150:
+                            h_pos += 30
+                        if offset_y < -64 and v_pos >= 30:
+                            v_pos -= 30
+                        if offset_y > 64 and v_pos <= 150:
+                            v_pos += 30
+                    
+                        msg = "{},{}".format(h_pos,v_pos)
+                        print("sending hpos,vpos: {} to serial".format(msg))
+                        # TODO: Uncomment this line to send the message to the serial port
+                        # ser.write(msg.encode('utf-8'))
+                        # line = ser.readline().decode('utf-8').rstrip()
+                        # print(line)
+                        # time.sleep(0)
+                        
+                        # Update the last send time
+                        last_send_time = current_time
 
                 # Press 'q' to quit
                                 # Press 'q' to quit
