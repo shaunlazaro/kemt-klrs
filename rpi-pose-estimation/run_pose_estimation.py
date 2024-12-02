@@ -32,12 +32,20 @@ import serial
 import RPi.GPIO as GPIO
 
 # Set up the serial communication
-ser = serial.Serial('/dev/ttyUSB0', 115200)
-ser.setRTS(False)
-ser.setDTR(False)
+# TODO: Uncomment these lines to set up the serial communication
+#ser = serial.Serial('/dev/ttyUSB0', 115200)
+#ser.setRTS(False)
+#ser.setDTR(False)
 
+# Starting motor positions
 h_pos = 90
 v_pos = 90
+
+# Message sending interval
+SEND_INTERVAL = 1.5  # 1500ms between messages
+
+# Track the time when the last message was sent
+last_send_time = time.time()
 
 GPIO.setmode(GPIO.BCM)
 #led
@@ -266,10 +274,6 @@ try:
                 input_data = np.expand_dims(frame_resized, axis=0)
                 
                 frame_resized = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
-                
-                # NOTE: this may be removed if we don't want to flip the image
-                # Flip the frame upside down
-                frame_resized = cv2.flip(frame_resized, 0)  # 0 for vertical flip
 
                 # Normalize pixel values if using a floating model (i.e. if model is non-quantized)
                 if floating_model:
@@ -315,6 +319,7 @@ try:
                 cv2.putText(frame_resized, f'FPS: {frame_rate_calc:.2f}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2, cv2.LINE_AA)
 
                 # Show the processed frame
+                frame_resized = cv2.flip(frame_resized, 0)  # 0 for vertical flip
                 cv2.imshow("Pose Estimation", frame_resized)
                 
                 # Display a grid
@@ -346,22 +351,33 @@ try:
                     # These values will span from -128 to 128
                     print(f"OFFSET- x: {offset_x}, y: {offset_y}")
                     
+                    # Track the time when the last message was sent
+                    last_send_time = time.time()
                     
-                    if offset_x < -64 and h_pos >= 30:
-                        h_pos = h_pos =- 30
-                    if offset_x > 64 and h_pos <= 150:
-                        h_pos = h_pos =+ 30
-                    if offset_y < -64 and h_pos >= 30:
-                        h_pos = v_pos =- 30
-                    if offset_x > 64 and h_pos <= 150:
-                        h_pos = v_pos =+ 30
+                    # If enough time has passed since the last send
+                    if current_time - last_send_time >= SEND_INTERVAL:
+                        # These values will span from -128 to 128
+                        print(f"OFFSET- x: {offset_x}, y: {offset_y}")
+                        
+                        if offset_x < -64 and h_pos >= 30:
+                            h_pos -= 30
+                        if offset_x > 64 and h_pos <= 150:
+                            h_pos += 30
+                        if offset_y < -64 and v_pos >= 30:
+                            v_pos -= 30
+                        if offset_y > 64 and v_pos <= 150:
+                            v_pos += 30
                     
-                    msg = "{},{}".format(h_pos,v_pos)
-                    print("sending hpos,vpos: {} to serial".format(msg))
-                    # ser.write(msg.encode('utf-8'))
-                    # line = ser.readline().decode('utf-8').rstrip()
-                    # print(line)
-                    # time.sleep(0)
+                        msg = "{},{}".format(h_pos,v_pos)
+                        print("sending hpos,vpos: {} to serial".format(msg))
+                        # TODO: Uncomment this line to send the message to the serial port
+                        # ser.write(msg.encode('utf-8'))
+                        # line = ser.readline().decode('utf-8').rstrip()
+                        # print(line)
+                        # time.sleep(0)
+                        
+                        # Update the last send time
+                        last_send_time = current_time
 
                 # Press 'q' to quit
                                 # Press 'q' to quit
