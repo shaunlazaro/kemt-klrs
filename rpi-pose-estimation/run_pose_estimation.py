@@ -273,7 +273,9 @@ try:
                 frame_resized = cv2.resize(frame_rgb, (width, height))
                 input_data = np.expand_dims(frame_resized, axis=0)
                 
-                frame_resized = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
+                # frame_resized = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
+                frame_resized = cv2.flip(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 0) # vertical flip for webcam
+
 
                 # Normalize pixel values if using a floating model (i.e. if model is non-quantized)
                 if floating_model:
@@ -319,7 +321,6 @@ try:
                 cv2.putText(frame_resized, f'FPS: {frame_rate_calc:.2f}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2, cv2.LINE_AA)
 
                 # Show the processed frame
-                frame_resized = cv2.flip(frame_resized, 0)  # 0 for vertical flip
                 cv2.imshow("Pose Estimation", frame_resized)
                 
                 # Display a grid
