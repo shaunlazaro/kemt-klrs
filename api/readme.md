@@ -19,9 +19,15 @@ Other:
     Run Migrations: `python manage.py migrate`
 
 Deployment:
-    Currently deployed on VM with public IP: 129.153.49.30
-    Access Django at 129.153.49.30/admin
 
-    To connect, use ssh (will need to ask for the key).
-    Start server using manage.py runserver, inside of a tmux session
-    (`tmux attach` to enter session,   `ctrl+b :detach` to exit without terminating, `tmux` to start new session)
+Site is currently deployed on VM with public IP: 129.153.49.30
+Access Django at: http://129.153.49.30:8000/admin
+
+To connect, use ssh (will need to ask me for the key).
+Start server as normal, but inside of a tmux session while connected over ssh.
+
+`tmux attach` to enter session
+
+`ctrl+b :detach` to exit without terminating
+
+`tmux` to start new session
