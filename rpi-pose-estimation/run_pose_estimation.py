@@ -27,9 +27,17 @@ import pathlib
 from threading import Thread
 import importlib.util
 import datetime
+import serial
 
-import time
 import RPi.GPIO as GPIO
+
+# Set up the serial communication
+ser = serial.Serial('/dev/ttyUSB0', 115200)
+ser.setRTS(False)
+ser.setDTR(False)
+
+h_pos = 90
+v_pos = 90
 
 GPIO.setmode(GPIO.BCM)
 #led
@@ -258,6 +266,10 @@ try:
                 input_data = np.expand_dims(frame_resized, axis=0)
                 
                 frame_resized = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
+                
+                # NOTE: this may be removed if we don't want to flip the image
+                # Flip the frame upside down
+                frame_resized = cv2.flip(frame_resized, 0)  # 0 for vertical flip
 
                 # Normalize pixel values if using a floating model (i.e. if model is non-quantized)
                 if floating_model:
@@ -331,7 +343,25 @@ try:
                     offset_x = detected_x - (256) / 2
                     offset_y = detected_y - (256) / 2
 
+                    # These values will span from -128 to 128
                     print(f"OFFSET- x: {offset_x}, y: {offset_y}")
+                    
+                    
+                    if offset_x < -64 and h_pos >= 30:
+                        h_pos = h_pos =- 30
+                    if offset_x > 64 and h_pos <= 150:
+                        h_pos = h_pos =+ 30
+                    if offset_y < -64 and h_pos >= 30:
+                        h_pos = v_pos =- 30
+                    if offset_x > 64 and h_pos <= 150:
+                        h_pos = v_pos =+ 30
+                    
+                    msg = "{},{}".format(h_pos,v_pos)
+                    print("sending hpos,vpos: {} to serial".format(msg))
+                    # ser.write(msg.encode('utf-8'))
+                    # line = ser.readline().decode('utf-8').rstrip()
+                    # print(line)
+                    # time.sleep(0)
 
                 # Press 'q' to quit
                                 # Press 'q' to quit
