@@ -352,7 +352,7 @@ try:
                     print(f"OFFSET- x: {offset_x}, y: {offset_y}")
                     
                     # Track the time when the last message was sent
-                    last_send_time = time.time()
+                    current_time = time.time()
                     
                     # If enough time has passed since the last send
                     if current_time - last_send_time >= SEND_INTERVAL:
