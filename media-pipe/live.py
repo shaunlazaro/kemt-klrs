@@ -47,10 +47,27 @@ with mp_pose.Pose(
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     
     knee_angle = 0
+    midpoint = (0, 0)
+
 
     if results.pose_landmarks:
         # Get landmarks
         landmarks = results.pose_landmarks.landmark
+        all_points = [(landmark.x, landmark.y) for landmark in landmarks]
+
+        # Calculate the midpoint of all landmarks
+        x_coords, y_coords = zip(*all_points)  # Separate x and y coordinates
+        midpoint = (sum(x_coords) / len(x_coords), sum(y_coords) / len(y_coords))
+
+        # Convert midpoint to pixel coordinates
+        h, w, _ = image.shape
+        pixel_midpoint = (int(midpoint[0] * w), int(midpoint[1] * h))
+
+        # Draw a circle at the midpoint
+        cv2.circle(image, pixel_midpoint, radius=5, color=(0, 0, 255), thickness=-1)
+        cv2.putText(image, "Midpoint", (pixel_midpoint[0] + 10, pixel_midpoint[1]),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+
         right_hip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x, 
                      landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y,
                      landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].z]
