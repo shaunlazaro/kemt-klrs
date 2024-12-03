@@ -1,9 +1,12 @@
 
 import requests
 import json
+import copy
+from datetime import datetime
 
 # URL to Django API
-API_BASE_URL = "http://127.0.0.1:8000/api"
+API_BASE_URL = "http://129.153.49.30:8000/api"
+
 
 # Function to send a routine to the backend
 # This will perform a POST -> Creates a new routine
@@ -20,6 +23,25 @@ def send_routine_to_server(routine_data):
     else:
         print('Error:', response.status_code, response.text)
 
+
+# Quick and dirty way of uploading data for testing.  Just insert poses from cv script over time, then upload when done. 
+BASE_ROUTINE = {
+    "name": "TEST ROUTINE",
+    "description": f"Test data, generated at {datetime.now()}",
+    "poses":[],
+}
+current_routine = copy.deepcopy(BASE_ROUTINE)
+
+def add_pose_to_routine(pose_json):
+    global current_routine
+    current_routine["poses"].append({"landmarks":pose_json})
+    return len(current_routine["poses"])
+
+
+def upload_current_routine():
+    global current_routine
+    send_routine_to_server(current_routine)
+    current_routine = copy.deepcopy(BASE_ROUTINE)
 
 
 if __name__ == "__main__":

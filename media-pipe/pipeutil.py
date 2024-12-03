@@ -4,7 +4,7 @@ mp_pose = mp.solutions.pose
 
 # Returns a json serializable version of a pose, suitable for import into database.
 # Pass processing results (e.g. results = pose.process(image); )
-def pose_to_json(results):
+def result_to_pose_json(results):
     if results.pose_landmarks:
         # Convert landmarks to a list of simple dicts
         landmarks = [
