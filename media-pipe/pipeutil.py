@@ -27,3 +27,7 @@ def get_landmark_names():
 # Just for reference
 def get_connections():
     return list(mp_pose.POSE_CONNECTIONS)
+
+if __name__ == "__main__":
+    print(get_landmark_names())
+    print(get_connections())
