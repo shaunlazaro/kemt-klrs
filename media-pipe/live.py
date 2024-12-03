@@ -4,8 +4,14 @@ import numpy as np
 import time
 import serial
 import math
+from poseapi import add_pose_to_routine, upload_current_routine
+from pipeutil import result_to_pose_json
 
-ser = serial.Serial('COM3', 115200)
+try:
+    ser = serial.Serial('COM3', 115200)
+except Exception as e:
+   ser = None
+   print(f"Error initializing serial:\n{e}\n")
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -25,10 +31,11 @@ motor_y = 45  # Vertical motor
 
 last_sent = time.time()
 
-ser.setRTS(False)
-ser.setDTR(False)
-msg = "{},{}".format(motor_x,motor_y)
-ser.write(msg.encode('utf-8'))
+if ser:
+    ser.setRTS(False)
+    ser.setDTR(False)
+    msg = "{},{}".format(motor_x,motor_y)
+    ser.write(msg.encode('utf-8'))
     
 def calculate_angle(a, b, c):
     """
@@ -131,7 +138,8 @@ with mp_pose.Pose(
                 print(f"x:{offset_x} y:{offset_y}")
                 print(f"Updating motors to: X={motor_x}, Y={motor_y}")
                 msg = "{},{}".format(motor_x,motor_y)
-                ser.write(msg.encode('utf-8'))
+                if ser:
+                    ser.write(msg.encode('utf-8'))
 
                 last_sent = time.time()
 
@@ -168,6 +176,13 @@ with mp_pose.Pose(
     cv2.imshow('MediaPipe Pose', flipped_image)
 
     # Exit with the ESC key
-    if cv2.waitKey(5) & 0xFF == 27:
+    keypressed = cv2.waitKey(5)
+    KEYCODE_ESC = 27
+    KEYCODE_ENTER = 13
+    if keypressed & 0xFF == KEYCODE_ESC:
+      upload_current_routine()
       break
+    elif keypressed & 0xFF == KEYCODE_ENTER and results.pose_landmarks:
+       n = add_pose_to_routine(result_to_pose_json(results))
+       print(f"Saved pose into routine, {n} poses currently saved.")
 cap.release()
