@@ -6,17 +6,12 @@ import serial
 import math
 from poseapi import add_pose_to_routine, upload_current_routine
 from pipeutil import result_to_pose_json
+from collections import deque
 
-try:
-    ser = serial.Serial('COM3', 115200)
-except Exception as e:
-   ser = None
-   print(f"Error initializing serial:\n{e}\n")
 
-mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
-mp_pose = mp.solutions.pose
+CONFIDENCE_THRESHOLD = 0.6  # Adjust based on desired accuracy
 
+# ----------------------------- CAMERA-TRACKING ----------------------------------
 # Define frame dimensions and tolerance range
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
@@ -31,11 +26,65 @@ motor_y = 45  # Vertical motor
 
 last_sent = time.time()
 
+
+try:
+    ser = serial.Serial('COM3', 115200)
+except Exception as e:
+   ser = None
+   print(f"Error initializing serial:\n{e}\n")
+
+mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
+mp_pose = mp.solutions.pose
+
 if ser:
     ser.setRTS(False)
     ser.setDTR(False)
     msg = "{},{}".format(motor_x,motor_y)
     ser.write(msg.encode('utf-8'))
+    
+# ---------------------------------------------------------------------------------
+
+
+knee_visible = False
+angle_history = deque(maxlen=5)  # Store the last 5 angles
+
+def smooth_angle(knee_angle):
+    angle_history.append(knee_angle)
+    return sum(angle_history) / len(angle_history)
+
+
+# Parameters
+flexion_threshold = 90  # Fully bent position
+extension_threshold = 160  # Fully extended position
+rep_count = 0
+state = "rest"  # Can be 'flexing', 'extending', or 'rest'
+
+# Initialize variables for repetition timing
+rep_start_time = None
+last_rep_duration = 0  # Duration of the last completed repetition in seconds
+
+def detect_reps(knee_angle):
+    """
+    Detect repetitions and measure the time taken for each repetition.
+    """
+    global rep_count, state, rep_start_time, last_rep_duration
+
+    current_time = time.time()
+
+    if state == "rest" and knee_angle < flexion_threshold:
+        state = "flexing"
+        rep_start_time = current_time  # Start timing when flexing begins
+    elif state == "flexing" and knee_angle > extension_threshold:
+        state = "extending"
+        if rep_start_time is not None:
+            last_rep_duration = current_time - rep_start_time  # Calculate the time for the rep
+        rep_count += 1  # Count a full rep
+    elif state == "extending" and knee_angle < flexion_threshold:
+        state = "flexing"
+        rep_start_time = current_time  # Restart the timer for the next rep
+
+    return rep_count, last_rep_duration
     
 def calculate_angle(a, b, c):
     """
@@ -66,8 +115,8 @@ print("frame width: ", FRAME_WIDTH)
 print("frame height: ", FRAME_HEIGHT)
 
 with mp_pose.Pose(
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.5) as pose:
+    min_detection_confidence=CONFIDENCE_THRESHOLD,
+    min_tracking_confidence=CONFIDENCE_THRESHOLD) as pose:
   while cap.isOpened():
     success, image = cap.read()
     if not success:
@@ -143,18 +192,38 @@ with mp_pose.Pose(
 
                 last_sent = time.time()
 
-        right_hip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x, 
-                     landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y,
-                     landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].z]
-        right_knee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x, 
-                      landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y,
-                      landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].z]
-        right_ankle = [landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x, 
-                       landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y,
-                       landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].z]
+        # Get landmark confidence values
+        hip_visibility = landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].visibility
+        knee_visibility = landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].visibility
+        ankle_visibility = landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].visibility
+        
+        if (
+        hip_visibility > CONFIDENCE_THRESHOLD and
+        knee_visibility > CONFIDENCE_THRESHOLD and
+        ankle_visibility > CONFIDENCE_THRESHOLD
+        ):
+            knee_visible = True
+            right_hip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x, 
+                        landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y,
+                        landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].z]
+            right_knee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x, 
+                        landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y,
+                        landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].z]
+            right_ankle = [landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x, 
+                        landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y,
+                        landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].z]
 
-        # Calculate angle
-        knee_angle = calculate_angle(right_hip, right_knee, right_ankle)
+            # Calculate angle
+            knee_angle = calculate_angle(right_hip, right_knee, right_ankle)
+            reps = detect_reps(knee_angle)
+
+            # Display on image
+        
+            flipped_image = cv2.flip(image, 1)
+            cv2.putText(image, f"Reps: {reps}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            cv2.putText(image, f"Knee Angle: {int(knee_angle)}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            image = cv2.flip(flipped_image, 1)
+            
         
     # Draw landmarks
     mp_drawing.draw_landmarks(
@@ -165,13 +234,22 @@ with mp_pose.Pose(
 
     # Flip horizontally for a selfie view
     flipped_image = cv2.flip(image, 1)
+
     # Flip the text so it is readable
-    #cv2.putText(flipped_image, f"Midpoint: {pixel_midpoint}", (pixel_midpoint[0] + 10, pixel_midpoint[1]),
+    # cv2.putText(flipped_image, f"Midpoint: {pixel_midpoint}", (pixel_midpoint[0] + 10, pixel_midpoint[1]),
     #                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-    cv2.putText(flipped_image, f'Knee Angle: {int(knee_angle)} deg', 
-            (50, 50), 
-            cv2.FONT_HERSHEY_SIMPLEX, 
-            1, (255, 255, 255), 2, cv2.LINE_AA)
+    # cv2.putText(flipped_image, f'Knee Angle: {int(knee_angle)} deg', 
+    #         (50, 50), 
+    #         cv2.FONT_HERSHEY_SIMPLEX, 
+    #         1, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(flipped_image, f"Exersize: Seated Leg Extensions (Right)", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    cv2.putText(flipped_image, f"Reps: {rep_count}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    cv2.putText(flipped_image, f"Last Rep Time: {last_rep_duration:.2f} sec", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    if (knee_visible):
+        cv2.putText(flipped_image, f"Knee Angle: {int(smooth_angle(knee_angle))}", (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    print("knee: ", knee_visible)
+    knee_visible = False
+
     # Show the flipped image
     cv2.imshow('MediaPipe Pose', flipped_image)
 
