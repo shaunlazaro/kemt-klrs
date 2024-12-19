@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainMenu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainMenu">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="268dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="100dp"
+                android:textAlignment="center"
+                android:layout_gravity="center_horizontal"
+                android:textSize="40sp"
+                android:text="PhysiKneed" />
+
+            <Button
+                android:id="@+id/today_button"
+                android:layout_width="268dp"
+                android:layout_height="133dp"
+                android:layout_marginBottom="0dp"
+                android:layout_marginTop="50dp"
+                android:text="Today's Exercises"
+                android:textSize="24sp"
+                android:layout_gravity="center_horizontal" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/exercise_button"
+                    android:layout_width="175dp"
+                    android:layout_height="90dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="0dp"
+                    android:text="My Exercises"
+                    android:textSize="24sp"
+                    android:layout_marginStart="20dp" />
+
+                <Button
+                    android:id="@+id/stats_button"
+                    android:layout_width="175dp"
+                    android:layout_height="90dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="32dp"
+                    android:layout_marginRight="20dp"
+                    android:text="Review Stats"
+                    android:textSize="24sp"
+                    android:layout_marginEnd="20dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
