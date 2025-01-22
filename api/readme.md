@@ -22,6 +22,7 @@ Deployment:
 
 Site is currently deployed on VM with public IP: 129.153.49.30
 Access Django at: http://129.153.49.30:8000/admin
+Access API spec at: http://129.153.49.30:8000/api/schema/swagger-ui/
 
 To connect, use ssh (will need to ask me for the key).
 Start server as normal, but inside of a tmux session while connected over ssh.

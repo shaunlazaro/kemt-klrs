@@ -1,0 +1,390 @@
+openapi: 3.0.3
+info:
+  title: Kemt-KLRS
+  version: 0.0.1
+  description: Physiotherapy exercise helper using CV pose estimation
+paths:
+  /api/poses/:
+    get:
+      operationId: api_poses_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pose'
+          description: ''
+    post:
+      operationId: api_poses_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pose'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pose'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pose'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pose'
+          description: ''
+  /api/poses/{id}/:
+    get:
+      operationId: api_poses_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this pose.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pose'
+          description: ''
+    put:
+      operationId: api_poses_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this pose.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pose'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pose'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pose'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pose'
+          description: ''
+    patch:
+      operationId: api_poses_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this pose.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPose'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPose'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPose'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pose'
+          description: ''
+    delete:
+      operationId: api_poses_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this pose.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/routines/:
+    get:
+      operationId: api_routines_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Routine'
+          description: ''
+    post:
+      operationId: api_routines_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Routine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Routine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Routine'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Routine'
+          description: ''
+  /api/routines/{id}/:
+    get:
+      operationId: api_routines_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this routine.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Routine'
+          description: ''
+    put:
+      operationId: api_routines_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this routine.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Routine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Routine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Routine'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Routine'
+          description: ''
+    patch:
+      operationId: api_routines_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this routine.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRoutine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRoutine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRoutine'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Routine'
+          description: ''
+    delete:
+      operationId: api_routines_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this routine.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    PatchedPose:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        landmarks: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedRoutine:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+        poses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pose'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    Pose:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        landmarks: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+    Routine:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+        poses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pose'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - poses
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

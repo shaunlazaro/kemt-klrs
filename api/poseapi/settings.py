@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'poseapp'
+    'poseapp',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -123,3 +124,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# DRF:
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Kemt-KLRS',
+    'DESCRIPTION': 'Physiotherapy exercise helper using CV pose estimation',
+    'VERSION': '0.0.1',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
