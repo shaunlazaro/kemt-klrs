@@ -32,3 +32,12 @@ Start server as normal, but inside of a tmux session while connected over ssh.
 `ctrl+b :detach` to exit without terminating
 
 `tmux` to start new session
+
+
+API Spec:
+Automatically generated using drf-spectacular.
+https://github.com/tfranzel/drf-spectacular/
+
+Generate new schema.yml file:
+`python ./manage.py spectacular --color --file schema.yml`
+ (Access using swagger-ui path above)
