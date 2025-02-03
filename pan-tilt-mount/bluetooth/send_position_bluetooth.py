@@ -19,7 +19,8 @@ async def discover_and_write():
     
     if not esp32_address:
         print(f"Device named '{DEVICE_NAME}' not found.")
-        return
+        return None
+    
     
     print(f"Connecting to {DEVICE_NAME} at address {esp32_address}...")
     

@@ -18,7 +18,7 @@ FRAME_HEIGHT = 480
 
 TOLERANCE = 50  # Pixels from the center where no updates are sent
 MAX_MOVE_DISTANCE = 25 # Move no more than 10 units.
-TIME_THRESHOLD = 1.5
+TIME_THRESHOLD = 2
 
 # Initialize motors at center positions
 motor_x = 90  # Horizontal motor
@@ -107,7 +107,7 @@ def calculate_angle(a, b, c):
     return np.degrees(angle)  # Convert to degrees
 
 # For webcam input:
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 FRAME_WIDTH = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 FRAME_HEIGHT = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
