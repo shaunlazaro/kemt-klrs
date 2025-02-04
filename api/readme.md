@@ -5,6 +5,8 @@ Using Python 3.11.7 (any similar version should be fine)
 
 Setup:
 1: Recommended to use venv `python -m venv venv`
+`source venv/bin/activate` (bash)
+OR `venv/scripts/Activate.ps1` (windows powershell)
 2: Install requirements `pip install requirements.txt`
 
 If using local DB:
@@ -19,9 +21,9 @@ Other:
 
 Deployment:
 
-Site is currently deployed on VM with public IP: 129.153.49.30
-Access Django at: http://129.153.49.30:8000/admin
-Access API spec at: http://129.153.49.30:8000/api/schema/swagger-ui/
+Site is currently deployed on VM with public IP: 140.238.151.117
+Access Django at: http://140.238.151.117:8000/admin
+Access API spec at: http://140.238.151.117:8000/api/schema/swagger-ui/
 
 To connect, use ssh (will need to ask me for the key).
 Start server as normal, but inside of a tmux session while connected over ssh.
