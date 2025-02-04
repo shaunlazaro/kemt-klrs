@@ -10,8 +10,7 @@ Setup:
 If using local DB:
 3: Run migrations `python manage.py migrate`
 4: Create superuser `python manage.py createsuperuser --username admin --email admin@example.com`
-
-5: Run dev mode server using: `python manage.py runserver`
+5: Run dev mode server using: `python manage.py runserver 0.0.0.0:8000`
 6: Access admin panel from url/admin (e.g. `127.0.0.1:8000/admin`)
 
 Other:
