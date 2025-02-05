@@ -14,6 +14,8 @@ int hpostarget = 90;
 unsigned long previousMillis = 0;
 const int moveInterval = 20;
 
+char targetchar = ','; // Character to count
+
 // Bluetooth variables
 BluetoothSerial SerialBT;
 const String bluetooth_name = "RePose-BT";
@@ -59,8 +61,11 @@ void loop() {
 
   if (SerialBT.available()) {
     String data = SerialBT.readString(); // Read data from Bluetooth
-    vpostarget = get_number_from_serial(data, 0);
-    hpostarget = get_number_from_serial(data, 1);  
+    int count = std::count(data.begin(), data.end(), targetchar);
+    if (count == 1) {
+      vpostarget = get_number_from_serial(data, 0);
+      hpostarget = get_number_from_serial(data, 1);  
+    }
     Serial.println("Received: " + data); // print to serial for checking if recieved 
     SerialBT.println("Echo: " + data); // Echo the data back
   }
