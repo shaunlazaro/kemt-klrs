@@ -3,11 +3,14 @@ import mediapipe as mp
 from poseapi import add_pose_to_routine, upload_current_routine
 from pipeutil import result_to_pose_json
 from collections import deque
-from physio_tools import calculate_angle, smooth_angle, get_exercise_params, EXERCISES
+from physio_tools import calculate_angle, smooth_angle
 from display import draw_pose_landmarks, display_text, flip_image  # Import functions from display.py
 
 from physio_tools import ExerciseTracker
 from camera_tracking import MotorController
+
+from routines.tracking import TrackingDetail, TrackingType
+from routines.workout_config import ExerciseDetail, RoutineConfig   
 
 motor_controller = MotorController()
 
@@ -21,19 +24,78 @@ angle_history = deque(maxlen=5) # Store the last 5 angles
 
 smoothed_angle = 0
 
-# ----------------------- EXERCISE CONFIGURATION -----------------------
 
-# Choose an exercise dynamically
-current_exercise = "leg_extension" # Change this to switch exercises
-exercise_params = EXERCISES[current_exercise]
+# ----------------------- ROUTINE / EXERCISE CONFIGURATION [HARDCODED FOR NOW] -----------------------
 
-tracker = ExerciseTracker(exercise_params)
+# TODO: hardcode the params for each exercise
 
-# Exercise-specific parameters
-current_exercise = "leg_extension" # Change this to switch exercises
-selected_side = "right" # "left" or "right" for side-based exercises, or "default" for non-side-based
+# tracking details
+right_leg_extension_angle_tracking = TrackingDetail(
+    tracking_type=TrackingType.ANGLE_OF_THREE_POINTS,
+    keypoints=["right_hip", "right_knee", "right_ankle"],
+    # show_alert_if_below=0,
+    # show_alert_if_above=180,
+    # alert_message=""
+)
 
-exercise_params = get_exercise_params(current_exercise, selected_side)
+# exercise details
+right_leg_extension = ExerciseDetail(
+    rep_keypoints=["right_hip", "right_knee", "right_ankle"],
+    threshold_flexion=100,
+    threshold_extension=130,
+    display_name="Leg Extension",
+    default_tracking_details=[right_leg_extension_angle_tracking],
+)
+
+# Tracking knee angle for squats
+squat_angle_tracking = TrackingDetail(
+    tracking_type=TrackingType.ANGLE_OF_THREE_POINTS,
+    keypoints=["right_hip", "right_knee", "right_ankle"],
+    # show_alert_if_below=60,
+    # show_alert_if_above=170,
+    # alert_message="Maintain proper squat depth!"
+)
+
+# Defining the squat exercise
+squat_exercise = ExerciseDetail(
+    rep_keypoints=["right_hip", "right_knee", "right_ankle"],
+    threshold_flexion=110,
+    threshold_extension=160,
+    display_name="Squat",
+    default_tracking_details=[squat_angle_tracking],
+)
+
+
+# config routine
+routine_config = RoutineConfig()
+
+routine_config.add_exercise(
+    exercise_name="right_leg_extension",
+    exercise_detail= right_leg_extension,
+    reps=10,
+)
+
+routine_config.add_exercise(
+    exercise_name="squat",
+    exercise_detail=squat_exercise,
+    reps=10,
+)
+
+
+
+# ----------------------- SETUP ROUTINE -----------------------
+
+# Fetch workout details TODO: Make this dynamic
+exercise_name = "right_leg_extension"
+
+routine_data = routine_config.get_workout(exercise_name)
+if not routine_data:
+    raise ValueError(f"Workout '{exercise_name}' not found in routine config.")
+
+exercise_detail = routine_data["Workout"]
+tracker = ExerciseTracker(exercise_detail)
+custom_tracking_details = routine_data["CustomTrackingDetails"]
+
 
 # -------------------- FUNCTIONS ---------------------------------
 def extract_keypoints_dynamic(landmarks, pose, keypoints):
@@ -47,12 +109,9 @@ def extract_keypoints_dynamic(landmarks, pose, keypoints):
         for kp in keypoints
     ]
 
-def process_exercise_angle(landmarks, pose, params):
-    """Calculate the angle and detect repetitions dynamically based on the chosen exercise."""
-    
-    keypoints = extract_keypoints_dynamic(landmarks, pose, params["keypoints"])
+def process_exercise_angle(landmarks, pose, exercise_detail: ExerciseDetail):
+    keypoints = extract_keypoints_dynamic(landmarks, pose, exercise_detail.rep_keypoints)
     exercise_angle = calculate_angle(keypoints[0], keypoints[1], keypoints[2])
-    # rep_count, last_rep_duration = tracker.detect_reps(exercise_angle, flexion_threshold, extension_threshold)
     rep_count, last_rep_duration = tracker.detect_reps(exercise_angle)
     return exercise_angle, rep_count, last_rep_duration
 
@@ -106,19 +165,25 @@ with mp_pose.Pose(
         # Check if all keypoints for the current exercise are visible
         keypoints_visible = all(
             visibility.get(kp, 0) > CONFIDENCE_THRESHOLD
-            for kp in exercise_params["keypoints"]
+            for kp in exercise_detail.rep_keypoints
         )
         
         if keypoints_visible:
             exercise_angle, rep_count, last_rep_duration = process_exercise_angle(
-                landmarks,
-                mp_pose.PoseLandmark,
-                exercise_params,
+                landmarks, mp_pose.PoseLandmark, exercise_detail
             )
             
             # TODO: Imporve smoothing
             # 5pt local average smoothing
             smoothed_angle = smooth_angle(exercise_angle, angle_history)
+            
+        for tracking in custom_tracking_details:
+            if tracking.tracking_type == TrackingType.ANGLE_OF_THREE_POINTS:
+                keypoints = extract_keypoints_dynamic(landmarks, mp_pose.PoseLandmark, tracking.keypoints)
+                angle = calculate_angle(*keypoints)
+                
+                if tracking.show_alert_if_below and angle < tracking.show_alert_if_below:
+                    print(tracking.alert_message)
     
     # ---------------------- Display Output ----------------------
     

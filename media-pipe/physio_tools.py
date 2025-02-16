@@ -1,42 +1,45 @@
 import numpy as np
 import time
+from routines.workout_config import ExerciseDetail
 
-EXERCISES = {
-    "leg_extension": {
-        "sides": {
-            "right": {
-                "keypoints": ["right_hip", "right_knee", "right_ankle"],
-            },
-            "left": {
-                "keypoints": ["left_hip", "left_knee", "left_ankle"],
-            }
-        },
-        "threshold_flexion": 60,
-        "threshold_extension": 160,
-        "display_name": "Leg Extension",
-        "show_angle": True,
-        "show_reps": True,
-        "user_body_alignment": "right"
-    },
-    "air_squat": {
-        "keypoints": ["right_hip", "right_knee", "right_ankle"],  # No sides here
-        "threshold_flexion": 90,
-        "threshold_extension": 160,
-        "display_name": "Air Squat",
-        "show_angle": True,
-        "show_reps": True,
-        "user_body_alignment": "side",
-    }
-}
 
-def get_exercise_params(exercise_name, side="right"):
-    exercise_data = EXERCISES.get(exercise_name)
+# TODO: remove!
+# EXERCISES = {
+#     "leg_extension": {
+#         "sides": {
+#             "right": {
+#                 "keypoints": ["right_hip", "right_knee", "right_ankle"],
+#             },
+#             "left": {
+#                 "keypoints": ["left_hip", "left_knee", "left_ankle"],
+#             }
+#         },
+#         "threshold_flexion": 60,
+#         "threshold_extension": 160,
+#         "display_name": "Leg Extension",
+#         "show_angle": True,
+#         "show_reps": True,
+#         "user_body_alignment": "right"
+#     },
+#     "air_squat": {
+#         "keypoints": ["right_hip", "right_knee", "right_ankle"],  # No sides here
+#         "threshold_flexion": 90,
+#         "threshold_extension": 160,
+#         "display_name": "Air Squat",
+#         "show_angle": True,
+#         "show_reps": True,
+#         "user_body_alignment": "side",
+#     }
+# }
+
+# def get_exercise_params(exercise_name, side="right"):
+#     exercise_data = EXERCISES.get(exercise_name)
     
-    # Check if the exercise has sides (e.g. left and right)
-    if "sides" in exercise_data:
-        return exercise_data["sides"].get(side, exercise_data["sides"]["right"])
-    else:
-        return exercise_data
+#     # Check if the exercise has sides (e.g. left and right)
+#     if "sides" in exercise_data:
+#         return exercise_data["sides"].get(side, exercise_data["sides"]["right"])
+#     else:
+#         return exercise_data
 
 
 # Function to calculate the angle between three, 3D points
@@ -62,13 +65,13 @@ def smooth_angle(knee_angle, angle_history):
 
 
 class ExerciseTracker:
-    def __init__(self, exercise_params):
+    def __init__(self, exercise_detail: ExerciseDetail):
         self.rep_count = 0
         self.state = "rest"
         self.rep_start_time = None
         self.last_rep_duration = 0
-        self.flexion_threshold = exercise_params["threshold_flexion"]
-        self.extension_threshold = exercise_params["threshold_extension"]
+        self.flexion_threshold = exercise_detail.threshold_flexion
+        self.extension_threshold = exercise_detail.threshold_extension
     
     # TODO: Rethink how this should work...
     # Should it be controlled by threshold angles, or the user's movement regardless of threshold? ...

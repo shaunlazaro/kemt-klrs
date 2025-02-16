@@ -6,7 +6,7 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
 
 # For static images:
-IMAGE_FILES = ["images/image.jpg"]
+IMAGE_FILES = ["media-pipe/images/squat-45.png"]
 BG_COLOR = (192, 192, 192) # gray
 with mp_pose.Pose(
     static_image_mode=True,
@@ -15,9 +15,9 @@ with mp_pose.Pose(
     min_detection_confidence=0.5) as pose:
   for idx, file in enumerate(IMAGE_FILES):
     image = cv2.imread(file)
-    # if image is None:
-    #   print(f"Error: Could not load image: {file}")
-    # continue
+    if image is None:
+      print(f"Error: Could not load image: {file}")
+      continue
     image_height, image_width, _ = image.shape
     # Convert the BGR image to RGB before processing.
     results = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -44,7 +44,7 @@ with mp_pose.Pose(
         results.pose_landmarks,
         mp_pose.POSE_CONNECTIONS,
         landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-    cv2.imwrite('images/annotated-poses/annotated_image' + str(idx) + '.png', annotated_image)
+    cv2.imwrite('media-pipe/images/annotated-poses/squat-45' + str(idx) + '.png', annotated_image)
     # Plot pose world landmarks.
     mp_drawing.plot_landmarks(
         results.pose_world_landmarks, mp_pose.POSE_CONNECTIONS)
