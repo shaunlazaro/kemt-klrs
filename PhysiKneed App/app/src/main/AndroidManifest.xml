@@ -6,6 +6,7 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
@@ -19,11 +20,16 @@
         android:theme="@style/Theme.PhysioKneeds_v3"
         tools:targetApi="31">
         <activity
+            android:name=".PerfromExercises"
+            android:exported="false" />
+        <activity
             android:name=".MyExercises"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:taskAffinity=""/>
         <activity
             android:name=".MainMenu"
             android:exported="true">

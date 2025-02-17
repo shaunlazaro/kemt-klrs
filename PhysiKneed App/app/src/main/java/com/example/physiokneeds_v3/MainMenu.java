@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,29 +29,47 @@ public class MainMenu extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
 
-            Python.start(new AndroidPlatform(getApplicationContext()));
+            if (!Python.isStarted()) {
+                Python.start(new AndroidPlatform(getApplicationContext()));
+            }
 
             return insets;
         });
 
-        // initialize all buttons
-        Button todayButton = findViewById(R.id.today_button);
-        Button exerciseButton = findViewById(R.id.exercise_button);
+        // initialize buttons and text fields
+        Button loginButton = findViewById(R.id.login_button);
+        EditText emailInput = findViewById(R.id.email_input);
+        EditText passwordInput = findViewById(R.id.password_input);
 
-        todayButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent todayIntent = new Intent(MainMenu.this, MyExercises.class);
+                if (emailInput.getText().toString().equals("user")
+                        && passwordInput.getText().toString().equals("password")) {
+                    Intent exerciseIntent = new Intent(MainMenu.this, MyExercises.class);
 
-                MainMenu.this.startActivity(todayIntent);
+                    MainMenu.this.startActivity(exerciseIntent);
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Incorrect Email or Password, Please Try Again",
+                            Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        exerciseButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent exerciseIntent = new Intent(MainMenu.this, MyExercises.class);
+//        todayButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                Intent todayIntent = new Intent(MainMenu.this, MainActivity.class);
+//
+//                MainMenu.this.startActivity(todayIntent);
+//            }
+//        });
 
-                MainMenu.this.startActivity(exerciseIntent);
-            }
-        });
+//        exerciseButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                Intent exerciseIntent = new Intent(MainMenu.this, MyExercises.class);
+//
+//                MainMenu.this.startActivity(exerciseIntent);
+//            }
+//        });
     }
 }

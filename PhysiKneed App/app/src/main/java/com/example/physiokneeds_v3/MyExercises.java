@@ -2,6 +2,7 @@ package com.example.physiokneeds_v3;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +31,7 @@ public class MyExercises extends AppCompatActivity {
 
         startExercises.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MyExercises.this, MainActivity.class);
+                Intent intent = new Intent(MyExercises.this, PerfromExercises.class);
 
                 MyExercises.this.startActivity(intent);
             }

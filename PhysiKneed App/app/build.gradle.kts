@@ -77,4 +77,8 @@ dependencies {
 
     implementation(libs.tasks.vision)
     implementation(libs.coil)
+
+    implementation("io.reactivex.rxjava3:rxjava:3.1.10")
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
 }
