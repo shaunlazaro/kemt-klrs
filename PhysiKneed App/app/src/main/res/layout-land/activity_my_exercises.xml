@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MyExercises">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="268dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="40dp"
+                android:textAlignment="center"
+                android:layout_gravity="center_horizontal"
+                android:textSize="40sp"
+                android:text="Seated Knee Flexion and Extension" />
+
+            <TextView
+                android:layout_width="268dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="40dp"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20sp"
+                android:text="Sit upright with your thigh supported in a chair. Bend your affected knee as far back as possible, hold for 10 seconds. Straighten your affected knee as far as possible and hold for 5-10 seconds, then relax. This exercise will help to strengthen your thigh muscles and regain range of motion in your knee. By your two week follow up appointment, you should be able to fully straighten your leg and bend it at least 90 degrees. Perform this exercise with each leg" />
+
+            <Button
+                android:id="@+id/start_button"
+                android:layout_width="268dp"
+                android:layout_height="70dp"
+                android:layout_marginBottom="30dp"
+                android:layout_marginTop="50dp"
+                android:text="Start Exercises"
+                android:textSize="20sp"
+                android:layout_gravity="center_horizontal" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

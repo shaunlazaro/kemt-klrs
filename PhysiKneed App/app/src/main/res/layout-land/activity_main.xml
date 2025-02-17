@@ -8,23 +8,24 @@
     tools:context=".MainActivity">
 
     <TextureView
-        android:layout_width="1440px"
-        android:layout_height="1080px"
+        android:layout_width="1080px"
+        android:layout_height="1440px"
+        android:layout_alignParentRight="true"
         android:id="@+id/camera_feed" />
 
     <com.example.physiokneeds_v3.OverlayView
-        android:layout_width="1440px"
-        android:layout_height="1080px"
+        android:layout_width="1080px"
+        android:layout_height="1440px"
+        android:layout_alignParentRight="true"
         android:id="@+id/overlayView" />
 
     <TextView
         android:id="@+id/kneeAngle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/camera_feed"
         android:layout_margin="20dp"
         android:textSize="20dp"
-        android:text="Right Knee Angle: " />
+        android:text="Right Knee Angle: LANDSCAPE" />
 
     <TextView
         android:id="@+id/repsCount"
@@ -34,30 +35,6 @@
         android:layout_margin="20dp"
         android:textSize="20dp"
         android:text="Reps: " />
-
-    <Button
-        android:id="@+id/start_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/repsCount"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginTop="20dp"
-        android:text="START"/>
-
-    <Button
-        android:id="@+id/camera_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/start_button"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginTop="20dp"
-        android:text="Switch Camera"/>
 
     <Button
         android:id="@+id/search_button"
@@ -93,9 +70,9 @@
         android:id="@+id/status_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/repsCount"
+        android:layout_below="@id/bt_button"
         android:layout_margin="20dp"
         android:textSize="20dp"
-        android:text="Reps: " />
+        android:text="NOT CONNECTED" />
 
 </RelativeLayout>
