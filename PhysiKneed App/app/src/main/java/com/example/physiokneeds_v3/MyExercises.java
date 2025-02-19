@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,10 +29,35 @@ public class MyExercises extends AppCompatActivity {
 
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         Button startExercises = findViewById(R.id.start_button);
+        Button startCastExercises = findViewById(R.id.start_cast_button);
+
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        ImageButton backButton = findViewById(R.id.back_button);
+
+        // get routine from previous screen
+        Pose pose = (Pose) getIntent().getSerializableExtra(HomeScreen.ROUTINE_TAG);
+
+        // TODO Set the text and images to the correct routine
 
         startExercises.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                Intent intent = new Intent(MyExercises.this, MainActivity.class);
+
+                MyExercises.this.startActivity(intent);
+            }
+        });
+
+        startCastExercises.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 Intent intent = new Intent(MyExercises.this, PerfromExercises.class);
+
+                MyExercises.this.startActivity(intent);
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MyExercises.this, HomeScreen.class);
 
                 MyExercises.this.startActivity(intent);
             }

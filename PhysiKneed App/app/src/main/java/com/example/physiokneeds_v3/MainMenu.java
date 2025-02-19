@@ -19,6 +19,9 @@ import com.chaquo.python.android.AndroidPlatform;
 
 public class MainMenu extends AppCompatActivity {
 
+    // intent sending constant
+    public static final String USERNAME_TAG = "USERNAME";
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +48,10 @@ public class MainMenu extends AppCompatActivity {
             public void onClick(View v) {
                 if (emailInput.getText().toString().equals("user")
                         && passwordInput.getText().toString().equals("password")) {
-                    Intent exerciseIntent = new Intent(MainMenu.this, MyExercises.class);
+                    Intent homeIntent = new Intent(MainMenu.this, HomeScreen.class);
+                    homeIntent.putExtra(USERNAME_TAG, emailInput.getText().toString());
 
-                    MainMenu.this.startActivity(exerciseIntent);
+                    MainMenu.this.startActivity(homeIntent);
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "Incorrect Email or Password, Please Try Again",
@@ -64,12 +68,5 @@ public class MainMenu extends AppCompatActivity {
 //            }
 //        });
 
-//        exerciseButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                Intent exerciseIntent = new Intent(MainMenu.this, MyExercises.class);
-//
-//                MainMenu.this.startActivity(exerciseIntent);
-//            }
-//        });
     }
 }

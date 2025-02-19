@@ -18,7 +18,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PhysioKneeds_v3"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".HomeScreen"
+            android:exported="false" />
         <activity
             android:name=".PerfromExercises"
             android:exported="false" />
@@ -29,7 +33,7 @@
             android:name=".MainActivity"
             android:exported="false"
             android:launchMode="singleInstance"
-            android:taskAffinity=""/>
+            android:taskAffinity="" />
         <activity
             android:name=".MainMenu"
             android:exported="true">

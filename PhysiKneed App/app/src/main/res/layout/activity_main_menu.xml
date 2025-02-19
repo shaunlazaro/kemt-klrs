@@ -26,6 +26,7 @@
                 android:layout_gravity="center_horizontal"
                 android:textSize="40sp"
                 android:textColor="@color/black"
+                android:fontFamily="@font/source_sans"
                 android:text="RePose" />
             
             <EditText
@@ -35,6 +36,7 @@
                 android:hint="Email"
                 android:textSize="20sp"
                 android:textColor="@color/black"
+                android:fontFamily="@font/source_sans"
                 android:padding="10dp"
                 android:inputType="text"
                 android:id="@+id/email_input" />
@@ -46,17 +48,19 @@
                 android:hint="Password"
                 android:textSize="20sp"
                 android:textColor="@color/black"
+                android:fontFamily="@font/source_sans"
                 android:padding="10dp"
-                android:inputType="text"
+                android:inputType="textPassword"
                 android:id="@+id/password_input" />
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:backgroundTint="#FF0353A4"
+                android:background="@drawable/blue_button"
                 android:textSize="20sp"
                 android:textColor="@color/white"
+                android:fontFamily="@font/source_sans"
                 android:padding="10dp"
                 android:text="Login"
                 android:id="@+id/login_button" />
