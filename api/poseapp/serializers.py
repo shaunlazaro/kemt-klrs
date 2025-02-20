@@ -43,15 +43,20 @@ class ExerciseDetailSerializer(serializers.ModelSerializer):
         return exercise
 
 class RoutineExerciseSerializer(serializers.ModelSerializer):
+    exercise = ExerciseDetailSerializer(read_only=True)
     custom_tracking_details = TrackingDetailSerializer(many=True, required=False)
 
     class Meta:
         model = RoutineExercise
-        fields = '__all__'
+        fields = ['exercise', 'reps', 'custom_tracking_details']
 
 class RoutineConfigSerializer(serializers.ModelSerializer):
     exercises = RoutineExerciseSerializer(source='routineexercise_set', many=True)
 
     class Meta:
         model = RoutineConfig
-        fields = '__all__'
+        fields = ['id', 'name', 'exercises']
+
+    def get_exercises(self, obj):
+        routine_exercises = RoutineExercise.objects.filter(routine=obj).select_related('exercise').prefetch_related('custom_tracking_details')
+        return RoutineExerciseSerializer(routine_exercises, many=True).data
