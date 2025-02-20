@@ -104,6 +104,7 @@ class ExerciseDetail(models.Model):
         return self.display_name
 
 class RoutineConfig(models.Model):
+    name = models.CharField(max_length=100)
     exercises = models.ManyToManyField(
         ExerciseDetail,
         through='RoutineExercise',
@@ -111,7 +112,7 @@ class RoutineConfig(models.Model):
     )
 
     def __str__(self):
-        return f"RoutineConfig {self.id}"
+        return self.name
 
 # Part of routine.  This is a join table which links routine (the whole set of exercices) to individual workout configs, adding metadata like reps and tracking details
 class RoutineExercise(models.Model):
