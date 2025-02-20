@@ -104,7 +104,7 @@ class ExerciseDetail(models.Model):
         return self.display_name
 
 class RoutineConfig(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, default="Unnamed Routine")
     exercises = models.ManyToManyField(
         ExerciseDetail,
         through='RoutineExercise',
