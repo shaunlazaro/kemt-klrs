@@ -312,6 +312,9 @@ class MainActivity : AppCompatActivity() {
                 val mpImage = BitmapImageBuilder(bitmap).build()
                 val result = poseLandmarker?.detect(mpImage)
 
+                Log.d("NICKDEBUG", mpImage.height.toString())
+                Log.d("NICKDEBUG", mpImage.width.toString())
+
                 // display the keypoints and lines
                 result?.let { overlayView.setResults(it, mpImage.height, mpImage.width) }
 

@@ -16,6 +16,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MyExercises extends AppCompatActivity {
 
+    public static final String IS_CASTED = "CASTORNOT";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +43,9 @@ public class MyExercises extends AppCompatActivity {
 
         startExercises.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MyExercises.this, MainActivity.class);
+                Intent intent = new Intent(MyExercises.this, SetUpDevice.class);
+
+                intent.putExtra(IS_CASTED, false);
 
                 MyExercises.this.startActivity(intent);
             }
@@ -49,7 +53,9 @@ public class MyExercises extends AppCompatActivity {
 
         startCastExercises.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MyExercises.this, PerfromExercises.class);
+                Intent intent = new Intent(MyExercises.this, SetUpDevice.class);
+
+                intent.putExtra(IS_CASTED, true);
 
                 MyExercises.this.startActivity(intent);
             }
