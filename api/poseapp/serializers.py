@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pose, Routine
+from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise
 
 class PoseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,3 +21,37 @@ class RoutineSerializer(serializers.ModelSerializer):
             pose = Pose.objects.create(**pose_data)
             routine.poses.add(pose)
         return routine
+
+class TrackingDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrackingDetail
+        fields = '__all__'
+
+class ExerciseDetailSerializer(serializers.ModelSerializer):
+    default_tracking_details = TrackingDetailSerializer(many=True)
+
+    class Meta:
+        model = ExerciseDetail
+        fields = '__all__'
+
+    def create(self, validated_data):
+        tracking_details_data = validated_data.pop('default_tracking_details')
+        exercise = ExerciseDetail.objects.create(**validated_data)
+        exercise.default_tracking_details.set([
+            TrackingDetail.objects.create(**detail) for detail in tracking_details_data
+        ])
+        return exercise
+
+class RoutineExerciseSerializer(serializers.ModelSerializer):
+    custom_tracking_details = TrackingDetailSerializer(many=True, required=False)
+
+    class Meta:
+        model = RoutineExercise
+        fields = '__all__'
+
+class RoutineConfigSerializer(serializers.ModelSerializer):
+    exercises = RoutineExerciseSerializer(source='routineexercise_set', many=True)
+
+    class Meta:
+        model = RoutineConfig
+        fields = '__all__'

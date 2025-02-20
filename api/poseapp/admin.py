@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Pose, Routine
+from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise
 
 # Customizing Pose admin view
 @admin.register(Pose)
@@ -25,3 +25,8 @@ class RoutineAdmin(admin.ModelAdmin):
         # This counts the number of poses related to a routine
         return obj.poses.count()
     pose_count.short_description = 'Number of Poses'
+
+admin.site.register(TrackingDetail)
+admin.site.register(ExerciseDetail)
+admin.site.register(RoutineConfig)
+admin.site.register(RoutineExercise)
