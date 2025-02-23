@@ -1,0 +1,3 @@
+- Node 20.13.1
+- Vite 
+- Tailwind
