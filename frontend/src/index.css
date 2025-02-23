@@ -1,13 +1,222 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-default: #525955;
+  --color-menu: #8A959E;
+
+  --color-accent-100: #EAF8F4;
+  --color-accent-200: #E0F5EF;
+  --color-accent-300: #D6F2EB;
+
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-50: #FAFAFA;
+  --color-neutral-100: #F6F6F6;
+  --color-neutral-200: #EAEBEC;
+  --color-neutral-300: #E2E2E2;
+  --color-neutral-350: #D9DBDB;
+  --color-neutral-400: #ABAFB1;
+  --color-neutral-450: #8F9191;
+  --color-neutral-500: #6E6F70;
+  --color-neutral-600: #545757;
+  --color-neutral-700: #404248;
+  --color-neutral-800: #242626;
+  --color-neutral-900: #041410;
+  --color-neutral-1000: #000000;
+
+  --color-primary-50: #ECFCF8;
+  --color-primary-100: #CCEFE7;
+  --color-primary-300: #94E8D4;
+  --color-primary-500: #00AF85;
+  --color-primary-600: #008C6A;
+  --color-primary-700: #006950;
+  --color-primary-900: #003428;
+
+  --color-forest-100: #C9EEE5;
+  --color-forest-300: #59A191;
+  --color-forest-500: #084D3D;
+  --color-forest-700: #05362A;
+  --color-forest-900: #02241C;
+
+  --color-red-50: #FCE9E9;
+  --color-red-100: #F8D4D4;
+  --color-red-300: #F59A9A;
+  --color-red-500: #DC2626;
+  --color-red-600: #BC1E1E;
+  --color-red-700: #841717;
+  --color-red-900: #2C0808;
+
+  --color-orange-50: #FFF7EA;
+  --color-orange-100: #FEEDD2;
+  --color-orange-500: #F9A620;
+
+  --color-gray-overlay: #323232;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-gray-950: #030712;
+
+  --color-hippieblue-50: #f1f8fa;
+  --color-hippieblue-100: #DAEEF4;
+  --color-hippieblue-200: #bedbe3;
+  --color-hippieblue-300: #90c1d0;
+  --color-hippieblue-400: #62a3b7;
+  --color-hippieblue-500: #40849a;
+  --color-hippieblue-600: #386c82;
+  --color-hippieblue-700: #33596b;
+  --color-hippieblue-800: #304c5a;
+  --color-hippieblue-900: #2c414d;
+  --color-hippieblue-950: #192933;
+
+  --color-lightningyellow-50: #fffeeb;
+  --color-lightningyellow-100: #fefbc7;
+  --color-lightningyellow-200: #fef789;
+  --color-lightningyellow-300: #fded4c;
+  --color-lightningyellow-400: #fdde22;
+  --color-lightningyellow-500: #f7c10f;
+  --color-lightningyellow-600: #db9504;
+  --color-lightningyellow-700: #b56b08;
+  --color-lightningyellow-800: #93530d;
+  --color-lightningyellow-900: #79440e;
+  --color-lightningyellow-950: #462302;
+
+  --color-seagull-50: #f3f9fc;
+  --color-seagull-100: #e6f3f8;
+  --color-seagull-200: #c8e5ef;
+  --color-seagull-300: #82c6db;
+  --color-seagull-400: #60b7d0;
+  --color-seagull-500: #3c9fbb;
+  --color-seagull-600: #2b819e;
+  --color-seagull-700: #246780;
+  --color-seagull-800: #22576a;
+  --color-seagull-900: #214a59;
+  --color-seagull-950: #162f3b;
+
+  /* Animations */
+  @keyframes bouncing {
+
+    0%,
+    66% {
+      transform: none;
+    }
+
+    33% {
+      transform: translateY(-.5em);
+    }
+  }
+
+  --animation-loadBounce: bouncing 700ms ease-out infinite;
+
+  /* Dark mode */
+  --dark-mode: class;
+
+  /* Content paths are now handled by default in Tailwind v4.0 CSS-first config */
+}
+
+
+/* TODO: Remove below once it's in the git history */
+
+/* 
+@layer base {
+  html {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Manrope", ui-sans-serif, system-ui, sans-serif,
+      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+      "Noto Color Emoji";
+    @apply text-default;
+  }
+
+  main {
+    @apply min-h-screen w-full space-y-16 bg-white px-0;
+  }
+
+  input[type="checkbox"] {
+    @apply w-[18px] h-[18px] text-primary bg-neutral-0 border-neutral-300 rounded focus:ring-primary focus:ring-2;
+  }
+
+  b {
+    @apply font-semibold;
+  }
+} */
+
+/* :root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
 }
+
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  a:hover {
+    color: #747bff;
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+} */
