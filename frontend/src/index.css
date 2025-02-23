@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors */
   --color-default: #525955;
   --color-menu: #8A959E;
 
+  --color-accent: #D6F2EB;
   --color-accent-100: #EAF8F4;
   --color-accent-200: #E0F5EF;
   --color-accent-300: #D6F2EB;
 
+  --color-neutral: #6E6F70;
+  --color-neutral-SECONDARY: #767D80;
   --color-neutral-0: #FFFFFF;
   --color-neutral-50: #FAFAFA;
   --color-neutral-100: #F6F6F6;
@@ -24,6 +26,7 @@
   --color-neutral-900: #041410;
   --color-neutral-1000: #000000;
 
+  --color-primary: #00AF85;
   --color-primary-50: #ECFCF8;
   --color-primary-100: #CCEFE7;
   --color-primary-300: #94E8D4;
@@ -32,12 +35,14 @@
   --color-primary-700: #006950;
   --color-primary-900: #003428;
 
+  --color-forest: #084D3D;
   --color-forest-100: #C9EEE5;
   --color-forest-300: #59A191;
   --color-forest-500: #084D3D;
   --color-forest-700: #05362A;
   --color-forest-900: #02241C;
 
+  --color-red: #DC2626;
   --color-red-50: #FCE9E9;
   --color-red-100: #F8D4D4;
   --color-red-300: #F59A9A;
@@ -50,7 +55,7 @@
   --color-orange-100: #FEEDD2;
   --color-orange-500: #F9A620;
 
-  --color-gray-overlay: #323232;
+  --color-gray-OVERLAY: #323232;
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
@@ -63,6 +68,7 @@
   --color-gray-900: #111827;
   --color-gray-950: #030712;
 
+  --color-hippieblue: #62a3b7;
   --color-hippieblue-50: #f1f8fa;
   --color-hippieblue-100: #DAEEF4;
   --color-hippieblue-200: #bedbe3;
@@ -75,6 +81,7 @@
   --color-hippieblue-900: #2c414d;
   --color-hippieblue-950: #192933;
 
+  --color-lightningyellow: #f7c10f;
   --color-lightningyellow-50: #fffeeb;
   --color-lightningyellow-100: #fefbc7;
   --color-lightningyellow-200: #fef789;
@@ -87,6 +94,7 @@
   --color-lightningyellow-900: #79440e;
   --color-lightningyellow-950: #462302;
 
+  --color-seagull: #82c6db;
   --color-seagull-50: #f3f9fc;
   --color-seagull-100: #e6f3f8;
   --color-seagull-200: #c8e5ef;
@@ -99,124 +107,7 @@
   --color-seagull-900: #214a59;
   --color-seagull-950: #162f3b;
 
-  /* Animations */
-  @keyframes bouncing {
-
-    0%,
-    66% {
-      transform: none;
-    }
-
-    33% {
-      transform: translateY(-.5em);
-    }
-  }
-
+  --keyframe-bouncing-0-66: none;
+  --keyframe-bouncing-33: translateY(-.5em);
   --animation-loadBounce: bouncing 700ms ease-out infinite;
-
-  /* Dark mode */
-  --dark-mode: class;
-
-  /* Content paths are now handled by default in Tailwind v4.0 CSS-first config */
 }
-
-
-/* TODO: Remove below once it's in the git history */
-
-/* 
-@layer base {
-  html {
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    font-family: "Manrope", ui-sans-serif, system-ui, sans-serif,
-      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-      "Noto Color Emoji";
-    @apply text-default;
-  }
-
-  main {
-    @apply min-h-screen w-full space-y-16 bg-white px-0;
-  }
-
-  input[type="checkbox"] {
-    @apply w-[18px] h-[18px] text-primary bg-neutral-0 border-neutral-300 rounded focus:ring-primary focus:ring-2;
-  }
-
-  b {
-    @apply font-semibold;
-  }
-} */
-
-/* :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
-button:hover {
-  border-color: #646cff;
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
-} */
