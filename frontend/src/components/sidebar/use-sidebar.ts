@@ -6,16 +6,16 @@ interface SidebarStore {
   toggle: () => void;
 }
 
-// // Persistent state with Zustand for sidebar expanding
-// export const useSidebar = create<SidebarStore>()(
-//   persist(
-//     (set) => ({
-//       isOpen: true,
-//       toggle: () => set((state) => ({ isOpen: !state.isOpen })),
-//     }),
-//     {
-//       name: "sidebar",
-//       storage: createJSONStorage(() => localStorage),
-//     },
-//   ),
-// );
+// Persistent state with Zustand for sidebar expanding
+export const useSidebar = create<SidebarStore>()(
+  persist(
+    (set) => ({
+      isOpen: true,
+      toggle: () => set((state) => ({ isOpen: !state.isOpen })),
+    }),
+    {
+      name: "sidebar",
+      storage: createJSONStorage(() => localStorage),
+    },
+  ),
+);
