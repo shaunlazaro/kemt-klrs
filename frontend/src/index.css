@@ -4,6 +4,12 @@
   --color-default: #525955;
   --color-menu: #8A959E;
 
+  --color-primary: #0353A4;
+  --color-primary-blue: #0353A4;
+  --color-primary-lightblue: #C1EEFF;
+  --color-primary-darkblue: #061A40;
+
+
   --color-accent: #D6F2EB;
   --color-accent-100: #EAF8F4;
   --color-accent-200: #E0F5EF;
@@ -26,14 +32,13 @@
   --color-neutral-900: #041410;
   --color-neutral-1000: #000000;
 
-  --color-primary: #00AF85;
-  --color-primary-50: #ECFCF8;
+  /* --color-primary-50: #ECFCF8;
   --color-primary-100: #CCEFE7;
   --color-primary-300: #94E8D4;
   --color-primary-500: #00AF85;
   --color-primary-600: #008C6A;
   --color-primary-700: #006950;
-  --color-primary-900: #003428;
+  --color-primary-900: #003428; */
 
   --color-forest: #084D3D;
   --color-forest-100: #C9EEE5;
