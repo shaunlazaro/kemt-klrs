@@ -1,8 +1,24 @@
-import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
+import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route } from 'react-router-dom';
 import { ErrorPage, Exercises, Home, Patients, Signin} from '../pages';
+import { PageTemplate } from '../page.template';
+
+const ProtectedRoute: React.FC = () => {
+  // const session = useSession();
+  
+  // if (!session) {
+  //   return <Navigate to={SIGNIN_PATH} replace />;
+  // }
+
+  return (
+    <PageTemplate>
+      <Outlet />
+    </PageTemplate>
+  );
+};
+
 
 const routes = createRoutesFromElements(
-  <Route errorElement={<ErrorPage />}>
+  <Route element={<ProtectedRoute/> } errorElement={<ErrorPage />}>
     <Route path="/" element={<Home />} />
     <Route path="/signin" element={<Signin />} />
     {/* <Route path="/register" element={<Register />} /> */}
