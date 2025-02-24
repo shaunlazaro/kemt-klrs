@@ -45,8 +45,9 @@ export default function Sidebar({ className }: SidebarProps) {
             key={item.title}
             to={item.href}
             className={cn(
-                "flex items-center gap-3 p-4 rounded-lg hover:bg-neutral-200 transition",
+                "flex items-center gap-3 p-4 rounded-lg transition",
                 pathname === item.href && "bg-primary-lightblue text-primary-darkblue",
+                pathname != item.href && "hover:bg-primary-darkblue"
             )}
             >
             <item.icon className="h-6 w-6" />
