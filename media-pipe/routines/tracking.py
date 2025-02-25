@@ -16,7 +16,7 @@ class TrackingDetail:
         self,
         tracking_type: TrackingType,
         keypoints: List[str],
-        dimensionality: Optional[str] = "3D",
+        dimensionality: Optional[str] = "2D",
         goal_flexion: Optional[float] = None,
         goal_extension: Optional[float] = None,
         show_alert_if_above: Optional[float] = None,

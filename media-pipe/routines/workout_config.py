@@ -6,42 +6,61 @@ class ExerciseDetail:
     def __init__(
         self,
         rep_keypoints: List[str],
+        rep_tracking: TrackingDetail,
         threshold_flexion: float,
         threshold_extension: float,
         display_name: str,
         start_in_flexion: bool,
         body_alignment: str,
-        default_tracking_details: List["TrackingDetail"]
+        default_tracking_details: List[TrackingDetail],
+        instruction: Optional[str] = None
     ):
         self.rep_keypoints = rep_keypoints
+        self.rep_tracking = rep_tracking
         self.threshold_flexion = threshold_flexion
         self.threshold_extension = threshold_extension
         self.display_name = display_name
         self.start_in_flexion = start_in_flexion
         self.body_alignment = body_alignment
         self.default_tracking_details = default_tracking_details
+        self.instruction = instruction
 
 
+class RoutineComponent:
+    def __init__(
+        self,
+        name: str,
+        exercise: ExerciseDetail,
+        reps: float,        
+    ):
+        self.name = name
+        self.exercise = exercise
+        self.reps = reps
+        
+
+        
 class RoutineConfig:
-    def __init__(self):
-        self.exercises: Dict[str, Dict[str, Union[ExerciseDetail, float]]] = {}
-        self.exercises_sequence: List[str] = []
+    def __init__(
+        self,
+        name: str,
+        exercises: List[RoutineComponent],
+        injury: str,
+    ):
+        self.name = name
+        self.exercises = exercises
+        self.injury = injury
 
     def add_exercise(
         self, 
-        exercise_name: str, 
+        name: str,
         exercise_detail: ExerciseDetail, 
         reps: Optional[float] = None, 
-        custom_tracking_details: Optional[List["TrackingDetail"]] = None
     ):
-        self.exercises[exercise_name] = {
-            "Workout": exercise_detail,
-            "Reps": reps,
-            "CustomTrackingDetails": custom_tracking_details or exercise_detail.default_tracking_details,
-        }
-
-    def get_workout(self, exercise_name: str):
-        return self.exercises.get(exercise_name, None)
+        self.exercises.append(RoutineComponent(name, exercise_detail, reps))
     
-    def get_workout_sequence(self):
-        return [self.exercises[name] for name in self.workout_sequence]
+    def get_workout(self, exercise_name: str) -> Optional[RoutineComponent]:
+        for component in self.exercises:
+            if component.name == exercise_name:
+                return component
+        return None
+
