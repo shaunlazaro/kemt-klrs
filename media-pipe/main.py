@@ -43,6 +43,7 @@ right_leg_extension_angle_tracking = TrackingDetail(
 # exercise details
 right_leg_extension = ExerciseDetail(
     rep_keypoints=["right_hip", "right_knee", "right_ankle"],
+    rep_tracking=right_leg_extension_angle_tracking,
     threshold_flexion=100,
     threshold_extension=130,
     display_name="Leg Extension",
@@ -65,6 +66,7 @@ squat_angle_tracking = TrackingDetail(
 # Defining the squat exercise
 squat_exercise = ExerciseDetail(
     rep_keypoints=["right_hip", "right_knee", "right_ankle"],
+    rep_tracking=squat_angle_tracking,
     threshold_flexion=110,
     threshold_extension=160,
     display_name="Squat",
@@ -75,16 +77,20 @@ squat_exercise = ExerciseDetail(
 
 
 # config routine
-routine_config = RoutineConfig()
+routine_config = RoutineConfig(
+    name="knee_routine",
+    exercises=[],
+    injury="knee"
+)
 
 routine_config.add_exercise(
-    exercise_name="right_leg_extension",
-    exercise_detail= right_leg_extension,
+    name="right_leg_extension",
+    exercise_detail=right_leg_extension,
     reps=10,
 )
 
 routine_config.add_exercise(
-    exercise_name="squat",
+    name="squat",
     exercise_detail=squat_exercise,
     reps=10,
 )
@@ -100,9 +106,9 @@ routine_data = routine_config.get_workout(exercise_name)
 if not routine_data:
     raise ValueError(f"Workout '{exercise_name}' not found in routine config.")
 
-exercise_detail = routine_data["Workout"]
+exercise_detail = routine_data.exercise  # Correct way to access ExerciseDetail
 tracker = ExerciseTracker(exercise_detail)
-custom_tracking_details = routine_data["CustomTrackingDetails"]
+custom_tracking_details = routine_data.exercise.default_tracking_details  # Adjust if needed
 
 
 # -------------------- FUNCTIONS ---------------------------------

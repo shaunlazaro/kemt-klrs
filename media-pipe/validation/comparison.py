@@ -67,15 +67,15 @@ def process_video(video_path):
 
             if results.pose_landmarks:
                 landmarks = results.pose_landmarks.landmark
-                hip_3d = np.array([landmarks[mp_pose.PoseLandmark.RIGHT_HIP].x,
-                                   landmarks[mp_pose.PoseLandmark.RIGHT_HIP].y,
-                                   landmarks[mp_pose.PoseLandmark.RIGHT_HIP].z])
-                knee_3d = np.array([landmarks[mp_pose.PoseLandmark.RIGHT_KNEE].x,
-                                    landmarks[mp_pose.PoseLandmark.RIGHT_KNEE].y,
+                hip_3d = np.array([landmarks[mp_pose.PoseLandmark.RIGHT_HIP].x * frame_width,
+                                    landmarks[mp_pose.PoseLandmark.RIGHT_HIP].y * frame_height,
+                                    landmarks[mp_pose.PoseLandmark.RIGHT_HIP].z])
+                knee_3d = np.array([landmarks[mp_pose.PoseLandmark.RIGHT_KNEE].x * frame_width,
+                                    landmarks[mp_pose.PoseLandmark.RIGHT_KNEE].y * frame_height,
                                     landmarks[mp_pose.PoseLandmark.RIGHT_KNEE].z])
-                ankle_3d = np.array([landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE].x,
-                                     landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE].y,
-                                     landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE].z])
+                ankle_3d = np.array([landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE].x * frame_width,
+                                    landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE].y * frame_height,
+                                    landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE].z])
                 
                 # Apply smoothing
                 hip_3d = smooth_point(hip_buffer, hip_3d)
@@ -84,8 +84,8 @@ def process_video(video_path):
 
                 # Normalize 3D Z-coordinates
                 hip_3d[2] = 0
-                knee_3d[2] -= hip_3d[2]
-                ankle_3d[2] -= hip_3d[2]
+                knee_3d[2] = (knee_3d[2] - landmarks[mp_pose.PoseLandmark.RIGHT_HIP].z) * frame_width
+                ankle_3d[2] = (ankle_3d[2] - landmarks[mp_pose.PoseLandmark.RIGHT_HIP].z) * frame_width
                 
                 hip_2d = (int(landmarks[mp_pose.PoseLandmark.RIGHT_HIP].x * frame_width), 
                       int(landmarks[mp_pose.PoseLandmark.RIGHT_HIP].y * frame_height))
@@ -251,7 +251,7 @@ def align_and_plot(mp_knee_angles_3d, mp_knee_angles_2d, fps_mp, opt_knee_angles
     plt.xlabel("Time (seconds)")
     plt.ylabel("Knee Angle (degrees)")
     plt.legend()
-    plt.title(f"Aligned Squat Right Knee Angle Comparison: MediaPipe ({view}) vs OptiTrack")
+    plt.title(f"Aligned Leg Extension Right Knee Angle Comparison: MediaPipe ({view}) vs OptiTrack")
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.show()
 
@@ -263,19 +263,19 @@ def align_and_plot(mp_knee_angles_3d, mp_knee_angles_2d, fps_mp, opt_knee_angles
 # mp_knee_angles_3d_front, mp_knee_angles_2d_front, fps_mp_front = process_video("media-pipe/images/squat_1_front.MOV")
 
 # Squat 45/45
-opt_knee_angles = process_optitrack("media-pipe/validation/optitrack_data/squat_006.csv")
-mp_knee_angles_3d_side, mp_knee_angles_2d_side, fps_mp_side = process_video("media-pipe/images/squat_6_45_close_leg.mp4")
-mp_knee_angles_3d_front, mp_knee_angles_2d_front, fps_mp_front = process_video("media-pipe/images/squat_6_45_far_leg.MOV")
+# opt_knee_angles = process_optitrack("media-pipe/validation/optitrack_data/squat_006.csv")
+# mp_knee_angles_3d_side, mp_knee_angles_2d_side, fps_mp_side = process_video("media-pipe/images/squat_6_45_close_leg.mp4")
+# mp_knee_angles_3d_front, mp_knee_angles_2d_front, fps_mp_front = process_video("media-pipe/images/squat_6_45_far_leg.MOV")
 
-# # Leg extension Front/Side
+# Leg extension Front/Side
 # opt_knee_angles = process_optitrack("media-pipe/validation/optitrack_data/leg_extension_001.csv")
 # mp_knee_angles_3d_side, mp_knee_angles_2d_side, fps_mp_side = process_video("media-pipe/images/leg_extension_1_side.mp4")
 # mp_knee_angles_3d_front, mp_knee_angles_2d_front, fps_mp_front = process_video("media-pipe/images/leg_extension_1_front.MOV")
 
-# # Leg extension 45/45
-# opt_knee_angles = process_optitrack("media-pipe/validation/optitrack_data/leg_extension_006.csv")
-# mp_knee_angles_3d_side, mp_knee_angles_2d_side, fps_mp_side = process_video("media-pipe/images/leg_extension_6_45_close_leg.mp4")
-# mp_knee_angles_3d_front, mp_knee_angles_2d_front, fps_mp_front = process_video("media-pipe/images/leg_extension_6_45_far_leg.MOV")
+# Leg extension 45/45
+opt_knee_angles = process_optitrack("media-pipe/validation/optitrack_data/leg_extension_006.csv")
+mp_knee_angles_3d_side, mp_knee_angles_2d_side, fps_mp_side = process_video("media-pipe/images/leg_extension_6_45_close_leg.mp4")
+mp_knee_angles_3d_front, mp_knee_angles_2d_front, fps_mp_front = process_video("media-pipe/images/leg_extension_6_45_far_leg.MOV")
 
 # Plot results for side and front views
 align_and_plot(mp_knee_angles_3d_side, mp_knee_angles_2d_side, fps_mp_side, opt_knee_angles, "Cam A - close 45º-view")
