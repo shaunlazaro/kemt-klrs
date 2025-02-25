@@ -9,18 +9,23 @@ class ExerciseDetail:
         threshold_flexion: float,
         threshold_extension: float,
         display_name: str,
+        start_in_flexion: bool,
+        body_alignment: str,
         default_tracking_details: List["TrackingDetail"]
     ):
         self.rep_keypoints = rep_keypoints
         self.threshold_flexion = threshold_flexion
         self.threshold_extension = threshold_extension
         self.display_name = display_name
+        self.start_in_flexion = start_in_flexion
+        self.body_alignment = body_alignment
         self.default_tracking_details = default_tracking_details
 
 
 class RoutineConfig:
     def __init__(self):
         self.exercises: Dict[str, Dict[str, Union[ExerciseDetail, float]]] = {}
+        self.exercises_sequence: List[str] = []
 
     def add_exercise(
         self, 
@@ -37,3 +42,6 @@ class RoutineConfig:
 
     def get_workout(self, exercise_name: str):
         return self.exercises.get(exercise_name, None)
+    
+    def get_workout_sequence(self):
+        return [self.exercises[name] for name in self.workout_sequence]

@@ -33,9 +33,11 @@ smoothed_angle = 0
 right_leg_extension_angle_tracking = TrackingDetail(
     tracking_type=TrackingType.ANGLE_OF_THREE_POINTS,
     keypoints=["right_hip", "right_knee", "right_ankle"],
+    dimensionality="2D",
+    goal_extension=160,
     # show_alert_if_below=0,
     # show_alert_if_above=180,
-    # alert_message=""
+    alert_message="Extend further!"
 )
 
 # exercise details
@@ -44,6 +46,8 @@ right_leg_extension = ExerciseDetail(
     threshold_flexion=100,
     threshold_extension=130,
     display_name="Leg Extension",
+    start_in_flexion=True,
+    body_alignment="side",
     default_tracking_details=[right_leg_extension_angle_tracking],
 )
 
@@ -51,9 +55,11 @@ right_leg_extension = ExerciseDetail(
 squat_angle_tracking = TrackingDetail(
     tracking_type=TrackingType.ANGLE_OF_THREE_POINTS,
     keypoints=["right_hip", "right_knee", "right_ankle"],
+    dimensionality="2D",
+    goal_flexion=90,
     # show_alert_if_below=60,
     # show_alert_if_above=170,
-    # alert_message="Maintain proper squat depth!"
+    alert_message="Go deeper!"
 )
 
 # Defining the squat exercise
@@ -62,6 +68,8 @@ squat_exercise = ExerciseDetail(
     threshold_flexion=110,
     threshold_extension=160,
     display_name="Squat",
+    start_in_flexion=False,
+    body_alignment="side",
     default_tracking_details=[squat_angle_tracking],
 )
 
@@ -86,7 +94,7 @@ routine_config.add_exercise(
 # ----------------------- SETUP ROUTINE -----------------------
 
 # Fetch workout details TODO: Make this dynamic
-exercise_name = "right_leg_extension"
+exercise_name = "squat"
 
 routine_data = routine_config.get_workout(exercise_name)
 if not routine_data:
@@ -98,19 +106,45 @@ custom_tracking_details = routine_data["CustomTrackingDetails"]
 
 
 # -------------------- FUNCTIONS ---------------------------------
-def extract_keypoints_dynamic(landmarks, pose, keypoints):
-    """Extract dynamic keypoints for the chosen exercise."""
-    return [
-        [
-            landmarks[getattr(pose, kp.upper()).value].x,
-            landmarks[getattr(pose, kp.upper()).value].y,
-            landmarks[getattr(pose, kp.upper()).value].z,
-        ]
-        for kp in keypoints
-    ]
+# TODO: pass in frame width and height as params
+def extract_keypoints_dynamic(landmarks, pose, keypoints, mode="2D"):
+    """Extract keypoints dynamically for the chosen exercise in 2D or 3D."""
+    
+    if mode == "3D":
+        if frame_width is None:
+            raise ValueError("Frame width must be provided for 3D mode.")
+        
+        # Reference z-depth
+        ref_z = landmarks[getattr(pose, keypoints[0].upper()).value].z 
 
+        return [
+            [
+                landmarks[getattr(pose, kp.upper()).value].x * frame_width,
+                landmarks[getattr(pose, kp.upper()).value].y * frame_height,
+                (landmarks[getattr(pose, kp.upper()).value].z - ref_z) * frame_width
+            ]
+            for kp in keypoints
+        ]
+
+    elif mode == "2D":
+        if frame_width is None or frame_height is None:
+            raise ValueError("Frame width and height must be provided for 2D mode.")
+        
+        return [
+            [
+                int(landmarks[getattr(pose, kp.upper()).value].x * frame_width),
+                int(landmarks[getattr(pose, kp.upper()).value].y * frame_height),
+            ]
+            for kp in keypoints
+        ]
+    
+    else:
+        raise ValueError("Mode must be '2D' or '3D'")
+
+# TODO: Right now this just checks the excersize rep angle and first tracking detail
 def process_exercise_angle(landmarks, pose, exercise_detail: ExerciseDetail):
-    keypoints = extract_keypoints_dynamic(landmarks, pose, exercise_detail.rep_keypoints)
+    # TODO: make this dynamic (some kind of loop)
+    keypoints = extract_keypoints_dynamic(landmarks, pose, exercise_detail.rep_keypoints, exercise_detail.default_tracking_details[0].dimensionality)
     exercise_angle = calculate_angle(keypoints[0], keypoints[1], keypoints[2])
     rep_count, last_rep_duration = tracker.detect_reps(exercise_angle)
     return exercise_angle, rep_count, last_rep_duration
@@ -124,6 +158,7 @@ def get_landmarks_visibility(landmarks, pose_landmark_enum):
 
 # ----------------------- LIVE VIDEO CAPTURE -----------------------
 cap = cv2.VideoCapture(0)
+frame_width, frame_height = int(cap.get(3)), int(cap.get(4))
 
 with mp_pose.Pose(
     min_detection_confidence=CONFIDENCE_THRESHOLD,
@@ -162,7 +197,8 @@ with mp_pose.Pose(
         # Get visibility scores for all landmarks
         visibility = get_landmarks_visibility(landmarks, mp_pose.PoseLandmark)
 
-        # Check if all keypoints for the current exercise are visible
+        # TODO: make this check all keypoints involved (not just for rep detection)
+        # Check rep detection keypoints for the current exercise are visible
         keypoints_visible = all(
             visibility.get(kp, 0) > CONFIDENCE_THRESHOLD
             for kp in exercise_detail.rep_keypoints
@@ -177,13 +213,13 @@ with mp_pose.Pose(
             # 5pt local average smoothing
             smoothed_angle = smooth_angle(exercise_angle, angle_history)
             
-        for tracking in custom_tracking_details:
-            if tracking.tracking_type == TrackingType.ANGLE_OF_THREE_POINTS:
-                keypoints = extract_keypoints_dynamic(landmarks, mp_pose.PoseLandmark, tracking.keypoints)
-                angle = calculate_angle(*keypoints)
+        # for tracking in custom_tracking_details:
+        #     if tracking.tracking_type == TrackingType.ANGLE_OF_THREE_POINTS:
+        #         keypoints = extract_keypoints_dynamic(landmarks, mp_pose.PoseLandmark, tracking.keypoints)
+        #         angle = calculate_angle(*keypoints)
                 
-                if tracking.show_alert_if_below and angle < tracking.show_alert_if_below:
-                    print(tracking.alert_message)
+                # if tracking.show_alert_if_below and angle < tracking.show_alert_if_below:
+                #     print(tracking.alert_message)
     
     # ---------------------- Display Output ----------------------
     
@@ -195,7 +231,7 @@ with mp_pose.Pose(
     flipped_image = image
 
     # Display text (exercise, reps, time, angle)
-    display_text(flipped_image, "Seated Leg Extensions (Right)", tracker.rep_count, tracker.last_rep_duration, smoothed_angle)
+    display_text(flipped_image, exercise_detail.display_name, exercise_detail.body_alignment, tracker.rep_count, tracker.last_rep_duration, smoothed_angle, tracker.alert)
 
     # Show the flipped image
     cv2.imshow('MediaPipe Pose', flipped_image)
