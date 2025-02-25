@@ -22,8 +22,8 @@ export default function Sidebar({ className }: SidebarProps) {
         className,
       )}
     >
-        {/* Expandable sidebar, just comment out the button if we're not using that part */}
-        {/* <div
+      {/* Expandable sidebar, just comment out the button if we're not using that part */}
+      {/* <div
             className="absolute -right-5 top-20 z-10 flex h-7 w-5 cursor-pointer rounded-r-md border bg-white shadow"
             onClick={toggleSidebar}
         >
@@ -35,26 +35,26 @@ export default function Sidebar({ className }: SidebarProps) {
             )}
             />
         </div> */}
-        <div className="pb-6 flex items-center px-5 pt-6">
-            <div className="w-14 h-14 border-2 border-white rounded-lg"></div>
-            <span className="h-auto ml-3 font-semibold text-2xl mb-1">RePose</span>
-        </div>
-        <div className="space-y-2 pb-2 h-full overflow-y-auto">
+      <div className="pb-6 flex items-center px-5 pt-6">
+        <div className="w-14 h-14 border-2 border-white rounded-lg"></div>
+        <span className="h-auto ml-3 font-semibold text-2xl mb-1">RePose</span>
+      </div>
+      <div className="space-y-2 pb-2 h-full overflow-y-auto">
         {NavItems.map((item: NavItem) => (
-            <Link
+          <Link
             key={item.title}
             to={item.href}
             className={cn(
-                "flex items-center gap-3 p-4 rounded-lg transition",
-                pathname === item.href && "bg-primary-lightblue text-primary-darkblue",
-                pathname != item.href && "hover:bg-primary-darkblue"
+              "flex items-center gap-3 p-4 transition hover:bg-primary-lightblue hover:text-black text-white",
+              pathname === item.href && "bg-secondary-darkpink",
+              pathname != item.href && "bg-primary-blue"
             )}
-            >
+          >
             <item.icon className="h-6 w-6" />
             {isOpen && <span className="text-md font-semibold">{item.title}</span>}
-            </Link>
+          </Link>
         ))}
-        </div>
+      </div>
     </nav>
   );
 }
