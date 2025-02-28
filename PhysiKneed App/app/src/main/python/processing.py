@@ -26,7 +26,8 @@ def detect_reps(knee_angle):
         state = "extending"
         if rep_start_time is not None:
             last_rep_duration = current_time - rep_start_time  # Calculate the time for the rep
-        rep_count += 1  # Count a full rep
+        if rep_count < 10:
+            rep_count += 1  # Count a full rep
     elif state == "extending" and knee_angle < flexion_threshold:
         state = "flexing"
         rep_start_time = current_time  # Restart the timer for the next rep

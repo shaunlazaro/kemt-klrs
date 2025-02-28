@@ -53,12 +53,13 @@
                 android:inputType="textPassword"
                 android:id="@+id/password_input" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:background="@drawable/blue_button"
                 android:textSize="20sp"
+                android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:fontFamily="@font/source_sans"
                 android:padding="10dp"

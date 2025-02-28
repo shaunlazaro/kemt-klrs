@@ -27,6 +27,7 @@ import android.view.TextureView
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -58,6 +59,8 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var textView_knee: TextView
     lateinit var textView_reps: TextView
+
+    lateinit var reps_text: TextView
 //    lateinit var start_button: Button
 //    lateinit var camera_button: Button
 
@@ -94,7 +97,9 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var connectedThreadWrite: ConnectedThread
 
-    var startTracking = true
+    var isConnected = false
+
+    var startTracking = false
 
     val COUNT_MAX = 10
     var counts = 0
@@ -120,8 +125,23 @@ class MainActivity : AppCompatActivity() {
             }
             if (intent?.action == "com.example.PRESS_START_BUTTON") {
                 Log.d(TAG, "Start Tracking Called")
-                textView_reps.text = "Start Tracking Called"
-//                    search_button.performClick() // Simulate button press
+                startTracking = true
+                if (isConnected) {
+                    Toast.makeText(
+                        applicationContext,
+                        "Tracking Will Now Start",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        "Bluetooth Mount Not Connected Please Try Again",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            if (intent?.action == "com.example.CLOSE_EXTERNAL_ACTIVITY") {
+                finish()
             }
         }
     }
@@ -148,6 +168,8 @@ class MainActivity : AppCompatActivity() {
         connection_text = findViewById(R.id.status_text)
         send_coords = findViewById(R.id.send_coords)
 
+        reps_text = findViewById(R.id.rep_count_text)
+
         // BT observable
         val connectToBTObservable = Observable.create<String> { emitter ->
             // Call the constructor of the ConnectThread class
@@ -173,10 +195,13 @@ class MainActivity : AppCompatActivity() {
         val searchFilter = IntentFilter("com.example.PRESS_SEARCH_BUTTON")
         val connectFilter = IntentFilter("com.example.PRESS_CONNECT_BUTTON")
         val startFilter = IntentFilter("com.example.PRESS_START_BUTTON")
+        val closeFilter = IntentFilter("com.example.CLOSE_EXTERNAL_ACTIVITY")
+
 
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, searchFilter)
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, connectFilter)
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, startFilter)
+        LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, closeFilter)
 
         isReceiverRegistered = true
 
@@ -194,7 +219,19 @@ class MainActivity : AppCompatActivity() {
                     subscribe({ valueRead ->
                         // valueRead returned by the onNext() from the Observable
                         connection_text.setText(valueRead)
+                        isConnected = true
+                        Toast.makeText(
+                            applicationContext,
+                            "BT Mount Connected",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     })
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        "BT Mount Could Not Connect",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         })
@@ -230,6 +267,8 @@ class MainActivity : AppCompatActivity() {
 
                     val pairedDevices = bluetoothAdapter.bondedDevices
 
+                    var deviceFound = false
+
                     if (pairedDevices.size > 0) {
                         for (device in pairedDevices) {
                             Log.d(TAG, device.name)
@@ -237,8 +276,23 @@ class MainActivity : AppCompatActivity() {
                                 arduinoUUID = device.uuids[0].uuid
                                 arduinoBTModule = device
                                 bt_button.isEnabled = true
+                                deviceFound = true
+
+                                Toast.makeText(
+                                    applicationContext,
+                                    "BT Mount Found",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
+                    }
+
+                    if (!deviceFound) {
+                        Toast.makeText(
+                            applicationContext,
+                            "BT Mount Not Found In Paired Devices",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
                 Log.d(TAG, "Button Pressed")
@@ -311,9 +365,6 @@ class MainActivity : AppCompatActivity() {
 
                 val mpImage = BitmapImageBuilder(bitmap).build()
                 val result = poseLandmarker?.detect(mpImage)
-
-                Log.d("NICKDEBUG", mpImage.height.toString())
-                Log.d("NICKDEBUG", mpImage.width.toString())
 
                 // display the keypoints and lines
                 result?.let { overlayView.setResults(it, mpImage.height, mpImage.width) }
@@ -479,8 +530,8 @@ class MainActivity : AppCompatActivity() {
                 val reps = py.getModule("processing")
                     .callAttr("detect_reps", kneeAngle)
 
-                textView_knee.text = "Right Knee Angle: " + kneeAngle.toString()
-                textView_reps.text = "Reps: " + reps.toString()
+//                textView_knee.text = "Right Knee Angle: " + kneeAngle.toString()
+                reps_text.text = "Rep " + reps.toString() + "/ 10"
 
             } catch (e: Exception) {
                 // Log the stack trace to Logcat

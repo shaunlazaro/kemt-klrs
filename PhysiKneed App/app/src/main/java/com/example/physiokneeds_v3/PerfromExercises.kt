@@ -6,8 +6,13 @@ import android.content.Intent
 import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +25,28 @@ class PerfromExercises : AppCompatActivity() {
     lateinit var searchButton: Button
     lateinit var connectButton: Button
     lateinit var startTrackingButton: Button
+    lateinit var progressBar: ProgressBar
+    lateinit var status: TextView
+
+    var displayCount = 0
+
+    private lateinit var displayManager: DisplayManager
+    private var externalDisplayId: Int? = null
+    private val displayListener = object : DisplayManager.DisplayListener {
+        override fun onDisplayAdded(displayId: Int) {}
+
+        override fun onDisplayChanged(displayId: Int) {}
+
+        override fun onDisplayRemoved(displayId: Int) {
+            Log.d("NickDebug", "onDisplayRemoved")
+            if (displayId == externalDisplayId) {
+                Log.d("NickDebug", "onDisplayRemoved_if")
+                val intent = Intent("com.example.CLOSE_EXTERNAL_ACTIVITY")
+                LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+                status.text = "External Display Disconnected"
+            }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,16 +64,38 @@ class PerfromExercises : AppCompatActivity() {
         connectButton = findViewById(R.id.connect_button)
         startTrackingButton = findViewById(R.id.start_tracking_button)
 
+        progressBar = findViewById(R.id.progressBar)
+        status = findViewById(R.id.status)
+
+        // automatic bluetooth
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (displayCount >= 2) {
+                searchButton.performClick()
+            }
+        }, 2000)  // Clicks after 2 seconds
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (displayCount >= 2) {
+                connectButton.performClick()
+                status.text = "Look at the TV to perform your exercises"
+                progressBar.visibility = ProgressBar.GONE
+//            connectButton.visibility = Button.VISIBLE
+//            connectButton.text = "Reconnect"
+            }
+        }, 5000)  // Clicks after 2 seconds
+
         // set clickListeners
         searchButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {
+                Log.d("NickDebug", "search")
                 val intent = Intent("com.example.PRESS_SEARCH_BUTTON")
-                LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent);
+                LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
             }
         })
 
         connectButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {
+                Log.d("NickDebug", "connect")
                 val intent = Intent("com.example.PRESS_CONNECT_BUTTON")
                 LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
             }
@@ -59,14 +108,30 @@ class PerfromExercises : AppCompatActivity() {
             }
         })
 
-        // secondary display test
-        val displays = (getSystemService(Context.DISPLAY_SERVICE) as DisplayManager).displays
+        // secondary display
+        displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        displayManager.registerDisplayListener(displayListener, null)
+
+        val displays = displayManager.displays
         val actOptions = ActivityOptions.makeBasic()
 
-        if (displays.size >= 2) {
-            actOptions.launchDisplayId = displays[1].displayId
+        displayCount = displays.size
+
+        if (displayCount >= 2) {
+            externalDisplayId = displays[1].displayId
+            actOptions.launchDisplayId = externalDisplayId!!
 
             startActivity(Intent(this, MainActivity::class.java), actOptions.toBundle())
+        } else {
+            status.text = "Please Connect To External Display"
+            progressBar.visibility = ProgressBar.GONE
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val intent = Intent("com.example.CLOSE_EXTERNAL_ACTIVITY")
+        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+        displayManager.unregisterDisplayListener(displayListener)
     }
 }

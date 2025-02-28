@@ -72,7 +72,7 @@ public class HomeScreen extends AppCompatActivity {
     private void loadData() {
         // create retrofit instance
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://140.238.151.117:8000/api/poses/")
+                .baseUrl("http://140.238.151.117:8000/api/routine-configs/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

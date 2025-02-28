@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/light_blue"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -33,12 +33,25 @@
                 android:padding="10dp"
                 android:layout_marginStart="10dp" />
 
+            <TextView
+                android:id="@+id/rep_count_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Reps 0 / 10"
+                android:fontFamily="@font/source_sans"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:layout_gravity="right"
+                android:layout_marginEnd="30dp" />
+
         </FrameLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@android:color/darker_gray" />
+            android:background="@android:color/black" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -50,16 +63,43 @@
                 android:layout_height="match_parent">
 
                 <TextureView
-                    android:layout_width="879px"
+                    android:layout_width="900px"
                     android:layout_height="match_parent"
                     android:layout_alignParentRight="true"
                     android:id="@+id/camera_feed" />
 
                 <com.example.physiokneeds_v3.OverlayView
-                    android:layout_width="879px"
+                    android:layout_width="900px"
                     android:layout_height="match_parent"
                     android:layout_alignParentRight="true"
                     android:id="@+id/overlayView" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="300dp"
+                        android:layout_height="300dp"
+                        android:background="@drawable/outline_button"
+                        android:src="@drawable/baseline_fitness_center_24"
+                        android:padding="10dp"
+                        android:layout_marginStart="170dp"
+                        android:layout_marginTop="50dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="1. Sit on a chair with both feet on the floor.\n\n2. Slowly bend your left knee to bring your leg up\n   a. Lift until you feel discomfort or your leg is \n\        pointing straight out\n\n3. Slowly lower your leg back to the ground"
+                        android:fontFamily="@font/source_sans"
+                        android:textSize="20sp"
+                        android:textColor="@color/black"
+                        android:padding="10dp"
+                        android:layout_marginStart="130dp"
+                        android:layout_marginTop="30dp" />
+
+                </LinearLayout>
 
             </RelativeLayout>
 

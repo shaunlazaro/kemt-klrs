@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".MainActivity">
 
     <TextureView
@@ -24,7 +25,8 @@
         android:layout_below="@id/camera_feed"
         android:layout_margin="20dp"
         android:textSize="20dp"
-        android:text="Right Knee Angle: " />
+        android:text="Right Knee Angle: "
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/repsCount"
@@ -33,7 +35,8 @@
         android:layout_below="@id/kneeAngle"
         android:layout_margin="20dp"
         android:textSize="20dp"
-        android:text="Reps: " />
+        android:text="Reps: "
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/start_button"
@@ -45,7 +48,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="START"/>
+        android:text="START"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/camera_button"
@@ -57,7 +61,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="Switch Camera"/>
+        android:text="Switch Camera"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/search_button"
@@ -67,7 +72,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="SEARCH DEVICES"/>
+        android:text="SEARCH DEVICES"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/bt_button"
@@ -77,7 +83,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="CONNECT TO MOUNT"/>
+        android:text="CONNECT TO MOUNT"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/send_coords"
@@ -87,7 +94,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="SEND COORDS"/>
+        android:text="SEND COORDS"
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/status_text"
@@ -96,6 +104,20 @@
         android:layout_below="@id/repsCount"
         android:layout_margin="20dp"
         android:textSize="20dp"
-        android:text="Reps: " />
+        android:text="Reps: "
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/rep_count_text"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="Reps: 0"
+        android:fontFamily="@font/source_sans"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:padding="10dp"
+        android:layout_gravity="right"
+        android:layout_marginEnd="30dp" />
 
 </RelativeLayout>

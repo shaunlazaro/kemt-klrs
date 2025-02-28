@@ -56,7 +56,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="end|center_vertical"
-                    android:background="@color/white"
+                    android:background="@drawable/outline_button"
                     android:src="@drawable/baseline_fitness_center_24"
                     android:padding="10dp"
                     android:layout_marginStart="40dp" />
@@ -84,7 +84,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="end|center_vertical"
-                    android:background="@color/white"
+                    android:background="@drawable/outline_button"
                     android:src="@drawable/baseline_fitness_center_24"
                     android:padding="10dp"
                     android:layout_marginStart="40dp" />
@@ -112,7 +112,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="end|center_vertical"
-                    android:background="@color/white"
+                    android:background="@drawable/outline_button"
                     android:src="@drawable/baseline_fitness_center_24"
                     android:padding="10dp"
                     android:layout_marginStart="40dp" />
@@ -140,7 +140,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="end|center_vertical"
-                    android:background="@color/white"
+                    android:background="@drawable/outline_button"
                     android:src="@drawable/baseline_fitness_center_24"
                     android:padding="10dp"
                     android:layout_marginStart="40dp" />
@@ -158,7 +158,7 @@
 
             </LinearLayout>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/start_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -167,6 +167,7 @@
                 android:layout_marginStart="40dp"
                 android:layout_marginEnd="40dp"
                 android:text="Start"
+                android:textAllCaps="false"
                 android:textSize="20sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/source_sans"
@@ -174,20 +175,23 @@
                 android:background="@drawable/blue_button"
                 android:padding="10dp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/start_cast_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:layout_marginStart="40dp"
                 android:layout_marginEnd="40dp"
                 android:text="Cast &amp; Start"
                 android:textSize="20sp"
-                android:textColor="@color/blue"
+                android:textAllCaps="false"
+                android:textColor="@android:color/darker_gray"
                 android:fontFamily="@font/source_sans"
                 android:textStyle="bold"
                 android:background="@drawable/outline_button"
-                android:padding="10dp"/>
+                android:paddingStart="70dp"
+                android:drawablePadding="-70dp"
+                android:drawableStart="@drawable/baseline_cast_24"
+                android:enabled="false"/>
 
         </LinearLayout>
     </ScrollView>

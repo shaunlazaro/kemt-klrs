@@ -45,7 +45,7 @@ public class MyExercises extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MyExercises.this, SetUpDevice.class);
 
-                intent.putExtra(IS_CASTED, false);
+                intent.putExtra(IS_CASTED, true);
 
                 MyExercises.this.startActivity(intent);
             }

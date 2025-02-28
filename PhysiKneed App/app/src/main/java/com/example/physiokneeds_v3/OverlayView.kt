@@ -5,8 +5,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import com.google.mediapipe.tasks.components.containers.Connection
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
@@ -51,7 +53,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
         super.draw(canvas)
         results?.let { poseLandmarkerResult ->
             for(landmark in poseLandmarkerResult.landmarks()) {
-                for(normalizedLandmark in landmark) {
+                for(normalizedLandmark in landmark.drop(23).take(6)) {
                     canvas.drawPoint(
                         normalizedLandmark.x() * imageWidth * scaleFactor,
                         normalizedLandmark.y() * imageHeight * scaleFactor,
@@ -59,7 +61,10 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                     )
                 }
 
-                PoseLandmarker.POSE_LANDMARKS.forEach {
+                val connections = setOf(Connection.create(23,25), Connection.create(24,26), Connection.create(25,27), Connection.create(26,28))
+
+//                PoseLandmarker.POSE_LANDMARKS.forEach {
+                connections.forEach {
                     canvas.drawLine(
                         poseLandmarkerResult.landmarks().get(0).get(it!!.start()).x() * imageWidth * scaleFactor,
                         poseLandmarkerResult.landmarks().get(0).get(it.start()).y() * imageHeight * scaleFactor,
