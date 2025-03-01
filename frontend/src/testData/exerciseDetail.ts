@@ -42,3 +42,5 @@ export const ExerciseMockD: ExerciseDetail = {
     threshold_extension: 90,
     display_name: "Mock Exercise D",
 }
+
+export const ExerciseList: ExerciseDetail[] = [ExerciseMockA, ExerciseMockB, ExerciseMockC, ExerciseMockD]
