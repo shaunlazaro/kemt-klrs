@@ -2,14 +2,13 @@ import Button from "../../components/button";
 import Searchbar from "../../components/searchbar";
 import Select from "../../components/select/select";
 import { MdAddCircleOutline } from "react-icons/md";
-import { TestRoutineConfig, TestRoutineConfig2 } from "../../testData/exercisePlans";
+import { ExercisePlanListMock } from "../../testData/exercisePlans";
 import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 
 
-const ExercisePlanListMock: RoutineConfig[] = [TestRoutineConfig, TestRoutineConfig2, TestRoutineConfig2, TestRoutineConfig2, TestRoutineConfig, TestRoutineConfig]
-// Utility function
+// Utility function, should probably be done by server, or create a "injury" table.
 const getUniqueInjuryValues = (routineConfigs: RoutineConfig[]): string[] => {
   return [...new Set(routineConfigs.map((routineConfig) => routineConfig.injury))]
 }

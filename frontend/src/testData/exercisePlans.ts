@@ -47,3 +47,4 @@ export const TestRoutineConfig2: RoutineConfig = {
     ],
     injury: "Ankle"
 }
+export const ExercisePlanListMock: RoutineConfig[] = [TestRoutineConfig, TestRoutineConfig2, TestRoutineConfig2, TestRoutineConfig2, TestRoutineConfig, TestRoutineConfig]
