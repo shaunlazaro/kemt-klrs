@@ -2,15 +2,22 @@
 export interface TrackingDetail {
     tracking_type: string,
     keypoints: string[],
+    dimensionality?: string,
+    goal_flexion: number,
+    goal_extension: number,
     show_alert_if_above?: number,
     show_alert_if_below?: number,
     alert_message?: string,
 }
 export interface ExerciseDetail {
-    // rep_tracking: TrackingDetail,
-    rep_keypoints: string[],
-    threshold_flexion: number,
-    threshold_extension: number,
+    rep_tracking: TrackingDetail,
+    // Rep tracking has been replaced by rep_tracking field, not these three below.
+    rep_keypoints: string[], // Old, but kept in temporarily
+    threshold_flexion: number, // Old, but kept in temporarily
+    threshold_extension: number, // Old, but kept in temporarily
     display_name: string,
-    default_tracking_details?: TrackingDetail[]
+    start_in_flexion: boolean,
+    body_alignment: string,
+    default_tracking_details?: TrackingDetail[],
+    instruction?: string
 }
