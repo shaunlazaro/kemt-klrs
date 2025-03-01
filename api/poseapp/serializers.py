@@ -29,6 +29,7 @@ class TrackingDetailSerializer(serializers.ModelSerializer):
 
 class ExerciseDetailSerializer(serializers.ModelSerializer):
     default_tracking_details = TrackingDetailSerializer(many=True)
+    rep_tracking = TrackingDetailSerializer()  # Ensure rep_tracking returns full object
 
     class Meta:
         model = ExerciseDetail
@@ -36,7 +37,8 @@ class ExerciseDetailSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tracking_details_data = validated_data.pop('default_tracking_details')
-        exercise = ExerciseDetail.objects.create(**validated_data)
+        rep_tracking_data = validated_data.pop('rep_tracking')
+        exercise = ExerciseDetail.objects.create(**validated_data, rep_tracking=TrackingDetail.objects.create(**rep_tracking_data))
         exercise.default_tracking_details.set([
             TrackingDetail.objects.create(**detail) for detail in tracking_details_data
         ])
