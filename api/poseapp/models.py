@@ -86,6 +86,9 @@ class TrackingType(models.TextChoices):
 class TrackingDetail(models.Model):
     tracking_type = models.CharField(max_length=50, choices=TrackingType.choices) # S.T.C, keep as string for now so we don't have to sync enums across projects
     keypoints = models.JSONField()  # List of keypoints (list<str>)
+    dimensionality = models.CharField(max_length=50, null=True, blank=True)
+    goal_flexion = models.FloatField(null=True, blank=True)
+    goal_extension = models.FloatField(null=True, blank=True)
     show_alert_if_above = models.FloatField(null=True, blank=True)
     show_alert_if_below = models.FloatField(null=True, blank=True)
     alert_message = models.TextField(null=True, blank=True)
@@ -94,6 +97,7 @@ class TrackingDetail(models.Model):
         return f"{self.tracking_type} - {self.alert_message or 'No Alert'}"
 
 class ExerciseDetail(models.Model):
+    rep_tracking = models.ForeignKey(TrackingDetail, on_delete=models.CASCADE, null=True, blank=True)
     rep_keypoints = models.JSONField()
     threshold_flexion = models.FloatField()
     threshold_extension = models.FloatField()
