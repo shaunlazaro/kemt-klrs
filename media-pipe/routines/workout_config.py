@@ -29,13 +29,13 @@ class ExerciseDetail:
 class RoutineComponent:
     def __init__(
         self,
-        name: str,
         exercise: ExerciseDetail,
-        reps: float,        
+        reps: float,
+        custom_tracking_details: List[TrackingDetail] = []        
     ):
-        self.name = name
         self.exercise = exercise
         self.reps = reps
+        self.custom_tracking_details = custom_tracking_details
         
 
         
