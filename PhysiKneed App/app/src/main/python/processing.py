@@ -1,5 +1,6 @@
 import numpy as np
 import time
+from collections import deque
 
 # Parameters
 flexion_threshold = 80  # Fully bent position

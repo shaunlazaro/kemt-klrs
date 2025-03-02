@@ -21,11 +21,14 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
+import android.os.Looper
 import android.util.Log
 import android.view.Surface
 import android.view.TextureView
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -50,6 +53,9 @@ import java.util.UUID
 class MainActivity : AppCompatActivity() {
 
     // global variables
+    lateinit var routineConfig: RoutineConfig
+    lateinit var exerciseTrackerKneeExt: ExerciseTracker
+
     lateinit var textureView: TextureView
     lateinit var cameraManager: CameraManager
     lateinit var handler:Handler
@@ -61,11 +67,15 @@ class MainActivity : AppCompatActivity() {
     lateinit var textView_reps: TextView
 
     lateinit var reps_text: TextView
+
+    lateinit var instructionsLayout : LinearLayout
 //    lateinit var start_button: Button
 //    lateinit var camera_button: Button
 
     lateinit var cameraDevice: CameraDevice
     lateinit var cameraCaptureSession: CameraCaptureSession
+    val FRONT_CAMERA = 1
+    val BACK_CAMERA = 0
 
     // set which pose estimation model being used (lite/full/heavy)
     val baseOptionsBuilder = BaseOptions.builder().setModelAssetPath("pose_landmarker_heavy.task")
@@ -107,6 +117,8 @@ class MainActivity : AppCompatActivity() {
     var currentPos = "90,45"
 
     var isReceiverRegistered = false
+
+    var doneExercise = false
 
     // set which camera the app opens first (FOR DEBUGGING)
     var current_camera = 0
@@ -157,6 +169,17 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        // get routine from previous screen
+        routineConfig = (intent.getSerializableExtra(HomeScreen.ROUTINE_TAG) as RoutineConfig?)!!
+
+        // TODO remove these hard coded values for knee extension
+        routineConfig.exercises.get(0).exercise.startInFlexion = true
+        routineConfig.exercises.get(0).exercise.thresholdExtension = 140
+        routineConfig.exercises.get(0).exercise.thresholdFlexion = 80
+
+        // create exercise tracker
+        exerciseTrackerKneeExt = ExerciseTracker(routineConfig.exercises.get(0).exercise)
 
         // connect to bluetooth
         val bluetoothManager = getSystemService(BluetoothManager::class.java)
@@ -249,13 +272,6 @@ class MainActivity : AppCompatActivity() {
                         Log.d(TAG, "Bluetooth is disabled")
                         var enableBtIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                         if (ActivityCompat.checkSelfPermission( applicationContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                            // TODO: Consider calling
-                            //    ActivityCompat#requestPermissions
-                            // here to request the missing permissions, and then overriding
-                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                            //                                          int[] grantResults)
-                            // to handle the case where the user grants the permission. See the documentation
-                            // for ActivityCompat#requestPermissions for more details.
                             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
                         } else {
                             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
@@ -327,6 +343,41 @@ class MainActivity : AppCompatActivity() {
         textView_knee = findViewById(R.id.kneeAngle)
         textView_reps = findViewById(R.id.repsCount)
 
+        instructionsLayout = findViewById(R.id.instructions_layout)
+
+        // set the camera resolution to half the width
+        val screenWidth = resources.displayMetrics.widthPixels
+        val newWidth = screenWidth / 2
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            instructionsLayout.post {
+                val layoutParams = instructionsLayout.layoutParams
+                layoutParams.width = newWidth
+                layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT  // Keep height flexible
+
+                instructionsLayout.layoutParams = layoutParams
+                instructionsLayout.requestLayout()
+            }
+        }, 2000)
+
+        textureView.post {
+            val layoutParams = textureView.layoutParams
+            layoutParams.width = newWidth
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+
+            textureView.layoutParams = layoutParams
+            textureView.requestLayout()
+        }
+
+        overlayView.post {
+            val layoutParams = overlayView.layoutParams
+            layoutParams.width = newWidth
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT  // Keep height flexible
+
+            overlayView.layoutParams = layoutParams
+            overlayView.requestLayout()
+        }
+
 //        start_button = findViewById(R.id.start_button)
 //
 //        // set up switch camera button (FOR DEBUGGING)
@@ -347,7 +398,7 @@ class MainActivity : AppCompatActivity() {
         // adjust camera preview
         textureView.surfaceTextureListener = object:TextureView.SurfaceTextureListener {
             override fun onSurfaceTextureAvailable(p0: SurfaceTexture, p1: Int, p2: Int) {
-                open_camera(1)
+                open_camera(FRONT_CAMERA)
             }
 
             override fun onSurfaceTextureSizeChanged(p0: SurfaceTexture, p1: Int, p2: Int) {
@@ -370,10 +421,10 @@ class MainActivity : AppCompatActivity() {
                 result?.let { overlayView.setResults(it, mpImage.height, mpImage.width) }
 
                 // check if any keypoints are detected before processing
-                if (result != null && result.landmarks().size > 0 && result.landmarks().get(0).get(0).visibility().orElse(0.0f) > 0.6f) {
+                if (result != null && result.landmarks().size > 0 && result.landmarks().get(0).get(24).visibility().orElse(0.0f) > 0.6f) {
                     // process and show results for the specified exercise
                     seated_knee_extension(result)
-                    if (counts > COUNT_MAX) {
+                    if (counts > COUNT_MAX && !doneExercise) {
                         track_user(result, mpImage.height, mpImage.width)
                         counts = 0
                     }
@@ -431,7 +482,9 @@ class MainActivity : AppCompatActivity() {
             override fun onOpened(p0: CameraDevice) {
                 cameraDevice = p0
                 val captureRequest = p0.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+
                 val surface = Surface(textureView.surfaceTexture)
+
                 captureRequest.addTarget(surface)
 
                 p0.createCaptureSession(listOf(surface), object:CameraCaptureSession.StateCallback() {
@@ -527,15 +580,19 @@ class MainActivity : AppCompatActivity() {
                 val kneeAngle = py.getModule("processing")
                     .callAttr("calculate_angle", rightHip, rightKnee, rightAnkle)
 
-                val reps = py.getModule("processing")
-                    .callAttr("detect_reps", kneeAngle)
+//                val reps = py.getModule("processing")
+//                    .callAttr("detect_reps", kneeAngle)
+
+                val repsList = exerciseTrackerKneeExt.detectReps(kneeAngle.toDouble())
+
+                Log.d("ExerciseTracker", kneeAngle.toDouble().toString())
 
 //                textView_knee.text = "Right Knee Angle: " + kneeAngle.toString()
-                reps_text.text = "Rep " + reps.toString() + "/ 10"
+                reps_text.text = "Rep " + repsList[0].toString() + "/ 10"
 
             } catch (e: Exception) {
                 // Log the stack trace to Logcat
-                Log.e("PythonError", "An error occurred:", e)
+                Log.e("PythonErrorKnee", "An error occurred:", e)
             }
         }
     }

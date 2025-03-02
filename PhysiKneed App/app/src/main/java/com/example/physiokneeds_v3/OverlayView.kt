@@ -65,12 +65,16 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
 
 //                PoseLandmarker.POSE_LANDMARKS.forEach {
                 connections.forEach {
-                    canvas.drawLine(
-                        poseLandmarkerResult.landmarks().get(0).get(it!!.start()).x() * imageWidth * scaleFactor,
-                        poseLandmarkerResult.landmarks().get(0).get(it.start()).y() * imageHeight * scaleFactor,
-                        poseLandmarkerResult.landmarks().get(0).get(it.end()).x() * imageWidth * scaleFactor,
-                        poseLandmarkerResult.landmarks().get(0).get(it.end()).y() * imageHeight * scaleFactor,
-                        linePaint)
+                    // only draw the lines if the visibility is over 60%
+                    if (poseLandmarkerResult.landmarks().get(0).get(it!!.start()).visibility().orElse(0.0f) > 0.6f
+                        && poseLandmarkerResult.landmarks().get(0).get(it!!.end()).visibility().orElse(0.0f) > 0.6f) {
+                        canvas.drawLine(
+                            poseLandmarkerResult.landmarks().get(0).get(it!!.start()).x() * imageWidth * scaleFactor,
+                            poseLandmarkerResult.landmarks().get(0).get(it.start()).y() * imageHeight * scaleFactor,
+                            poseLandmarkerResult.landmarks().get(0).get(it.end()).x() * imageWidth * scaleFactor,
+                            poseLandmarkerResult.landmarks().get(0).get(it.end()).y() * imageHeight * scaleFactor,
+                            linePaint)
+                    }
                 }
             }
         }

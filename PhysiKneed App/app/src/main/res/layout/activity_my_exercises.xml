@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
+            android:id="@+id/linear_layout_exercises"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -21,6 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
+                android:layout_marginBottom="20dp"
                 android:orientation="horizontal">
 
                 <ImageButton
@@ -46,117 +48,117 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="45dp"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="45dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:background="@drawable/outline_button"
-                    android:src="@drawable/baseline_fitness_center_24"
-                    android:padding="10dp"
-                    android:layout_marginStart="40dp" />
+<!--                <ImageView-->
+<!--                    android:layout_width="48dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_gravity="end|center_vertical"-->
+<!--                    android:background="@drawable/outline_button"-->
+<!--                    android:src="@drawable/baseline_fitness_center_24"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:layout_marginStart="40dp" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Seated Leg Extension"
-                    android:fontFamily="@font/source_sans"
-                    android:textSize="20sp"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:padding="10dp"
-                    android:layout_marginStart="10dp"/>
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:text="Seated Leg Extension"-->
+<!--                    android:fontFamily="@font/source_sans"-->
+<!--                    android:textSize="20sp"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:layout_marginStart="10dp"/>-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="25dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:background="@drawable/outline_button"
-                    android:src="@drawable/baseline_fitness_center_24"
-                    android:padding="10dp"
-                    android:layout_marginStart="40dp" />
+<!--                <ImageView-->
+<!--                    android:layout_width="48dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_gravity="end|center_vertical"-->
+<!--                    android:background="@drawable/outline_button"-->
+<!--                    android:src="@drawable/baseline_fitness_center_24"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:layout_marginStart="40dp" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Squat"
-                    android:fontFamily="@font/source_sans"
-                    android:textSize="20sp"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:padding="10dp"
-                    android:layout_marginStart="10dp"/>
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:text="Squat"-->
+<!--                    android:fontFamily="@font/source_sans"-->
+<!--                    android:textSize="20sp"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:layout_marginStart="10dp"/>-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="25dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:background="@drawable/outline_button"
-                    android:src="@drawable/baseline_fitness_center_24"
-                    android:padding="10dp"
-                    android:layout_marginStart="40dp" />
+<!--                <ImageView-->
+<!--                    android:layout_width="48dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_gravity="end|center_vertical"-->
+<!--                    android:background="@drawable/outline_button"-->
+<!--                    android:src="@drawable/baseline_fitness_center_24"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:layout_marginStart="40dp" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Standing Quad Stretch"
-                    android:fontFamily="@font/source_sans"
-                    android:textSize="20sp"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:padding="10dp"
-                    android:layout_marginStart="10dp"/>
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:text="Standing Quad Stretch"-->
+<!--                    android:fontFamily="@font/source_sans"-->
+<!--                    android:textSize="20sp"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:layout_marginStart="10dp"/>-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="25dp"-->
+<!--                android:orientation="horizontal">-->
 
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:background="@drawable/outline_button"
-                    android:src="@drawable/baseline_fitness_center_24"
-                    android:padding="10dp"
-                    android:layout_marginStart="40dp" />
+<!--                <ImageView-->
+<!--                    android:layout_width="48dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_gravity="end|center_vertical"-->
+<!--                    android:background="@drawable/outline_button"-->
+<!--                    android:src="@drawable/baseline_fitness_center_24"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:layout_marginStart="40dp" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Calf Raise"
-                    android:fontFamily="@font/source_sans"
-                    android:textSize="20sp"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:padding="10dp"
-                    android:layout_marginStart="10dp"/>
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:text="Calf Raise"-->
+<!--                    android:fontFamily="@font/source_sans"-->
+<!--                    android:textSize="20sp"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:layout_marginStart="10dp"/>-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/start_button"

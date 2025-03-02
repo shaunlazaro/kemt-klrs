@@ -67,6 +67,9 @@ class PerfromExercises : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         status = findViewById(R.id.status)
 
+        // get routine from previous screen
+        val routineConfig = intent.getSerializableExtra(HomeScreen.ROUTINE_TAG) as RoutineConfig?
+
         // automatic bluetooth
         Handler(Looper.getMainLooper()).postDelayed({
             if (displayCount >= 2) {
@@ -82,7 +85,7 @@ class PerfromExercises : AppCompatActivity() {
 //            connectButton.visibility = Button.VISIBLE
 //            connectButton.text = "Reconnect"
             }
-        }, 5000)  // Clicks after 2 seconds
+        }, 10000)  // Clicks after 10 seconds
 
         // set clickListeners
         searchButton.setOnClickListener(object : View.OnClickListener {
@@ -121,7 +124,10 @@ class PerfromExercises : AppCompatActivity() {
             externalDisplayId = displays[1].displayId
             actOptions.launchDisplayId = externalDisplayId!!
 
-            startActivity(Intent(this, MainActivity::class.java), actOptions.toBundle())
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig)
+
+            startActivity(intent, actOptions.toBundle())
         } else {
             status.text = "Please Connect To External Display"
             progressBar.visibility = ProgressBar.GONE

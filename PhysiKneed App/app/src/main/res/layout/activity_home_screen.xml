@@ -51,7 +51,7 @@
                 android:paddingRight="40dp"
                 android:layout_marginTop="5dp"
                 android:layout_gravity="left"
-                android:textSize="34sp"
+                android:textSize="44sp"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:fontFamily="@font/source_sans"
@@ -74,15 +74,17 @@
                     android:paddingRight="40dp"
                     android:paddingLeft="40dp">
 
-                    <TextView
-                        android:id="@+id/exercise_text"
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/exercise_text_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
                         android:background="@drawable/today_exercises_textbox"
                         android:padding="16dp"
-                        android:text="\n\nSeated Leg Extension x 8\nSquat x 6\nStanding Quad Stretch x 10\nCalf Raise x 10"
+                        android:text="\n\n\n"
                         android:textSize="16sp"
+                        android:textAllCaps="false"
+                        android:gravity="left"
                         android:fontFamily="@font/source_sans"
                         android:textColor="@android:color/black"/>
 
@@ -96,6 +98,7 @@
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:fontFamily="@font/source_sans"
+                        android:elevation="10dp"
                         android:textColor="@android:color/black"/>
 
                     <ImageButton
@@ -126,7 +129,7 @@
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         android:padding="10dp"
-                        android:layout_marginTop="200dp"
+                        android:layout_marginTop="160dp"
                         android:layout_gravity="center"/>
 
                     <TextView

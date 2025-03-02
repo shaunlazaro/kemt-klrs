@@ -122,7 +122,8 @@
                     android:fontFamily="@font/source_sans"
                     android:textStyle="bold"
                     android:background="@drawable/blue_button"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:enabled="false"/>
 
             </LinearLayout>
 
