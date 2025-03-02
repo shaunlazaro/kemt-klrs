@@ -29,13 +29,13 @@ class ExerciseDetail:
 class RoutineComponent:
     def __init__(
         self,
-        name: str,
         exercise: ExerciseDetail,
-        reps: float,        
+        reps: float,
+        custom_tracking_details: List[TrackingDetail] = []        
     ):
-        self.name = name
         self.exercise = exercise
         self.reps = reps
+        self.custom_tracking_details = custom_tracking_details
         
 
         
@@ -54,9 +54,10 @@ class RoutineConfig:
         self, 
         name: str,
         exercise_detail: ExerciseDetail, 
-        reps: Optional[float] = None, 
+        reps: Optional[float] = 0, 
+        custom_tracking_details: List[TrackingDetail] = []        
     ):
-        self.exercises.append(RoutineComponent(name, exercise_detail, reps))
+        self.exercises.append(RoutineComponent(exercise_detail, reps))
     
     def get_workout(self, exercise_name: str) -> Optional[RoutineComponent]:
         for component in self.exercises:
