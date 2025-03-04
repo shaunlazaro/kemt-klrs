@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
 import Button from "../../components/button"
-import Searchbar from "../../components/searchbar"
-import Select, { WideSelect } from "../../components/select/select"
+import { WideSelect } from "../../components/select/select"
 import { Input } from "../../components/input/input";
-import { ExercisePlanListMock } from "../../testData/exercisePlans";
-import MultiSelect from "../../components/multiselect/multiselect";
-import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
-import { useParams } from "react-router-dom";
+import { ExercisePlanListMock, TestRoutineConfig2 } from "../../testData/exercisePlans";
+import { RoutineComponent, RoutineConfig } from "../../interfaces/exercisePlan.interface";
+import { useNavigate, useParams } from "react-router-dom";
 import { CiCircleInfo } from "react-icons/ci";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdDragHandle } from "react-icons/md";
 import { ExerciseList } from "../../testData/exerciseDetail";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import { ExerciseDetail } from "../../interfaces/exerciseDetail.interface";
+import { EXERCISES_PATH } from "../../routes";
 
 
 const NEW_PLAN_ID = "new"
+const TEST_PLAN = TestRoutineConfig2;
+
+const BLANK_PLAN: RoutineConfig = {
+    name: "",
+    injury: "Knee",
+    exercises: []
+}
+
+const BLANK_EXERCISE: RoutineComponent = {
+    reps: 0,
+    exercise: ExerciseList[0]
+}
 
 // Utility function, should probably be done by server, or create a "injury" table.
 const getUniqueInjuryValues = (routineConfigs: RoutineConfig[]): string[] => {
@@ -26,23 +38,56 @@ const filterList = getUniqueInjuryValues(ExercisePlanListMock);
 const AddEditPlan: React.FC = () => {
 
     const { id: planId } = useParams();
+    const navigate = useNavigate();
 
-    const [planName, setPlanName] = useState<string>("");
-    const [planInjury, setPlanInjury] = useState<string>(filterList[0]);
+
+    const getPlanData = (id: string): RoutineConfig => {
+        return id == NEW_PLAN_ID ? BLANK_PLAN : TEST_PLAN; // TODO Back end integration
+    }
+
+    const [plan, setPlan] = useState<RoutineConfig>(getPlanData(planId ?? NEW_PLAN_ID));
+
+    console.log(plan);
+
+    const [planName, setPlanName] = useState<string>(plan.name);
+    const [planInjury, setPlanInjury] = useState<string>(plan.injury);
+    const [planComponents, setPlanComponents] = useState<RoutineComponent[]>(plan.exercises);
 
     useEffect(
         () => {
             const newPlan: RoutineConfig = {
                 name: planName,
                 injury: planInjury,
-                exercises: [],
+                exercises: planComponents,
             }
             setPlan(newPlan);
         },
         [planName, planInjury]
     )
 
-    const [plan, setPlan] = useState<RoutineConfig>();
+    const onClickInfo = (exercise: ExerciseDetail) => {
+        alert("Unimplemented: Show Display for " + exercise.display_name);
+    }
+    const onClickDelete = (index: number) => {
+        if (confirm("Remove this exercise from the routine?")) {
+            const newPlanComponents = [...planComponents]
+            newPlanComponents.splice(index, 1)
+            setPlanComponents(newPlanComponents)
+        }
+    }
+    const onClickAddExercise = () => {
+        const newPlanComponents = [...planComponents]
+        newPlanComponents.push(BLANK_EXERCISE)
+        setPlanComponents(newPlanComponents)
+    }
+    const onClickCancel = () => {
+        navigate(EXERCISES_PATH);
+    }
+    const onClickSubmit = () => {
+        alert("TODO: Save changes...");
+        navigate(EXERCISES_PATH);
+    }
+
 
     return (
         <div className="h-auto bg-white pb-20 px-8">
@@ -67,19 +112,57 @@ const AddEditPlan: React.FC = () => {
                         <div className="col-start-2 col-span-1 w-full text-left font-semibold text-primary-blue text-sm">Count</div>
                         <div className="col-start-4 col-span-1 w-full text-left font-semibold text-primary-blue text-sm">Exercise</div>
                         {/* Row */}
-                        <div className="col-start-1 w-full text-center flex justify-center"> <MdDragHandle className="w-7 h-auto" /> </div>
+                        {planComponents.map((planComponent, index) => (
+                            <>
+                                <div className="col-start-1 w-full text-center flex justify-center"> <MdDragHandle className="w-7 h-auto" /> </div>
+                                <div className="col-start-2 w-full h-full">
+                                    <Input
+                                        // type="number"
+                                        type="text"
+                                        pattern="\d*"
+                                        inputMode="numeric"
+                                        value={planComponent.reps}
+                                        onChange={(e) => {
+                                            const newPlanComponents = [...planComponents];
+                                            newPlanComponents[index] = { ...newPlanComponents[index], reps: Number.isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value) }
+                                            setPlanComponents(newPlanComponents);
+                                        }}
+                                    />
+                                </div>
+                                <div className="col-start-3 w-full text-sm pr-2 font-semibold"> reps </div>
+                                <div className="col-start-4 col-span-6 w-full">
+                                    <WideSelect
+                                        items={ExerciseList}
+                                        valueKey="display_name"
+                                        label="display_name"
+                                        value={planComponent.exercise.display_name}
+                                        onChange={(e) => {
+                                            const newPlanComponents = [...planComponents];
+                                            const newExercise = ExerciseList.find((ex) => ex.display_name == e.target.value) ?? ExerciseList[0]
+                                            newPlanComponents[index] = { ...newPlanComponents[index], exercise: newExercise }
+                                            setPlanComponents(newPlanComponents);
+                                        }}
+                                    />
+                                </div>
+                                <div className="col-start-10 flex justify-center ml-3 hover:cursor-pointer"> <CiCircleInfo className="w-7 h-auto" onClick={() => onClickInfo(planComponent.exercise)} /> </div>
+                                <div className="col-start-11 flex justify-center mr-3 hover:cursor-pointer"> <IoIosCloseCircleOutline className="w-7 h-auto" onClick={() => onClickDelete(index)} /> </div>
+                            </>
+                        ))}
+                        {/* ROW TEMPLATE: <div className="col-start-1 w-full text-center flex justify-center"> <MdDragHandle className="w-7 h-auto" /> </div>
                         <div className="col-start-2 w-full h-full"> <Input /> </div>
                         <div className="col-start-3 w-full text-sm pr-2 font-semibold"> reps </div>
                         <div className="col-start-4 col-span-6 w-full"> <WideSelect items={ExerciseList} valueKey="display_name" label="display_name" /> </div>
                         <div className="col-start-10 flex justify-center ml-3"> <CiCircleInfo className="w-7 h-auto" /> </div>
-                        <div className="col-start-11 flex justify-center mr-3"> <IoIosCloseCircleOutline className="w-7 h-auto" /> </div>
+                        <div className="col-start-11 flex justify-center mr-3"> <IoIosCloseCircleOutline className="w-7 h-auto" /> </div> */}
                     </div>
 
-                    <div className="flex rounded-4xl bg-primary-blue pt-1.5 pb-2 px-3 w-fit text-white text-sm font-semibold gap-x-1"> <IoMdAddCircleOutline className="w-5 h-auto" /> Add exercise </div>
+                    <div className="flex rounded-4xl bg-primary-blue pt-1.5 pb-2 px-3 w-fit text-white text-sm font-semibold gap-x-1 hover:cursor-pointer" onClick={() => onClickAddExercise()}>
+                        <IoMdAddCircleOutline className="w-5 h-auto" /> Add exercise
+                    </div>
 
                     <div className="flex pt-12 gap-x-4 text-sm font-semibold">
-                        <Button variant="primary-outline" className="border-2 font-bold w-[150px]"> Cancel </Button>
-                        <Button variant="primary" className="w-[150px]"> Save</Button>
+                        <Button variant="primary-outline" className="border-2 font-bold w-[150px]" onClick={() => onClickCancel()}> Cancel </Button>
+                        <Button variant="primary" className="w-[150px]" onClick={() => onClickSubmit()}> Save</Button>
                     </div>
                 </div>
                 <div className="col-span-2 rounded-lg bg-primary-lightblue h-auto w-full">

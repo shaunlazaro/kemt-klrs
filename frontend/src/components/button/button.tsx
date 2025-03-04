@@ -9,7 +9,7 @@ type ButtonProps = ComponentProps<"button"> &
   };
 
 export const buttonStyles = cva(
-  "group relative inline-flex justify-center items-center overflow-hidden z-10 px-5 gap-2.5 text-sm tracking-wide rounded-md",
+  "group relative inline-flex justify-center items-center overflow-hidden z-10 px-5 gap-2.5 text-sm tracking-wide rounded-md hover:cursor-pointer",
   {
     variants: {
       variant: {
