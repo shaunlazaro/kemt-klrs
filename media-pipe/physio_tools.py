@@ -1,11 +1,10 @@
 import numpy as np
 import time
-from routines.workout_config import ExerciseDetail
-from collections import deque
+from routines.workout_data import RepData
 
 
 # Function to calculate the angle between three, 3D points
-def calculate_angle(a, b, c):
+def calculate_three_point_angle(a, b, c):
     a = np.array(a)  # Point 1
     b = np.array(b)  # Vertex point
     c = np.array(c)  # Point 2
@@ -20,116 +19,209 @@ def calculate_angle(a, b, c):
 
     return np.degrees(angle)  # Convert to degrees
 
+def calculate_two_point_vertical_angle(a, b):
+    vertical = np.array([0, 1])
+    a = np.array(a)  # Point 1
+    b = np.array(b)  # Point 2
+    
+    ba = a - b
+    exercise_angle = np.degrees(
+        np.arccos(np.clip(np.dot(ba, vertical) / np.linalg.norm(ba), -1.0, 1.0))
+    )
 
-def smooth_angle(knee_angle, angle_history):
-    angle_history.append(knee_angle)
+    return exercise_angle
+    
+def calculate_two_point_horizontal_angle(a, b):
+    horizontal = np.array([1, 0])
+    vec = a - b
+    exercise_angle = np.degrees(
+        np.arccos(np.clip(np.dot(vec, horizontal) / np.linalg.norm(vec), -1.0, 1.0))
+    )
+    return exercise_angle
+
+def smooth_angle(angle, angle_history):
+    angle_history.append(angle)
     return sum(angle_history) / len(angle_history)
-
 
 class ExerciseTracker:
     def __init__(self, exercise_detail):
         self.rep_count = 0
         self.state = "rest"
+        self.just_completed_rep = False
         self.rep_start_time = None
         self.last_rep_duration = 0
         self.flexion_threshold = exercise_detail.threshold_flexion
         self.extension_threshold = exercise_detail.threshold_extension
 
-        # establish rep starting position (flexed or extended)
         self.start_in_flexion = exercise_detail.start_in_flexion
-        
-        # max/min angles for each rep
         self.current_max_flexion = float('inf')
         self.current_max_extension = float('-inf')
 
-        # goal angles
-        tracking_detail = exercise_detail.default_tracking_details[0]
-        self.goal_flexion = tracking_detail.goal_flexion
-        self.goal_extension = tracking_detail.goal_extension
-        
-        self.alert_message = tracking_detail.alert_message
-        self.alert = None
+        self.goal_flexion = exercise_detail.rep_tracking.goal_flexion
+        self.goal_extension = exercise_detail.rep_tracking.goal_extension
+
+        self.alerts = set()
+        self.last_rep_alerts = set()
 
         self.phase_1_start_time = None
         self.phase_2_start_time = None
         self.last_concentric_time = 0
         self.last_eccentric_time = 0
 
-        self.rep_data = deque(maxlen=50)
+        self.poses_buffer = []
+        self.last_pose_capture_time = 0
 
-    def detect_reps(self, knee_angle):
+    def detect_reps(self, tracking_results, exercise_detail, pose_data):
+        """Detects repetitions based on tracking results."""
+        rep_entry = None  
+        main_tracking_detail = exercise_detail.rep_tracking
+        
+        primary_angle = self._get_primary_angle(tracking_results, main_tracking_detail)
+        if primary_angle is None:
+            return self.rep_count, self.last_rep_duration
+
         current_time = time.time()
+        self._update_max_angles(primary_angle)
+        self._process_alerts(tracking_results, main_tracking_detail)
+        self._update_progress_score(primary_angle, exercise_detail.start_angle)
 
-        # Track max flexion and extension angles
-        self.current_max_flexion = min(self.current_max_flexion, knee_angle)
-        self.current_max_extension = max(self.current_max_extension, knee_angle)
+        if current_time - self.last_pose_capture_time >= 0.1:
+            self.poses_buffer.append((current_time, pose_data))
+            self.last_pose_capture_time = current_time
 
+        self._update_state(primary_angle, current_time)
+
+        if self.state == "rest" and self.just_completed_rep:
+            rep_entry = self._finalize_rep(current_time, main_tracking_detail, exercise_detail.min_rep_time)
+            self.just_completed_rep = False
+
+        return rep_entry
+
+    def _get_primary_angle(self, tracking_results, main_tracking_detail):
+        return next(
+            (entry["angle"] for entry in tracking_results if entry["detail"] == main_tracking_detail),
+            None
+        )
+
+    def _update_max_angles(self, primary_angle):
+        self.current_max_flexion = min(self.current_max_flexion, primary_angle)
+        self.current_max_extension = max(self.current_max_extension, primary_angle)
+
+    def _process_alerts(self, tracking_results, main_tracking_detail):
+        """Checks for alert conditions based on tracking data."""
+        for entry in tracking_results:
+            detail, value = entry["detail"], entry["angle"]
+            
+            # Main tracking detail alerts are handled separately
+            if detail == main_tracking_detail:
+                continue
+            if detail.show_alert_if_above and value > detail.show_alert_if_above:
+                self.alerts.add(detail.alert_message)
+            if detail.show_alert_if_below and value < detail.show_alert_if_below:
+                self.alerts.add(detail.alert_message)
+
+    def _update_progress_score(self, primary_angle, start_angle):
+        """Computes a normalized rep completion score (0 to 1) based on progress from start_angle to goal."""
+        if self.start_in_flexion:
+            target_angle = self.goal_extension
+            progress = (start_angle - primary_angle) / (start_angle - target_angle)
+        else:
+            target_angle = self.goal_flexion
+            progress = (primary_angle - start_angle) / (target_angle - start_angle)
+
+        self.score = max(0, min(1, progress))
+        # print(f"Progress: {self.score:.2%}")
+
+    def _update_state(self, primary_angle, current_time):
+        """Handles state transitions based on detected movement."""
         if self.state == "rest":
-            if (self.start_in_flexion and knee_angle < self.flexion_threshold) or \
-               (not self.start_in_flexion and knee_angle > self.extension_threshold):
-                # Start a new rep cycle
-                self.state = "phase_1"
-                self.phase_1_start_time = current_time
-                self.current_max_flexion = knee_angle
-                self.current_max_extension = knee_angle
-                print("Starting new rep...")
+            if self._is_start_of_rep(primary_angle):
+                self._start_new_rep(current_time)
 
         elif self.state == "phase_1":
-            if (self.start_in_flexion and knee_angle > self.extension_threshold) or \
-               (not self.start_in_flexion and knee_angle < self.flexion_threshold):
-                # Transition to phase 2
-                self.state = "phase_2"
-                self.phase_2_start_time = current_time
-                self.last_concentric_time = self.phase_2_start_time - self.phase_1_start_time
+            if self._is_half_rep_completed(primary_angle):
+                self._start_phase_2(current_time)
 
         elif self.state == "phase_2":
-            if (self.start_in_flexion and knee_angle < self.flexion_threshold) or \
-               (not self.start_in_flexion and knee_angle > self.extension_threshold):
-                # Full rep cycle completed
-                self.state = "phase_1"  # Ready for next rep
-                self.last_eccentric_time = current_time - self.phase_2_start_time
-                self.last_rep_duration = self.last_concentric_time + self.last_eccentric_time
-                self.rep_count += 1
+            if self._is_full_rep_completed(primary_angle):
+                self._complete_rep(current_time)
 
-                # Check if goal flexion/extension was met
-                flexion_goal_met = self.goal_flexion is None or self.current_max_flexion <= self.goal_flexion
-                extension_goal_met = self.goal_extension is None or self.current_max_extension >= self.goal_extension
+    def _is_start_of_rep(self, angle):
+        return (self.start_in_flexion and angle > self.flexion_threshold) or \
+               (not self.start_in_flexion and angle < self.extension_threshold)
 
-                # Determine if an alert should be given
-                if not flexion_goal_met:
-                    self.alert = self.alert_message
-                elif not extension_goal_met:
-                    self.alert = self.alert_message
-                else:
-                    self.alert = None
-                    
-                self.rep_data.append({
-                    "rep_number": self.rep_count,
-                    "max_flexion": self.current_max_flexion,
-                    "max_extension": self.current_max_extension,
-                    "concentric_time": self.last_concentric_time,
-                    "eccentric_time": self.last_eccentric_time,
-                    "total_time": self.last_rep_duration,
-                    "goal_flexion_met": flexion_goal_met,
-                    "goal_extension_met": extension_goal_met,
-                    "alert": self.alert
-                })
+    def _is_half_rep_completed(self, angle):
+        return (self.start_in_flexion and angle > self.extension_threshold) or \
+               (not self.start_in_flexion and angle < self.flexion_threshold)
 
-                # Print feedback
-                print(f"Rep {self.rep_count} completed in {self.last_rep_duration:.2f} sec")
-                print(f"Concentric: {self.last_concentric_time:.2f} sec, Eccentric: {self.last_eccentric_time:.2f} sec")
-                print(f"Max Flexion: {self.current_max_flexion:.2f}°, Max Extension: {self.current_max_extension:.2f}°")
-                print(f"Goal Flexion Met: {flexion_goal_met}, Goal Extension Met: {extension_goal_met}")
-                if self.alert:
-                    print(f"⚠️ {self.alert}")
+    def _is_full_rep_completed(self, angle):
+        return (self.start_in_flexion and angle < self.flexion_threshold) or \
+               (not self.start_in_flexion and angle > self.extension_threshold)
 
-                # Reset tracking values for next rep
-                self.current_max_flexion = float('inf')
-                self.current_max_extension = float('-inf')
-                self.phase_1_start_time = current_time
+    def _start_new_rep(self, current_time):
+        self.state = "phase_1"
+        self.phase_1_start_time = current_time
+        self.current_max_flexion = float('inf')
+        self.current_max_extension = float('-inf')
+        self.poses_buffer = []
+        self.just_completed_rep = False
+        print("Starting new rep...")
 
-        return self.rep_count, self.last_rep_duration
+    def _start_phase_2(self, current_time):
+        self.state = "phase_2"
+        self.phase_2_start_time = current_time
+        self.last_concentric_time = current_time - self.phase_1_start_time
 
-    def get_rep_data(self):
-        """Returns all recorded rep data, including goal tracking and alerts."""
-        return list(self.rep_data)
+    def _complete_rep(self, current_time):
+        self.state = "rest"
+        self.last_eccentric_time = current_time - self.phase_2_start_time
+        self.last_rep_duration = self.last_concentric_time + self.last_eccentric_time
+        self.rep_count += 1
+        self.just_completed_rep = True
+
+    def _finalize_rep(self, current_time, main_tracking_detail, min_rep_time):
+        """Generates rep data and resets tracking for the next rep."""
+        flexion_goal_met = self.goal_flexion is None or self.current_max_flexion <= self.goal_flexion
+        extension_goal_met = self.goal_extension is None or self.current_max_extension >= self.goal_extension
+
+        if not flexion_goal_met or not extension_goal_met:
+            self.alerts.add(main_tracking_detail.alert_message)
+            
+        if self.last_concentric_time + self.last_eccentric_time < min_rep_time:
+            self.alerts.add("Slow down your movement")
+
+        self.last_rep_alerts = self.alerts.copy()
+
+        rep_entry = RepData(
+            rep_number=self.rep_count,
+            max_flexion=self.current_max_flexion,
+            max_extension=self.current_max_extension,
+            concentric_time=self.last_concentric_time,
+            eccentric_time=self.last_eccentric_time,
+            total_time=self.last_rep_duration,
+            goal_flexion_met=flexion_goal_met,
+            goal_extension_met=extension_goal_met,
+            score=self.score,
+            alerts=list(self.last_rep_alerts),
+            poses=self.poses_buffer
+        )
+
+        self._print_rep_feedback()
+        self._reset_rep_tracking(current_time)
+
+        return rep_entry
+
+    def _print_rep_feedback(self):
+        print(f"Rep {self.rep_count} completed in {self.last_rep_duration:.2f} sec")
+        print(f"Concentric: {self.last_concentric_time:.2f} sec, Eccentric: {self.last_eccentric_time:.2f} sec")
+        print(f"Max Flexion: {self.current_max_flexion:.2f}°, Max Extension: {self.current_max_extension:.2f}°")
+        for alert in self.alerts:
+            print(f"⚠️ {alert}")
+
+    def _reset_rep_tracking(self, current_time):
+        self.current_max_flexion = float('inf')
+        self.current_max_extension = float('-inf')
+        self.phase_1_start_time = current_time
+        self.alerts.clear()
+        self.poses_buffer = []
+        self.last_pose_capture_time = 0

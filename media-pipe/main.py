@@ -3,14 +3,17 @@ import mediapipe as mp
 from poseapi import add_pose_to_routine, upload_current_routine
 from pipeutil import result_to_pose_json
 from collections import deque
-from physio_tools import calculate_angle, smooth_angle
+from physio_tools import calculate_three_point_angle, calculate_two_point_vertical_angle, calculate_two_point_horizontal_angle, smooth_angle
 from display import draw_pose_landmarks, display_text, flip_image  # Import functions from display.py
+import pprint
+
 
 from physio_tools import ExerciseTracker
 from camera_tracking import MotorController
 
 from routines.tracking import TrackingDetail, TrackingType
-from routines.workout_config import ExerciseDetail, RoutineConfig   
+from routines.workout_config import ExerciseDetail, RoutineConfig, RoutineComponent  
+from routines.workout_data import RoutineData, RoutineComponentData
 
 motor_controller = MotorController()
 
@@ -25,7 +28,7 @@ angle_history = deque(maxlen=5) # Store the last 5 angles
 smoothed_angle = 0
 
 
-# ----------------------- ROUTINE / EXERCISE CONFIGURATION [HARDCODED FOR NOW] -----------------------
+# ----------------------- ROUTINE CONFIGURATION [HARDCODED FOR NOW] -----------------------
 
 # TODO: hardcode the params for each exercise
 
@@ -44,8 +47,10 @@ right_leg_extension_angle_tracking = TrackingDetail(
 right_leg_extension = ExerciseDetail(
     rep_keypoints=["right_hip", "right_knee", "right_ankle"],
     rep_tracking=right_leg_extension_angle_tracking,
-    threshold_flexion=100,
-    threshold_extension=130,
+    start_angle=90,
+    min_rep_time=1.5,
+    threshold_flexion=100, # TODO: move to trackingDetail
+    threshold_extension=130, # TODO: move to trackingDetail
     display_name="Leg Extension",
     start_in_flexion=True,
     body_alignment="side",
@@ -55,7 +60,8 @@ right_leg_extension = ExerciseDetail(
 # Tracking knee angle for squats
 squat_angle_tracking = TrackingDetail(
     tracking_type=TrackingType.ANGLE_OF_THREE_POINTS,
-    keypoints=["right_hip", "right_knee", "right_ankle"],
+    keypoints=["hip", "knee", "ankle"],
+    symmetric=True,
     dimensionality="2D",
     goal_flexion=90,
     # show_alert_if_below=60,
@@ -63,52 +69,66 @@ squat_angle_tracking = TrackingDetail(
     alert_message="Go deeper!"
 )
 
+# Tracking trunk posture for squats
+squat_posture_tracking = TrackingDetail(
+    tracking_type=TrackingType.ANGLE_WITH_VERTICAL,
+    keypoints=["hip", "shoulder"],
+    symmetric=True,
+    dimensionality="2D",
+    # goal_flexion=50,
+    # show_alert_if_below=60,
+    show_alert_if_above=50,
+    alert_message="Keep your back more upright!"
+)
+
 # Defining the squat exercise
 squat_exercise = ExerciseDetail(
     rep_keypoints=["right_hip", "right_knee", "right_ankle"],
     rep_tracking=squat_angle_tracking,
-    threshold_flexion=110,
-    threshold_extension=160,
+    start_angle=180,
+    min_rep_time=1.5,
+    threshold_flexion=110, # TODO: move to trackingDetail
+    threshold_extension=160, # TODO: move to trackingDetail
     display_name="Squat",
     start_in_flexion=False,
     body_alignment="side",
-    default_tracking_details=[squat_angle_tracking],
+    default_tracking_details=[squat_angle_tracking, squat_posture_tracking],
 )
 
+# config routine components
+routine_component_right_leg_extension = RoutineComponent(
+    exercise=right_leg_extension,
+    reps=3,
+    custom_tracking_details=[]     
+)
+
+routine_component_squat = RoutineComponent(
+    exercise=squat_exercise,
+    reps=3,
+    custom_tracking_details=[]     
+)
 
 # config routine
 routine_config = RoutineConfig(
     name="knee_routine",
-    exercises=[],
+    exercises=[routine_component_squat, routine_component_right_leg_extension],
     injury="knee"
 )
 
-routine_config.add_exercise(
-    name="right_leg_extension",
-    exercise_detail=right_leg_extension,
-    reps=10,
+
+# ----------------------- SETUP DATA CAPTURE -----------------------
+
+# Initialize the list to store all RoutineComponentData
+routine_data = RoutineData(
+    routineConfig=routine_config,
+    routineComponentData=[]
 )
 
-routine_config.add_exercise(
-    name="squat",
-    exercise_detail=squat_exercise,
-    reps=10,
-)
+# Define current exercise index (progressing through the routine)
+current_exercise_index = 0
 
-
-
-# ----------------------- SETUP ROUTINE -----------------------
-
-# Fetch workout details TODO: Make this dynamic
-exercise_name = "squat"
-
-routine_data = routine_config.get_workout(exercise_name)
-if not routine_data:
-    raise ValueError(f"Workout '{exercise_name}' not found in routine config.")
-
-exercise_detail = routine_data.exercise  # Correct way to access ExerciseDetail
-tracker = ExerciseTracker(exercise_detail)
-custom_tracking_details = routine_data.exercise.default_tracking_details  # Adjust if needed
+# Initialize the RoutineComponentData list for each exercise
+routine_component_data_list = []
 
 
 # -------------------- FUNCTIONS ---------------------------------
@@ -116,44 +136,70 @@ custom_tracking_details = routine_data.exercise.default_tracking_details  # Adju
 def extract_keypoints_dynamic(landmarks, pose, keypoints, mode="2D"):
     """Extract keypoints dynamically for the chosen exercise in 2D or 3D."""
     
-    if mode == "3D":
-        if frame_width is None:
-            raise ValueError("Frame width must be provided for 3D mode.")
-        
-        # Reference z-depth
-        ref_z = landmarks[getattr(pose, keypoints[0].upper()).value].z 
+    if mode == "3D" and (frame_width is None or frame_height is None):
+        raise ValueError("Frame width and height must be provided for 3D mode.")
 
-        return [
-            [
-                landmarks[getattr(pose, kp.upper()).value].x * frame_width,
-                landmarks[getattr(pose, kp.upper()).value].y * frame_height,
-                (landmarks[getattr(pose, kp.upper()).value].z - ref_z) * frame_width
-            ]
-            for kp in keypoints
-        ]
+    extracted_points = []
 
-    elif mode == "2D":
-        if frame_width is None or frame_height is None:
-            raise ValueError("Frame width and height must be provided for 2D mode.")
-        
-        return [
-            [
-                int(landmarks[getattr(pose, kp.upper()).value].x * frame_width),
-                int(landmarks[getattr(pose, kp.upper()).value].y * frame_height),
-            ]
-            for kp in keypoints
-        ]
-    
-    else:
-        raise ValueError("Mode must be '2D' or '3D'")
+    for kp in keypoints:
+        landmark = landmarks[getattr(pose, kp.upper()).value]
+
+        if mode == "3D": # 2D mode
+            # Use the first keypoint as reference depth
+            ref_z = landmarks[getattr(pose, keypoints[0].upper()).value].z
+            extracted_points.append([
+                landmark.x * frame_width, # Convert x to pixel space
+                landmark.y * frame_height, # Convert y to pixel space
+                (landmark.z - ref_z) # Relative depth, unscaled
+            ])
+        elif mode == "2D": # 2D mode
+            extracted_points.append([
+                landmark.x * frame_width, # Convert x to pixel space
+                landmark.y * frame_height # Convert y to pixel space
+            ])
+
+    return extracted_points
+
+def detect_leading_side(landmarks, pose):
+    """Determines whether the left or right leg is leading based on x-coordinates of knees."""
+    right_knee_z = landmarks[pose.RIGHT_KNEE].z
+    left_knee_z = landmarks[pose.LEFT_KNEE].z
+    return "right" if right_knee_z < left_knee_z else "left"
 
 # TODO: Right now this just checks the excersize rep angle and first tracking detail
-def process_exercise_angle(landmarks, pose, exercise_detail: ExerciseDetail):
-    # TODO: make this dynamic (some kind of loop)
-    keypoints = extract_keypoints_dynamic(landmarks, pose, exercise_detail.rep_keypoints, exercise_detail.default_tracking_details[0].dimensionality)
-    exercise_angle = calculate_angle(keypoints[0], keypoints[1], keypoints[2])
-    rep_count, last_rep_duration = tracker.detect_reps(exercise_angle)
-    return exercise_angle, rep_count, last_rep_duration
+def process_exercise_metrics(landmarks, pose, exercise_detail: ExerciseDetail):
+    tracking_results = []  # List of dictionaries
+    
+    for tracking_detail in exercise_detail.default_tracking_details:
+        keypoints = []
+
+        # Determine whether to use left or right side
+        if tracking_detail.symmetric:
+            # Determine whether to use left or right side
+            side = detect_leading_side(landmarks, pose)  
+            keypoints = [f"{side}_{kp}" for kp in tracking_detail.keypoints]
+            
+            if tracking_detail == exercise_detail.rep_tracking:
+                exercise_detail.rep_keypoints = keypoints
+        else:
+            keypoints = tracking_detail.keypoints
+           
+        extracted_landmarks = extract_keypoints_dynamic(
+            landmarks, pose, keypoints, tracking_detail.dimensionality)
+
+        if tracking_detail.tracking_type == TrackingType.ANGLE_OF_THREE_POINTS:
+            exercise_angle = calculate_three_point_angle(extracted_landmarks[0], extracted_landmarks[1], extracted_landmarks[2])
+        elif tracking_detail.tracking_type == TrackingType.ANGLE_WITH_VERTICAL:
+            exercise_angle = calculate_two_point_vertical_angle(extracted_landmarks[0], extracted_landmarks[1])
+        elif tracking_detail.tracking_type == TrackingType.ANGLE_WITH_HORIZONTAL:
+            exercise_angle = calculate_two_point_horizontal_angle(extracted_landmarks[0], extracted_landmarks[1])
+        else:
+            raise ValueError(f"Unsupported tracking type: {tracking_detail.tracking_type}")
+
+        # Store results as a dictionary per tracking detail
+        tracking_results.append({"detail": tracking_detail, "angle": exercise_angle})
+    
+    return tracking_results  # Now returns a list of dictionaries
 
 # TODO: Consider refactoring: This function gets visibility scores of ALL points - may be unecessary computation
 def get_landmarks_visibility(landmarks, pose_landmark_enum):
@@ -164,93 +210,133 @@ def get_landmarks_visibility(landmarks, pose_landmark_enum):
 
 # ----------------------- LIVE VIDEO CAPTURE -----------------------
 cap = cv2.VideoCapture(0)
+if not cap.isOpened():
+    print("Error: Could not open video capture.")
+    exit()
+    
 frame_width, frame_height = int(cap.get(3)), int(cap.get(4))
 
-with mp_pose.Pose(
-    min_detection_confidence=CONFIDENCE_THRESHOLD,
-    min_tracking_confidence=CONFIDENCE_THRESHOLD) as pose:
-  while cap.isOpened():
-    success, image = cap.read()
-    if not success:
-      print("Ignoring empty camera frame.")
-      continue
+# Iterate through each exercise in the routine
+for routine_component in routine_config.exercises:
+    exercise_detail = routine_component.exercise
+    tracker = ExerciseTracker(exercise_detail)  # Track exercise progress
+    
+    # Initialize rep data list for this specific exercise
+    rep_data_list = []
+    
+    # Start processing the exercise
+    print(f"Starting exercise: {exercise_detail.display_name}")
 
-    # To improve performance, mark the image as not writeable.
-    image.flags.writeable = False
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    results = pose.process(image)
+    with mp_pose.Pose(
+        min_detection_confidence=CONFIDENCE_THRESHOLD,
+        min_tracking_confidence=CONFIDENCE_THRESHOLD) as pose:
+        while cap.isOpened():
+            success, image = cap.read()
+            if not success:
+                print("Ignoring empty camera frame.")
+                continue
 
-    # Draw the pose annotation on the image.
-    image.flags.writeable = True
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            # To improve performance, mark the image as not writeable.
+            image.flags.writeable = False
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            results = pose.process(image)
 
-    if results.pose_landmarks:
-        # Get landmarks
-        landmarks = results.pose_landmarks.landmark
-        
-        # ----------------------- Camera Tracking -----------------------
-        # TODO: Consider dynamic tracking based on the exersize keypoints
-        
-        all_points = [(landmark.x, landmark.y) for landmark in landmarks] # Extract all lamdmark pts (spatial coordinates)
-        h, w, _ = image.shape # Get frame dimensions (pixel coordinates)
-        
-        pixel_midpoint, offset_x, offset_y = motor_controller.get_offset(all_points, w, h)
-        cv2.circle(image, pixel_midpoint, radius=5, color=(0, 0, 255), thickness=-1)
+            # Draw the pose annotation on the image.
+            image.flags.writeable = True
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-        motor_controller.check_offset_tolerance(offset_x, offset_y)
-
-        # ----------------------- Excersize Processing -----------------------
-        # Get visibility scores for all landmarks
-        visibility = get_landmarks_visibility(landmarks, mp_pose.PoseLandmark)
-
-        # TODO: make this check all keypoints involved (not just for rep detection)
-        # Check rep detection keypoints for the current exercise are visible
-        keypoints_visible = all(
-            visibility.get(kp, 0) > CONFIDENCE_THRESHOLD
-            for kp in exercise_detail.rep_keypoints
-        )
-        
-        if keypoints_visible:
-            exercise_angle, rep_count, last_rep_duration = process_exercise_angle(
-                landmarks, mp_pose.PoseLandmark, exercise_detail
-            )
+            rep_data = None
             
-            # TODO: Imporve smoothing
-            # 5pt local average smoothing
-            smoothed_angle = smooth_angle(exercise_angle, angle_history)
-            
-        # for tracking in custom_tracking_details:
-        #     if tracking.tracking_type == TrackingType.ANGLE_OF_THREE_POINTS:
-        #         keypoints = extract_keypoints_dynamic(landmarks, mp_pose.PoseLandmark, tracking.keypoints)
-        #         angle = calculate_angle(*keypoints)
+            if results.pose_landmarks:
+                landmarks = results.pose_landmarks.landmark
+                visibility = get_landmarks_visibility(landmarks, mp_pose.PoseLandmark)
                 
-                # if tracking.show_alert_if_below and angle < tracking.show_alert_if_below:
-                #     print(tracking.alert_message)
-    
-    # ---------------------- Display Output ----------------------
-    
-    # Draw landmarks using the helper function
-    draw_pose_landmarks(image, results.pose_landmarks)
+                # ----------------------- Camera Tracking -----------------------
+                # TODO: Consider dynamic tracking based on the exersize keypoints
+                
+                all_points = [(landmark.x, landmark.y) for landmark in landmarks] # Extract all lamdmark pts (spatial coordinates)
+                h, w, _ = image.shape # Get frame dimensions (pixel coordinates)
+                
+                pixel_midpoint, offset_x, offset_y = motor_controller.get_offset(all_points, w, h)
+                cv2.circle(image, pixel_midpoint, radius=5, color=(0, 0, 255), thickness=-1)
 
-    # Flip the image for selfie view
-    # flipped_image = flip_image(image)
-    flipped_image = image
+                motor_controller.check_offset_tolerance(offset_x, offset_y)
 
-    # Display text (exercise, reps, time, angle)
-    display_text(flipped_image, exercise_detail.display_name, exercise_detail.body_alignment, tracker.rep_count, tracker.last_rep_duration, smoothed_angle, tracker.alert)
+                # ----------------------- Excersize Processing -----------------------
+            
+                # TODO: make this check all keypoints involved (not just for rep detection)
+                # Check rep detection keypoints for the current exercise are visible
+                keypoints_visible = all(
+                    visibility.get(kp, 0) > CONFIDENCE_THRESHOLD
+                    for kp in exercise_detail.rep_keypoints
+                )
+                
+                
+                if keypoints_visible:
+                    tracking_results = process_exercise_metrics(
+                        landmarks, mp_pose.PoseLandmark, exercise_detail
+                    )
 
-    # Show the flipped image
-    cv2.imshow('MediaPipe Pose', flipped_image)
-    
+                    rep_data = tracker.detect_reps(tracking_results, exercise_detail, result_to_pose_json(results))
+                    rep_data_list.append(rep_data)
 
-    # Exit with the ESC key
-    keypressed = cv2.waitKey(5)
-    KEYCODE_ESC = 27
-    KEYCODE_ENTER = 13
-    if keypressed & 0xFF == KEYCODE_ESC:
-      upload_current_routine()
-      break
-    elif keypressed & 0xFF == KEYCODE_ENTER and results.pose_landmarks:
-       n = add_pose_to_routine(result_to_pose_json(results))
-       print(f"Saved pose into routine, {n} poses currently saved.")
+                    # Extract the rep tracking angle dynamically
+                    rep_tracking_angle = next(
+                        (entry["angle"] for entry in tracking_results if entry["detail"] == exercise_detail.rep_tracking),
+                        None
+                    )
+
+                    # TODO: Improve smoothing (5-point local average)
+                    smoothed_angle = smooth_angle(rep_tracking_angle, angle_history)
+
+            # Extract latest rep data if available
+            if rep_data:
+                last_rep = rep_data  # Get the most recent completed rep
+                rep_count = last_rep.rep_number
+                last_rep_duration = last_rep.total_time
+                alert_message = last_rep.alerts[0] if last_rep.alerts else None
+            else:
+                rep_count = tracker.rep_count
+                last_rep_duration = tracker.last_rep_duration
+                alert_message = alert_message = ", ".join(tracker.last_rep_alerts) if tracker.last_rep_alerts else None
+                
+            # ---------------------- Display Output ----------------------
+            
+            # Draw landmarks using the helper function
+            draw_pose_landmarks(image, results.pose_landmarks)
+
+            # Flip the image for selfie view
+            # flipped_image = flip_image(image)
+            flipped_image = image
+            
+            # Display text (exercise, reps, time, angle)
+            display_text(flipped_image, exercise_detail.display_name, exercise_detail.body_alignment, 
+                rep_count, last_rep_duration, smoothed_angle, alert_message)
+
+            # Show the flipped image
+            cv2.imshow('MediaPipe Pose', flipped_image)
+            
+            # ---------------------- Handle Routine Progression ----------------------
+            
+            # Check if the current exercise is finished
+            if rep_data and rep_data.rep_number >= routine_component.reps:
+                print(f"{exercise_detail.display_name} completed.")
+                break  # End the current exercise
+
+            # Exit with the ESC key
+            keypressed = cv2.waitKey(5)
+            KEYCODE_ESC = 27
+            KEYCODE_ENTER = 13
+            if keypressed & 0xFF == KEYCODE_ESC:
+                upload_current_routine()
+                break
+            elif keypressed & 0xFF == KEYCODE_ENTER and results.pose_landmarks:
+                n = add_pose_to_routine(result_to_pose_json(results))
+                print(f"Saved pose into routine, {n} poses currently saved.")
+        
+        routine_component_data = RoutineComponentData(routine_component=routine_component, rep_data=rep_data_list)
+        routine_component_data_list.append(routine_component_data)
+        
+routine_data.routineComponentData = routine_component_data_list
+
 cap.release()

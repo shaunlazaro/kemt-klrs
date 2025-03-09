@@ -5,10 +5,12 @@ from .tracking import TrackingDetail, TrackingType
 class ExerciseDetail:
     def __init__(
         self,
-        rep_keypoints: List[str],
+        rep_keypoints: List[str], # TODO: consider removing
         rep_tracking: TrackingDetail,
-        threshold_flexion: float,
-        threshold_extension: float,
+        start_angle: float,
+        min_rep_time: float,
+        threshold_flexion: float, # TODO: move to trackingDetail
+        threshold_extension: float, # TODO: move to trackingDetail
         display_name: str,
         start_in_flexion: bool,
         body_alignment: str,
@@ -17,6 +19,8 @@ class ExerciseDetail:
     ):
         self.rep_keypoints = rep_keypoints
         self.rep_tracking = rep_tracking
+        self.start_angle = start_angle
+        self.min_rep_time = min_rep_time
         self.threshold_flexion = threshold_flexion
         self.threshold_extension = threshold_extension
         self.display_name = display_name
@@ -61,7 +65,7 @@ class RoutineConfig:
     
     def get_workout(self, exercise_name: str) -> Optional[RoutineComponent]:
         for component in self.exercises:
-            if component.name == exercise_name:
+            if component.exercise.display_name == exercise_name:
                 return component
         return None
 
