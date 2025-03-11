@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise
+from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise, RepData, RoutineComponentData, RoutineData
 
 class PoseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,3 +62,22 @@ class RoutineConfigSerializer(serializers.ModelSerializer):
     def get_exercises(self, obj):
         routine_exercises = RoutineExercise.objects.filter(routine=obj).select_related('exercise').prefetch_related('custom_tracking_details')
         return RoutineExerciseSerializer(routine_exercises, many=True).data
+
+class RepDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RepData
+        fields = '__all__'
+
+class RoutineComponentDataSerializer(serializers.ModelSerializer):
+    rep_data = RepDataSerializer(many=True)
+
+    class Meta:
+        model = RoutineComponentData
+        fields = '__all__'
+
+class RoutineDataSerializer(serializers.ModelSerializer):
+    routine_component_data = RoutineComponentDataSerializer(many=True)
+
+    class Meta:
+        model = RoutineData
+        fields = '__all__'

@@ -1,6 +1,16 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise
+from .models import (
+    Pose, 
+    Routine, 
+    TrackingDetail, 
+    ExerciseDetail, 
+    RoutineConfig, 
+    RoutineExercise, 
+    RepData, 
+    RoutineComponentData, 
+    RoutineData
+)
 from .serializers import (
     PoseSerializer, 
     RoutineSerializer, 
@@ -8,6 +18,9 @@ from .serializers import (
     ExerciseDetailSerializer,
     RoutineConfigSerializer,
     RoutineExerciseSerializer,
+    RepDataSerializer, 
+    RoutineComponentDataSerializer, 
+    RoutineDataSerializer
 )
 
 class PoseViewSet(viewsets.ModelViewSet):
@@ -33,3 +46,15 @@ class RoutineExerciseViewSet(viewsets.ModelViewSet):
 class RoutineConfigViewSet(viewsets.ModelViewSet):
     queryset = RoutineConfig.objects.all()
     serializer_class = RoutineConfigSerializer
+
+class RepDataViewSet(viewsets.ModelViewSet):
+    queryset = RepData.objects.all()
+    serializer_class = RepDataSerializer
+
+class RoutineComponentDataViewSet(viewsets.ModelViewSet):
+    queryset = RoutineComponentData.objects.all()
+    serializer_class = RoutineComponentDataSerializer
+
+class RoutineDataViewSet(viewsets.ModelViewSet):
+    queryset = RoutineData.objects.all()
+    serializer_class = RoutineDataSerializer
