@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+// import { useState } from "react";
 // import { MdArrowBackIosNew } from "react-icons/md";
 import { cn } from "../../common/utils";
 import { NavItems, type NavItem } from "./items";
@@ -10,12 +10,9 @@ interface SidebarProps {
 
 export default function Sidebar({ className }: SidebarProps) {
   const { pathname } = useLocation();
-  const [isOpen, setIsOpen] = useState(true);
+  const isOpen = true;// const [isOpen, setIsOpen] = useState(true);
 
-  const toggleSidebar = () => setIsOpen((prev) => !prev);
-
-  toggleSidebar();
-  toggleSidebar();
+  // const toggleSidebar = () => setIsOpen((prev) => !prev);
 
   return (
     <nav
