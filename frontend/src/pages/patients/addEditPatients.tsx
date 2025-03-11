@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MockPatients } from "../../testData/patient";
 import { Patient } from "../../interfaces/patient.interface";
 import { PATIENTS_PATH } from "../../routes";
@@ -6,13 +6,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../components/input/input";
 import Button from "../../components/button";
 import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
+import DatePicker from "../../components/datepicker/datepicker";
+import { WideSelect } from "../../components/select/select";
+import { injuryValueList } from "../../common/utils";
+import { ExerciseList } from "../../testData/exerciseDetail";
+import { RoutineConfigList } from "../../testData/exercisePlans";
 
 const NEW_PATIENT_ID = "new"
 const patientData = MockPatients
 const BLANK_PATIENT: Patient = {
     userId: "NA",
-    name: "",
-    age: 0,
+    firstName: "",
+    lastName: "",
+    email: "",
+    dateOfBirth: new Date(),
     sex: "",
     condition: "",
     exercises: undefined,
@@ -34,12 +41,31 @@ const AddEditPatients: React.FC = () => {
     }
 
     const [patient, setPatient] = useState<Patient>(getPatientData(patientId ?? "N/A"));
-    const [patientEmail, setPatientEmail] = useState<string>(patient.name);
-    const [patientFirstName, setPatientFirstName] = useState<string>(patient.name);
-    const [patientLastName, setPatientLastName] = useState<string>(patient.name);
-    const [patientDOB, setPatientDOB] = useState<Date>(new Date());
+    const [patientEmail, setPatientEmail] = useState<string>(patient.email);
+    const [patientFirstName, setPatientFirstName] = useState<string>(patient.firstName);
+    const [patientLastName, setPatientLastName] = useState<string>(patient.lastName);
+    const [patientDOB, setPatientDOB] = useState<Date>(patient.dateOfBirth);
     const [patientInjury, setPatientInjury] = useState<string>(patient.condition);
-    const [patientExercise, setPatientExercise] = useState<RoutineConfig | undefined>();
+    const [patientExercise, setPatientExercise] = useState<RoutineConfig | undefined>(patient.exercises);
+
+    useEffect(
+        () => {
+            const newPatient: Patient = {
+                userId: patient.userId,
+                sex: patient.sex,
+                weeklyProgress: patient.weeklyProgress,
+                // -------
+                email: patientEmail,
+                firstName: patientFirstName,
+                lastName: patientLastName,
+                dateOfBirth: patientDOB,
+                condition: patientInjury,
+                exercises: patientExercise,
+            }
+            setPatient(newPatient);
+        },
+        [patientEmail, patientFirstName, patientLastName, patientDOB, patientInjury, patientExercise]
+    )
 
     const onClickCancel = () => {
 
@@ -65,19 +91,29 @@ const AddEditPatients: React.FC = () => {
                     </div>
                     <div className="pb-4">
                         <div className="font-base text-sm text-primary-gray pb-1"> Last Name </div>
-                        <Input className="border-2 border-primary-gray" placeholder="Email" value={patientLastName} onChange={(e) => setPatientLastName(e.target.value)} />
+                        <Input className="border-2 border-primary-gray" placeholder="Last name" value={patientLastName} onChange={(e) => setPatientLastName(e.target.value)} />
                     </div>
                     <div className="pb-4">
                         <div className="font-base text-sm text-primary-gray pb-1"> Date of Birth </div>
-                        <Input className="border-2 border-primary-gray" placeholder="DOB TODO" />
+                        {/* <Input className="border-2 border-primary-gray" placeholder="DOB TODO" /> */}
+                        <DatePicker date={patientDOB} onDateChange={(date: Date) => { setPatientDOB(date ?? new Date()); }} />
                     </div>
                     <div className="pb-4">
                         <div className="font-base text-sm text-primary-gray pb-1"> Condition </div>
-                        <Input className="border-2 border-primary-gray" placeholder="CON TODO" />
+                        <WideSelect items={injuryValueList} value={patientInjury ?? injuryValueList[0]} onChange={(e) => setPatientInjury(e.target.value)} />
+                        {/* <Input className="border-2 border-primary-gray" placeholder="CON TODO" /> */}
                     </div>
                     <div className="pb-4">
                         <div className="font-base text-sm text-primary-gray pb-1"> Exercise </div>
-                        <Input className="border-2 border-primary-gray" placeholder="EX TODO" />
+                        <WideSelect
+                            items={RoutineConfigList}
+                            valueKey="name"
+                            label="name"
+                            value={patient.exercises?.name ?? ""}
+                            onChange={(e) => {
+                                setPatientExercise(RoutineConfigList.find((ex) => ex.name == e.target.value) ?? RoutineConfigList[0])
+                            }}
+                        />
                     </div>
                 </div>
             </div>

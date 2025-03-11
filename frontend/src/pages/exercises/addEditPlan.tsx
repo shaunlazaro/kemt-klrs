@@ -12,7 +12,7 @@ import { ExerciseList } from "../../testData/exerciseDetail";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { ExerciseDetail } from "../../interfaces/exerciseDetail.interface";
 import { EXERCISES_PATH } from "../../routes";
-import { filterList } from "../../common/utils";
+import { injuryValueList } from "../../common/utils";
 
 const NEW_PLAN_ID = "new"
 const TEST_PLAN = TestRoutineConfig2;
@@ -95,7 +95,7 @@ const AddEditPlan: React.FC = () => {
                     </div>
                     <div className="pt-4">
                         <span className="text-primary-darkblue text-sm font-semibold pb-1">Injury / Condition</span><br />
-                        <WideSelect items={filterList} value={plan?.injury ?? filterList[0]} onChange={(e) => setPlanInjury(e.target.value)} />
+                        <WideSelect items={injuryValueList} value={plan?.injury ?? injuryValueList[0]} onChange={(e) => setPlanInjury(e.target.value)} />
                     </div>
                     <div className="w-full h-[1px] bg-neutral-800 my-8" />
 

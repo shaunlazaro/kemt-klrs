@@ -1,11 +1,22 @@
 import { Patient } from "../interfaces/patient.interface";
 import { TestRoutineConfig, TestRoutineConfig2 } from "./exercisePlans";
 
+const cutoffDate = new Date();
+cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
+
+const dateNYearsAgo = (n: number) => {
+    const today = new Date()
+    today.setFullYear(today.getFullYear() - n)
+    return today
+}
+
 export const MockPatients: Patient[] = [
     {
         userId: "1",
-        name: "Al Liver",
-        age: 48,
+        firstName: "Al",
+        lastName: "Liver",
+        dateOfBirth: dateNYearsAgo(40),
+        email: "test@test.com",
         sex: "M",
         condition: "Knee",
         exercises: TestRoutineConfig,
@@ -13,8 +24,10 @@ export const MockPatients: Patient[] = [
     },
     {
         userId: "2",
-        name: "Bourne Happy",
-        age: 70,
+        firstName: "Bourne",
+        lastName: "Happy",
+        dateOfBirth: dateNYearsAgo(70),
+        email: "test@test.com",
         sex: "F",
         condition: "Ankle",
         exercises: TestRoutineConfig2,
@@ -22,8 +35,10 @@ export const MockPatients: Patient[] = [
     },
     {
         userId: "3",
-        name: "Craig Gnee",
-        age: 24,
+        firstName: "Craig",
+        lastName: "Gnee",
+        dateOfBirth: dateNYearsAgo(24),
+        email: "test@test.com",
         sex: "M",
         condition: "Knee",
         exercises: TestRoutineConfig2,
@@ -31,17 +46,21 @@ export const MockPatients: Patient[] = [
     },
     {
         userId: "4",
-        name: "Destry Bone",
-        age: 60,
+        firstName: "Destry",
+        lastName: "Bone",
+        dateOfBirth: dateNYearsAgo(60),
+        email: "test@test.com",
         sex: "F",
         condition: "Knee",
         exercises: TestRoutineConfig,
         weeklyProgress: 7
     },
     {
-        userId: "1",
-        name: "El Fizzio",
-        age: 13,
+        userId: "5",
+        firstName: "El",
+        lastName: "Fizzio",
+        dateOfBirth: dateNYearsAgo(14),
+        email: "test@test.com",
         sex: "F",
         condition: "Ankle",
         weeklyProgress: 7

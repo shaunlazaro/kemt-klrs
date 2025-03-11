@@ -14,12 +14,13 @@ import {
 import { ADDEDIT_PATIENTS_PATH } from "../../../routes";
 import { useNavigate } from "react-router-dom";
 import { RoutineConfig } from "../../../interfaces/exercisePlan.interface";
+import { getPatientAge, getPatientName } from "../../../common/utils";
 
 
 export const PatientTableColumnDef: ColumnDef<Patient>[] = [
     {
         id: "name",
-        accessorFn: (patient) => patient.name,
+        accessorFn: (patient) => getPatientName(patient),
         header: () => (
             <div className="w-full cursor-default text-center">Name</div>
         ),
@@ -33,7 +34,7 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
     },
     {
         id: "age",
-        accessorFn: (patient) => patient.age,
+        accessorFn: (patient) => getPatientAge(patient),
         header: () => (
             <div className="w-full cursor-default text-center">Age</div>
         ),

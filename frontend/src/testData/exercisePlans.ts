@@ -11,6 +11,7 @@ import { ExerciseMockA, ExerciseMockB, ExerciseMockC, ExerciseMockD } from "./ex
 //     customTrackingDetails?: TrackingDetail[]
 // }
 
+
 export const TestRoutineConfig: RoutineConfig = {
     name: "Abc of the Knee",
     exercises: [
@@ -47,4 +48,6 @@ export const TestRoutineConfig2: RoutineConfig = {
     ],
     injury: "Ankle"
 }
+
 export const ExercisePlanListMock: RoutineConfig[] = [TestRoutineConfig, TestRoutineConfig2, TestRoutineConfig2, TestRoutineConfig2, TestRoutineConfig, TestRoutineConfig]
+export const RoutineConfigList: RoutineConfig[] = [TestRoutineConfig, TestRoutineConfig2]

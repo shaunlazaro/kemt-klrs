@@ -6,7 +6,7 @@ import { ExercisePlanListMock } from "../../testData/exercisePlans";
 import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
-import { filterList } from "../../common/utils";
+import { injuryValueList } from "../../common/utils";
 
 const Exercises: React.FC = () => {
 
@@ -47,7 +47,7 @@ const Exercises: React.FC = () => {
           </div>
           <div>
             <span className="text-primary-darkblue text-sm font-semibold">Filter by Injury</span><br />
-            <Select items={filterList} placeholderString="All" onChange={(e) => onFilterChange(e.target.value)} />
+            <Select items={injuryValueList} placeholderString="All" onChange={(e) => onFilterChange(e.target.value)} />
           </div>
         </div>
         <Button variant="primary" className="h-auto mt-4 mb-1">
