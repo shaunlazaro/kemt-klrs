@@ -9,7 +9,6 @@ import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import DatePicker from "../../components/datepicker/datepicker";
 import { WideSelect } from "../../components/select/select";
 import { injuryValueList } from "../../common/utils";
-import { ExerciseList } from "../../testData/exerciseDetail";
 import { RoutineConfigList } from "../../testData/exercisePlans";
 
 const NEW_PATIENT_ID = "new"

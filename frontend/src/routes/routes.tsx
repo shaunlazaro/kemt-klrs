@@ -1,4 +1,4 @@
-import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route } from 'react-router-dom';
+import { createBrowserRouter, createRoutesFromElements, Outlet, Route } from 'react-router-dom';
 import { ErrorPage, Exercises, Home, Patients, Signin } from '../pages';
 import { PageTemplate } from '../page.template';
 import { ADDEDIT_EXERCISES_PATH, ADDEDIT_PATIENTS_PATH, EXERCISES_PATH, HOME_PATH, PATIENTS_PATH } from './name';

@@ -1,14 +1,14 @@
 import { Patient } from "../../../interfaces/patient.interface";
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import Button from "../../button"
 import {
     DropdownMenu,
-    DropdownMenuCheckboxItem,
+    // DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
+    // DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "../../dropdown/dropdown"
 import { ADDEDIT_PATIENTS_PATH } from "../../../routes";

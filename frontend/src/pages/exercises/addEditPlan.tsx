@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "../../components/button"
 import { WideSelect } from "../../components/select/select"
 import { Input } from "../../components/input/input";
-import { ExercisePlanListMock, TestRoutineConfig2 } from "../../testData/exercisePlans";
+import { TestRoutineConfig2 } from "../../testData/exercisePlans";
 import { RoutineComponent, RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import { useNavigate, useParams } from "react-router-dom";
 import { CiCircleInfo } from "react-icons/ci";
@@ -18,6 +18,7 @@ const NEW_PLAN_ID = "new"
 const TEST_PLAN = TestRoutineConfig2;
 
 const BLANK_PLAN: RoutineConfig = {
+    id: "TEMP",
     name: "",
     injury: "Knee",
     exercises: []
@@ -49,13 +50,14 @@ const AddEditPlan: React.FC = () => {
     useEffect(
         () => {
             const newPlan: RoutineConfig = {
+                id: plan.id,
                 name: planName,
                 injury: planInjury,
                 exercises: planComponents,
             }
             setPlan(newPlan);
         },
-        [planName, planInjury]
+        [planName, planInjury, planComponents]
     )
 
     const onClickInfo = (exercise: ExerciseDetail) => {

@@ -13,6 +13,7 @@ import { ExerciseMockA, ExerciseMockB, ExerciseMockC, ExerciseMockD } from "./ex
 
 
 export const TestRoutineConfig: RoutineConfig = {
+    id: "1",
     name: "Abc of the Knee",
     exercises: [
         {
@@ -39,6 +40,7 @@ export const TestRoutineConfig: RoutineConfig = {
     injury: "Knee"
 }
 export const TestRoutineConfig2: RoutineConfig = {
+    id: "2",
     name: "Ankle Turner",
     exercises: [
         {

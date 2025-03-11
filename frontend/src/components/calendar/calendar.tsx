@@ -81,7 +81,7 @@ function Calendar({
         }, [yearRange])
     )
 
-    const { onNextClick, onPrevClick, startMonth, endMonth } = props
+    const { /*onNextClick,*/ onPrevClick, startMonth, endMonth } = props
 
     const columnsDisplayed = navView === "years" ? 1 : numberOfMonths
 
@@ -395,7 +395,7 @@ function CaptionLabel({
         <Button
             className="h-7 w-full truncate text-sm font-medium"
             variant="ghost"
-            size="sm"
+            // size="sm"
             onClick={() => setNavView((prev) => (prev === "days" ? "years" : "days"))}
         >
             {navView === "days"

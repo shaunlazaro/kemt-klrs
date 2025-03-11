@@ -7,9 +7,11 @@ import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 import { injuryValueList } from "../../common/utils";
+import { useNavigate } from "react-router-dom";
+import { ADDEDIT_EXERCISES_PATH, ADDEDIT_EXERCISES_PATH_NEW } from "../../routes";
 
 const Exercises: React.FC = () => {
-
+  const navigate = useNavigate();
   const baseExercisePlanList = ExercisePlanListMock
   const [ExercisePlanList, setExercisePlanList] = useState<RoutineConfig[]>(baseExercisePlanList);
   const [searchString, setSearchString] = useState<string>("");
@@ -50,7 +52,7 @@ const Exercises: React.FC = () => {
             <Select items={injuryValueList} placeholderString="All" onChange={(e) => onFilterChange(e.target.value)} />
           </div>
         </div>
-        <Button variant="primary" className="h-auto mt-4 mb-1">
+        <Button variant="primary" className="h-auto mt-4 mb-1" onClick={() => navigate(ADDEDIT_EXERCISES_PATH_NEW)}>
           <MdAddCircleOutline className="h-auto w-6" />
           <span className="font-semibold">New Exercise Plan</span>
         </Button>
@@ -66,7 +68,10 @@ const Exercises: React.FC = () => {
                     <span className="font-semibold text-black text-xl">{routineConfig.name}</span><br />
                     <span className="font-semibold text-primary-darkblue text-sm">{routineConfig.injury}</span>
                   </div>
-                  <div className="rounded-2xl bg-secondary-lightpink text-white h-8 w-8 flex justify-center pb-1.5 pl-1.5 pr-1 pt-1">
+                  <div
+                    className="rounded-2xl bg-secondary-lightpink text-white h-8 w-8 flex justify-center pb-1.5 pl-1.5 pr-1 pt-1 hover:cursor-pointer"
+                    onClick={() => navigate(ADDEDIT_EXERCISES_PATH.replace(":id", routineConfig.id))}
+                  >
                     <LiaEditSolid className="w-6 h-auto" />
                   </div>
                 </div>
