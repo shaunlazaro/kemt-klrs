@@ -123,7 +123,8 @@ class TrackingType(models.TextChoices):
 class TrackingDetail(models.Model):
     tracking_type = models.CharField(max_length=50, choices=TrackingType.choices) # S.T.C, keep as string for now so we don't have to sync enums across projects
     keypoints = models.JSONField()  # List of keypoints (list<str>)
-    dimensionality = models.CharField(max_length=50, null=True, blank=True)
+    symmetric = models.BooleanField(default=True)
+    dimensionality = models.CharField(max_length=50, default="2D", blank=True)
     goal_flexion = models.FloatField(null=True, blank=True)
     goal_extension = models.FloatField(null=True, blank=True)
     show_alert_if_above = models.FloatField(null=True, blank=True)
@@ -136,10 +137,15 @@ class TrackingDetail(models.Model):
 class ExerciseDetail(models.Model):
     rep_tracking = models.ForeignKey(TrackingDetail, on_delete=models.CASCADE, null=True, blank=True)
     rep_keypoints = models.JSONField()
+    start_angle = models.FloatField(default=0)
+    min_rep_time = models.FloatField(default=0)
     threshold_flexion = models.FloatField()
     threshold_extension = models.FloatField()
     display_name = models.CharField(max_length=100)
+    start_in_flexion = models.BooleanField(default=False)
+    body_alignment = models.CharField(max_length=50, default="TODO")
     default_tracking_details = models.ManyToManyField(TrackingDetail, related_name="exercise_details")
+    instruction = models.CharField(max_length=900, default="Enter some instructions to show the user...")
 
     def __str__(self):
         return self.display_name
