@@ -10,7 +10,11 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-  } from "../../dropdown/dropdown"
+} from "../../dropdown/dropdown"
+import { ADDEDIT_PATIENTS_PATH } from "../../../routes";
+import { useNavigate } from "react-router-dom";
+import { RoutineConfig } from "../../../interfaces/exercisePlan.interface";
+
 
 export const PatientTableColumnDef: ColumnDef<Patient>[] = [
     {
@@ -65,9 +69,7 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
             <div
                 className={`rounded-md py-1 text-center font-semibold text-sm flex justify-center`}
             >
-                {(cell.getValue() as string[]).map((condition) => 
-                    (<div className="rounded-2xl border text-white bg-primary px-4 py-1">{condition}</div>)
-                )}
+                <div className="rounded-2xl border text-white bg-primary px-4 py-1">{`${cell.getValue()}`}</div>
             </div>
         ),
     },
@@ -81,7 +83,11 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
             <div
                 className={`rounded-md py-1 text-center font-semibold text-sm`}
             >
-                {`${(cell.getValue() as string[]).map((exercise) => exercise)}`}
+                {(cell.getValue() as RoutineConfig)?.name &&
+                    <div className="rounded-2xl border text-white bg-primary px-4 py-1">
+                        {(cell.getValue() as RoutineConfig)?.name}
+                    </div>
+                }
             </div>
         ),
     },
@@ -103,30 +109,31 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-        //   const patient = row.original
-    
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-neutral-300">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                {/* <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(payment.id)}
-                >
-                  Copy payment ID
-                </DropdownMenuItem>
-                <DropdownMenuSeparator /> */}
-                <DropdownMenuItem>Edit Patient Info</DropdownMenuItem>
-                <DropdownMenuItem>Delete Patient</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )
+            const patient = row.original
+            const navigate = useNavigate();
+
+            return (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-neutral-300">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        {/* <DropdownMenuItem
+                    onClick={() => navigator.clipboard.writeText(payment.id)}
+                    >
+                    Copy payment ID
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator /> */}
+                        <DropdownMenuItem onClick={() => navigate(ADDEDIT_PATIENTS_PATH.replace(":id", patient.userId))}>Edit Patient Info</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => alert("Unimplemented!\nTODO: Delete patient functionality")}>Delete Patient</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu >
+            )
         },
-      },
-    
+    },
+
 ]

@@ -1,8 +1,9 @@
 import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route } from 'react-router-dom';
 import { ErrorPage, Exercises, Home, Patients, Signin } from '../pages';
 import { PageTemplate } from '../page.template';
-import { ADDEDIT_EXERCISES_PATH, EXERCISES_PATH, HOME_PATH, PATIENTS_PATH } from './name';
+import { ADDEDIT_EXERCISES_PATH, ADDEDIT_PATIENTS_PATH, EXERCISES_PATH, HOME_PATH, PATIENTS_PATH } from './name';
 import AddEditPlan from '../pages/exercises/addEditPlan';
+import AddEditPatients from '../pages/patients/addEditPatients';
 
 const ProtectedRoute: React.FC = () => {
   // const session = useSession();
@@ -25,6 +26,7 @@ const routes = createRoutesFromElements(
     <Route path="/signin" element={<Signin />} />
     {/* <Route path="/register" element={<Register />} /> */}
     <Route path={PATIENTS_PATH} element={<Patients />} />
+    <Route path={ADDEDIT_PATIENTS_PATH} element={<AddEditPatients />} />
     <Route path={EXERCISES_PATH} element={<Exercises />} />
     <Route path={ADDEDIT_EXERCISES_PATH} element={<AddEditPlan />} />
   </Route>

@@ -6,12 +6,7 @@ import { ExercisePlanListMock } from "../../testData/exercisePlans";
 import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
-
-
-// Utility function, should probably be done by server, or create a "injury" table.
-const getUniqueInjuryValues = (routineConfigs: RoutineConfig[]): string[] => {
-  return [...new Set(routineConfigs.map((routineConfig) => routineConfig.injury))]
-}
+import { filterList } from "../../common/utils";
 
 const Exercises: React.FC = () => {
 
@@ -19,7 +14,6 @@ const Exercises: React.FC = () => {
   const [ExercisePlanList, setExercisePlanList] = useState<RoutineConfig[]>(baseExercisePlanList);
   const [searchString, setSearchString] = useState<string>("");
   const [selectedFilter, setSelectedFilter] = useState<string>("");
-  const filterList = getUniqueInjuryValues(baseExercisePlanList);
 
   const applyListFilters = () => {
     setExercisePlanList(baseExercisePlanList.filter((routineConfig) => routineConfig.name.includes(searchString)

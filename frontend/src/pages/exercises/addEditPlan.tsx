@@ -12,7 +12,7 @@ import { ExerciseList } from "../../testData/exerciseDetail";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { ExerciseDetail } from "../../interfaces/exerciseDetail.interface";
 import { EXERCISES_PATH } from "../../routes";
-
+import { filterList } from "../../common/utils";
 
 const NEW_PLAN_ID = "new"
 const TEST_PLAN = TestRoutineConfig2;
@@ -22,17 +22,10 @@ const BLANK_PLAN: RoutineConfig = {
     injury: "Knee",
     exercises: []
 }
-
 const BLANK_EXERCISE: RoutineComponent = {
     reps: 0,
     exercise: ExerciseList[0]
 }
-
-// Utility function, should probably be done by server, or create a "injury" table.
-const getUniqueInjuryValues = (routineConfigs: RoutineConfig[]): string[] => {
-    return [...new Set(routineConfigs.map((routineConfig) => routineConfig.injury))]
-}
-const filterList = getUniqueInjuryValues(ExercisePlanListMock);
 
 
 const AddEditPlan: React.FC = () => {

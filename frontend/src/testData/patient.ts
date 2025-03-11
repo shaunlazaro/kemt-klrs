@@ -1,4 +1,5 @@
 import { Patient } from "../interfaces/patient.interface";
+import { TestRoutineConfig, TestRoutineConfig2 } from "./exercisePlans";
 
 export const MockPatients: Patient[] = [
     {
@@ -6,8 +7,8 @@ export const MockPatients: Patient[] = [
         name: "Al Liver",
         age: 48,
         sex: "M",
-        condition: ["Knee"],
-        exercises: ["1"],
+        condition: "Knee",
+        exercises: TestRoutineConfig,
         weeklyProgress: 7
     },
     {
@@ -15,8 +16,8 @@ export const MockPatients: Patient[] = [
         name: "Bourne Happy",
         age: 70,
         sex: "F",
-        condition: ["Ankle"],
-        exercises: ["2"],
+        condition: "Ankle",
+        exercises: TestRoutineConfig2,
         weeklyProgress: 2
     },
     {
@@ -24,8 +25,8 @@ export const MockPatients: Patient[] = [
         name: "Craig Gnee",
         age: 24,
         sex: "M",
-        condition: ["Knee"],
-        exercises: ["1", "2"],
+        condition: "Knee",
+        exercises: TestRoutineConfig2,
         weeklyProgress: 7
     },
     {
@@ -33,8 +34,8 @@ export const MockPatients: Patient[] = [
         name: "Destry Bone",
         age: 60,
         sex: "F",
-        condition: ["Knee"],
-        exercises: ["3"],
+        condition: "Knee",
+        exercises: TestRoutineConfig,
         weeklyProgress: 7
     },
     {
@@ -42,8 +43,7 @@ export const MockPatients: Patient[] = [
         name: "El Fizzio",
         age: 13,
         sex: "F",
-        condition: ["Knee", "Ankle"],
-        exercises: ["1", "2", "3"],
+        condition: "Ankle",
         weeklyProgress: 7
     },
 ]
