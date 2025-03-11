@@ -2,8 +2,9 @@ from django.db import models
 from django.utils.safestring import mark_safe
 
 # ----
-# Workout Result Data
+# Workout Result Data  (DEPRECATED)
 # ----
+# DEPRECATED
 class Pose(models.Model):
     # Store the entire list of landmarks as a JSON field
     landmarks = models.JSONField(default=list)
@@ -60,6 +61,7 @@ class Pose(models.Model):
 
     render_pose.short_description = "Pose Rendering"  # Optional: Display column title
 
+# DEPRECATED
 class Routine(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
@@ -68,6 +70,41 @@ class Routine(models.Model):
 
     def __str__(self):
         return self.name
+
+# ----
+# Workout Result Data (New as of 3/11/25)
+# ----
+class RepData(models.Model):
+    rep_number = models.IntegerField()
+    max_flexion = models.FloatField()
+    max_extension = models.FloatField()
+    concentric_time = models.FloatField()
+    eccentric_time = models.FloatField()
+    total_time = models.FloatField()
+    goal_flexion_met = models.BooleanField()
+    goal_extension_met = models.BooleanField()
+    score = models.FloatField()
+    alerts = models.JSONField(default=list)  # List of alert messages
+    poses = models.ManyToManyField('Pose', blank=True)  # Link to Pose model
+
+    def __str__(self):
+        return f"Rep {self.rep_number}: Score {self.score}"
+
+class RoutineComponentData(models.Model):
+    routine_component = models.ForeignKey('RoutineExercise', on_delete=models.CASCADE)
+    rep_data = models.ManyToManyField(RepData)
+
+    def __str__(self):
+        return f"Routine Component {self.routine_component}"
+
+class RoutineData(models.Model):
+    routine_config = models.ForeignKey('RoutineConfig', on_delete=models.CASCADE)
+    routine_component_data = models.ManyToManyField(RoutineComponentData)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Routine Data for {self.routine_config.name}"
+
 
 # ----
 # Workout Routine/Config Data
@@ -86,7 +123,8 @@ class TrackingType(models.TextChoices):
 class TrackingDetail(models.Model):
     tracking_type = models.CharField(max_length=50, choices=TrackingType.choices) # S.T.C, keep as string for now so we don't have to sync enums across projects
     keypoints = models.JSONField()  # List of keypoints (list<str>)
-    dimensionality = models.CharField(max_length=50, null=True, blank=True)
+    symmetric = models.BooleanField(default=True)
+    dimensionality = models.CharField(max_length=50, default="2D", blank=True)
     goal_flexion = models.FloatField(null=True, blank=True)
     goal_extension = models.FloatField(null=True, blank=True)
     show_alert_if_above = models.FloatField(null=True, blank=True)
@@ -99,10 +137,15 @@ class TrackingDetail(models.Model):
 class ExerciseDetail(models.Model):
     rep_tracking = models.ForeignKey(TrackingDetail, on_delete=models.CASCADE, null=True, blank=True)
     rep_keypoints = models.JSONField()
+    start_angle = models.FloatField(default=0)
+    min_rep_time = models.FloatField(default=0)
     threshold_flexion = models.FloatField()
     threshold_extension = models.FloatField()
     display_name = models.CharField(max_length=100)
+    start_in_flexion = models.BooleanField(default=False)
+    body_alignment = models.CharField(max_length=50, default="TODO")
     default_tracking_details = models.ManyToManyField(TrackingDetail, related_name="exercise_details")
+    instruction = models.CharField(max_length=900, default="Enter some instructions to show the user...")
 
     def __str__(self):
         return self.display_name
@@ -129,3 +172,4 @@ class RoutineExercise(models.Model):
 
     def __str__(self):
         return f"{self.routine} - {self.exercise.display_name}"
+    
