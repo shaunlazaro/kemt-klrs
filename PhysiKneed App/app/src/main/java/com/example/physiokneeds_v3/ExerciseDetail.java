@@ -6,6 +6,8 @@ import java.util.List;
 public class ExerciseDetail implements Serializable {
     private TrackingDetail rep_tracking;
     private List<String> rep_keypoints;
+    private Float start_angle;
+    private Float min_rep_time;
     private Integer threshold_flexion;
     private Integer threshold_extension;
     private String display_name;
@@ -35,6 +37,21 @@ public class ExerciseDetail implements Serializable {
 
     public Integer getThresholdFlexion() {
         return threshold_flexion;
+    }
+
+    public void setStartAngle(Float startAngle) {
+        start_angle = startAngle;
+    }
+
+    public Float getStartAngle() {
+        return start_angle;
+    }
+    public void setMinRepTime(Float minRepTime) {
+        min_rep_time = minRepTime;
+    }
+
+    public Float getMinRepTime() {
+        return min_rep_time;
     }
 
     public void setThresholdFlexion(Integer thresholdFlexion) {

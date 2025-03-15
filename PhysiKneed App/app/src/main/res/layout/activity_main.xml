@@ -120,6 +120,19 @@
         android:layout_gravity="right"
         android:layout_marginEnd="30dp" />
 
+    <TextView
+        android:id="@+id/left_text"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="Reps: 0"
+        android:fontFamily="@font/source_sans"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:padding="10dp"
+        android:layout_gravity="right"
+        android:layout_marginEnd="30dp" />
+
     <LinearLayout
         android:id="@+id/instructions_layout"
         android:layout_width="match_parent"

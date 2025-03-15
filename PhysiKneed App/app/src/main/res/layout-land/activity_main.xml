@@ -90,6 +90,7 @@
                         android:padding="10dp" />
 
                     <TextView
+                        android:id="@+id/left_text"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="1. Sit on a chair with both feet on the floor.\n\n2. Slowly bend your left knee to bring your leg up\n   a. Lift until you feel discomfort or your leg is \n\        pointing straight out\n\n3. Slowly lower your leg back to the ground"

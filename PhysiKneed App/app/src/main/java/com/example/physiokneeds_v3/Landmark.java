@@ -6,6 +6,4 @@ public class Landmark {
     private float y;
     private float z;
     private float visibility;
-
-
 }

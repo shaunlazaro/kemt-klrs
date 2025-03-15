@@ -4,22 +4,23 @@ import java.io.Serializable;
 import java.util.List;
 
 public class TrackingDetail implements Serializable {
-    private String tracking_type;
+    private TrackingType tracking_type;
     private List<String> keypoints;
+    private Boolean symmetric;
     private String dimensionality;
-    private Integer goal_flexion;
-    private Integer goal_extension;
+    private Double goal_flexion;
+    private Double goal_extension;
     private Integer show_alert_if_above;
     private Integer show_alert_if_below;
     private String alert_message;
 
     public TrackingDetail() {}
 
-    public String getTrackingType() {
+    public TrackingType getTrackingType() {
         return tracking_type;
     }
 
-    public void setTrackingType(String trackingType) {
+    public void setTrackingType(TrackingType trackingType) {
         this.tracking_type = trackingType;
     }
 
@@ -31,6 +32,14 @@ public class TrackingDetail implements Serializable {
         this.keypoints = keypoints;
     }
 
+    public Boolean getSymmetric() {
+        return symmetric;
+    }
+
+    public void setSymmetric(Boolean symmetric) {
+        this.symmetric = symmetric;
+    }
+
     public String getDimensionality() {
         return dimensionality;
     }
@@ -39,19 +48,19 @@ public class TrackingDetail implements Serializable {
         this.dimensionality = dimensionality;
     }
 
-    public Integer getGoalFlexion() {
+    public Double getGoalFlexion() {
         return goal_flexion;
     }
 
-    public void setGoalFlexion(Integer goalFlexion) {
+    public void setGoalFlexion(Double goalFlexion) {
         this.goal_flexion = goalFlexion;
     }
 
-    public Integer getGoalExtension() {
+    public Double getGoalExtension() {
         return goal_extension;
     }
 
-    public void setGoalExtension(Integer goalExtension) {
+    public void setGoalExtension(Double goalExtension) {
         this.goal_extension = goalExtension;
     }
 

@@ -1,102 +1,202 @@
 package com.example.physiokneeds_v3;
 
-import android.util.Log;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ExerciseTracker {
-    private int repCount = 0;
-    private String state = "rest";
-    private Double repStartTime = null;
-    private double lastRepDuration = 0;
+    private int repCount;
+    private String state;
+    private boolean justCompletedRep;
+    private long repStartTime;
+    private long lastRepDuration;
     private double flexionThreshold;
     private double extensionThreshold;
     private boolean startInFlexion;
-    private double currentMaxFlexion = Double.POSITIVE_INFINITY;
-    private double currentMaxExtension = Double.NEGATIVE_INFINITY;
-    private Integer goalFlexion;
-    private Integer goalExtension;
-    private String alertMessage;
-    private String alert = null;
-    private Double phase1StartTime = null;
-    private Double phase2StartTime = null;
-    private double lastConcentricTime = 0;
-    private double lastEccentricTime = 0;
-    private Deque<Map<String, Object>> repData = new ArrayDeque<>(50);
+    private double currentMaxFlexion;
+    private double currentMaxExtension;
+    private Double goalFlexion;
+    private Double goalExtension;
+    private Set<String> alerts;
+    private Set<String> lastRepAlerts;
+    private long phase1StartTime;
+    private long phase2StartTime;
+    private long lastConcentricTime;
+    private long lastEccentricTime;
+    private List<Pose> posesBuffer;
+    private long lastPoseCaptureTime;
+    private Float score;
 
     public ExerciseTracker(ExerciseDetail exerciseDetail) {
+        this.repCount = 0;
+        this.state = "rest";
+        this.justCompletedRep = false;
+        this.repStartTime = 0;
+        this.lastRepDuration = 0;
         this.flexionThreshold = exerciseDetail.getThresholdFlexion();
         this.extensionThreshold = exerciseDetail.getThresholdExtension();
         this.startInFlexion = exerciseDetail.getStartInFlexion();
-
-        TrackingDetail trackingDetail = exerciseDetail.getDefaultTrackingDetails().get(0);
-        this.goalFlexion = trackingDetail.getGoalFlexion();
-        this.goalExtension = trackingDetail.getGoalExtension();
-        this.alertMessage = trackingDetail.getAlertMessage();
+        this.currentMaxFlexion = Double.POSITIVE_INFINITY;
+        this.currentMaxExtension = Double.NEGATIVE_INFINITY;
+        this.goalFlexion = exerciseDetail.getRepTracking().getGoalFlexion();
+        this.goalExtension = exerciseDetail.getRepTracking().getGoalExtension();
+        this.alerts = new HashSet<>();
+        this.lastRepAlerts = new HashSet<>();
+        this.phase1StartTime = 0;
+        this.phase2StartTime = 0;
+        this.lastConcentricTime = 0;
+        this.lastEccentricTime = 0;
+        this.posesBuffer = new ArrayList<>();
+        this.lastPoseCaptureTime = 0;
+        this.score = 0f;
     }
 
-    public int[] detectReps(double kneeAngle) {
-        double currentTime = System.currentTimeMillis() / 1000.0;
+    public RepData detectReps(List<TrackingResult> trackingResults, ExerciseDetail exerciseDetail, Pose poseData) {
+        RepData repEntry = null;
+        TrackingDetail mainTrackingDetail = exerciseDetail.getRepTracking();
+        Double primaryAngle = getPrimaryAngle(trackingResults, mainTrackingDetail);
 
-        currentMaxFlexion = Math.min(currentMaxFlexion, kneeAngle);
-        currentMaxExtension = Math.max(currentMaxExtension, kneeAngle);
+        if (primaryAngle == null) {
+            return null;
+        }
 
-        Log.e("ExerciseTracker", state);
-        Log.e("ExerciseTracker", String.valueOf(kneeAngle));
+        long currentTime = System.currentTimeMillis();
+        updateMaxAngles(primaryAngle);
+        processAlerts(trackingResults, mainTrackingDetail);
+        updateProgressScore(primaryAngle, exerciseDetail.getStartAngle());
 
+        if (currentTime - lastPoseCaptureTime >= 100) {
+            posesBuffer.add(poseData);
+            lastPoseCaptureTime = currentTime;
+        }
+
+        updateState(primaryAngle, currentTime);
+
+        if ("rest".equals(state) && justCompletedRep) {
+            repEntry = finalizeRep(currentTime, mainTrackingDetail, exerciseDetail.getMinRepTime());
+            justCompletedRep = false;
+        }
+        return repEntry;
+    }
+
+    private Double getPrimaryAngle(List<TrackingResult> trackingResults, TrackingDetail mainTrackingDetail) {
+        for (TrackingResult entry : trackingResults) {
+            if (entry.getDetail().equals(mainTrackingDetail)) {
+                return entry.getAngle();
+            }
+        }
+        return null;
+    }
+
+    private void updateMaxAngles(double primaryAngle) {
+        currentMaxFlexion = Math.min(currentMaxFlexion, primaryAngle);
+        currentMaxExtension = Math.max(currentMaxExtension, primaryAngle);
+    }
+
+    private void processAlerts(List<TrackingResult> trackingResults, TrackingDetail mainTrackingDetail) {
+        for (TrackingResult entry : trackingResults) {
+            TrackingDetail detail = entry.getDetail();
+            double value = entry.getAngle();
+
+            if (detail.equals(mainTrackingDetail)) continue;
+            if (detail.getShowAlertIfAbove() != null && value > detail.getShowAlertIfAbove()) {
+                alerts.add(detail.getAlertMessage());
+            }
+            if (detail.getShowAlertIfBelow() != null && value < detail.getShowAlertIfBelow()) {
+                alerts.add(detail.getAlertMessage());
+            }
+        }
+    }
+
+    private void updateProgressScore(double primaryAngle, double startAngle) {
+        double progress;
+        if (startInFlexion) {
+            progress = (startAngle - primaryAngle) / (startAngle - goalExtension);
+        } else {
+            progress = (primaryAngle - startAngle) / (goalFlexion - startAngle);
+        }
+
+        score = (float) Math.max(0, Math.min(1, progress));
+    }
+
+    private void updateState(double primaryAngle, long currentTime) {
         switch (state) {
             case "rest":
-                Log.e("ExerciseTracker", "Here!");
-                if ((startInFlexion && kneeAngle < flexionThreshold) || (!startInFlexion && kneeAngle > extensionThreshold)) {
-                    state = "phase_1";
-                    Log.e("ExerciseTracker", "Here Too!");
-                    phase1StartTime = currentTime;
-                    currentMaxFlexion = kneeAngle;
-                    currentMaxExtension = kneeAngle;
-                }
+                if (isStartOfRep(primaryAngle)) startNewRep(currentTime);
                 break;
-
             case "phase_1":
-                if ((startInFlexion && kneeAngle > extensionThreshold) || (!startInFlexion && kneeAngle < flexionThreshold)) {
-                    state = "phase_2";
-                    phase2StartTime = currentTime;
-                    lastConcentricTime = phase2StartTime - phase1StartTime;
-                }
+                if (isHalfRepCompleted(primaryAngle)) startPhase2(currentTime);
                 break;
-
             case "phase_2":
-                if ((startInFlexion && kneeAngle < flexionThreshold) || (!startInFlexion && kneeAngle > extensionThreshold)) {
-                    state = "phase_1";
-                    lastEccentricTime = currentTime - phase2StartTime;
-                    lastRepDuration = lastConcentricTime + lastEccentricTime;
-                    repCount++;
-
-                    boolean flexionGoalMet = goalFlexion == null || currentMaxFlexion <= goalFlexion;
-                    boolean extensionGoalMet = goalExtension == null || currentMaxExtension >= goalExtension;
-
-                    alert = (!flexionGoalMet || !extensionGoalMet) ? alertMessage : null;
-
-                    Map<String, Object> repInfo = new HashMap<>();
-                    repInfo.put("rep_number", repCount);
-                    repInfo.put("max_flexion", currentMaxFlexion);
-                    repInfo.put("max_extension", currentMaxExtension);
-                    repInfo.put("concentric_time", lastConcentricTime);
-                    repInfo.put("eccentric_time", lastEccentricTime);
-                    repInfo.put("total_time", lastRepDuration);
-                    repInfo.put("goal_flexion_met", flexionGoalMet);
-                    repInfo.put("goal_extension_met", extensionGoalMet);
-                    repInfo.put("alert", alert);
-                    repData.add(repInfo);
-
-                    currentMaxFlexion = Double.POSITIVE_INFINITY;
-                    currentMaxExtension = Double.NEGATIVE_INFINITY;
-                    phase1StartTime = currentTime;
-                }
+                if (isFullRepCompleted(primaryAngle)) completeRep(currentTime);
                 break;
         }
-        return new int[]{repCount, (int) lastRepDuration};
+    }
+
+    private boolean isStartOfRep(double angle) {
+        return (startInFlexion && angle > flexionThreshold) || (!startInFlexion && angle < extensionThreshold);
+    }
+
+    private boolean isHalfRepCompleted(double angle) {
+        return (startInFlexion && angle > extensionThreshold) || (!startInFlexion && angle < flexionThreshold);
+    }
+
+    private boolean isFullRepCompleted(double angle) {
+        return (startInFlexion && angle < flexionThreshold) || (!startInFlexion && angle > extensionThreshold);
+    }
+
+    private void startNewRep(long currentTime) {
+        state = "phase_1";
+        phase1StartTime = currentTime;
+        currentMaxFlexion = Double.POSITIVE_INFINITY;
+        currentMaxExtension = Double.NEGATIVE_INFINITY;
+        posesBuffer.clear();
+        justCompletedRep = false;
+    }
+
+    private void startPhase2(long currentTime) {
+        state = "phase_2";
+        phase2StartTime = currentTime;
+        lastConcentricTime = currentTime - phase1StartTime;
+    }
+
+    private void completeRep(long currentTime) {
+        state = "rest";
+        lastEccentricTime = currentTime - phase2StartTime;
+        lastRepDuration = lastConcentricTime + lastEccentricTime;
+        repCount++;
+        justCompletedRep = true;
+    }
+
+    private RepData finalizeRep(long currentTime, TrackingDetail mainTrackingDetail, Float minRepTime) {
+        boolean flexionGoalMet = goalFlexion == null || currentMaxFlexion <= goalFlexion;
+        boolean extensionGoalMet = goalExtension == null || currentMaxExtension >= goalExtension;
+
+        if (!flexionGoalMet || !extensionGoalMet) alerts.add(mainTrackingDetail.getAlertMessage());
+        if (lastConcentricTime + lastEccentricTime < minRepTime) alerts.add("Slow down your movement");
+
+        lastRepAlerts = new HashSet<>(alerts);
+
+        printRepFeedback();
+        resetRepTracking(currentTime);
+
+        return new RepData(repCount, currentMaxFlexion, currentMaxExtension, lastConcentricTime, lastEccentricTime, lastRepDuration, flexionGoalMet, extensionGoalMet, score, new ArrayList<>(lastRepAlerts), posesBuffer);
+    }
+
+    public void printRepFeedback() {
+//        System.out.printf("Rep %d completed in %.2f sec%n", repCount, lastRepDuration);
+//        System.out.printf("Concentric: %.2f sec, Eccentric: %.2f sec%n", lastConcentricTime, lastEccentricTime);
+//        System.out.printf("Max Flexion: %.2f°, Max Extension: %.2f°%n", currentMaxFlexion, currentMaxExtension);
+
+        for (String alert : alerts) {
+//            System.out.println("⚠️ " + alert);
+        }
+    }
+
+    public void resetRepTracking(long currentTime) {
+        currentMaxFlexion = Float.POSITIVE_INFINITY;
+        currentMaxExtension = Float.NEGATIVE_INFINITY;
+        phase1StartTime = currentTime;
+        alerts.clear();
+        posesBuffer.clear();
+        lastPoseCaptureTime = 0;
     }
 }

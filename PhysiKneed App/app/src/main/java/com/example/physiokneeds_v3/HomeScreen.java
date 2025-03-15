@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,6 +34,8 @@ public class HomeScreen extends AppCompatActivity {
     ImageButton exerciseButton;
     Button exerciseTextButton;
     TextView usernameText;
+
+    String ROUTNIE_ID = "3";
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -106,7 +109,11 @@ public class HomeScreen extends AppCompatActivity {
                         return;
                     }
 
-                    routineConfig = response.body().get(0);
+                    assert response.body() != null;
+                    routineConfig = response.body().stream()
+                            .filter(x -> Objects.equals(x.getId(), ROUTNIE_ID))
+                            .findFirst().orElse(null); // hardcode id
+                    Log.d("TESTNICK", routineConfig.getId());
 
                     // TODO When pulling a routine, set username to api username
 

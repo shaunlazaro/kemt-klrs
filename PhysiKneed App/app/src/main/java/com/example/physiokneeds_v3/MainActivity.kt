@@ -48,6 +48,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.UUID
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 
 class MainActivity : AppCompatActivity() {
@@ -62,6 +65,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var handlerThread: HandlerThread
     lateinit var overlayView:OverlayView
     lateinit var bitmap: Bitmap
+
+    lateinit var leftText: TextView
 
     lateinit var textView_knee: TextView
     lateinit var textView_reps: TextView
@@ -119,6 +124,10 @@ class MainActivity : AppCompatActivity() {
     var isReceiverRegistered = false
 
     var doneExercise = false
+
+    // For exercise flow
+    var state = 1
+    var trackUserCount = 0
 
     // set which camera the app opens first (FOR DEBUGGING)
     var current_camera = 0
@@ -181,6 +190,9 @@ class MainActivity : AppCompatActivity() {
         // create exercise tracker
         exerciseTrackerKneeExt = ExerciseTracker(routineConfig.exercises.get(0).exercise)
 
+        // Initialize rep data list for this specific exercise
+        var repDataList = mutableListOf<RepData>()
+
         // connect to bluetooth
         val bluetoothManager = getSystemService(BluetoothManager::class.java)
         val bluetoothAdapter = bluetoothManager.adapter
@@ -190,6 +202,8 @@ class MainActivity : AppCompatActivity() {
         bt_button.isEnabled = false
         connection_text = findViewById(R.id.status_text)
         send_coords = findViewById(R.id.send_coords)
+
+        leftText = findViewById(R.id.left_text)
 
         reps_text = findViewById(R.id.rep_count_text)
 
@@ -349,16 +363,14 @@ class MainActivity : AppCompatActivity() {
         val screenWidth = resources.displayMetrics.widthPixels
         val newWidth = screenWidth / 2
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            instructionsLayout.post {
-                val layoutParams = instructionsLayout.layoutParams
-                layoutParams.width = newWidth
-                layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT  // Keep height flexible
+        instructionsLayout.post {
+            val layoutParams = instructionsLayout.layoutParams
+            layoutParams.width = newWidth
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT  // Keep height flexible
 
-                instructionsLayout.layoutParams = layoutParams
-                instructionsLayout.requestLayout()
-            }
-        }, 2000)
+            instructionsLayout.layoutParams = layoutParams
+            instructionsLayout.requestLayout()
+        }
 
         textureView.post {
             val layoutParams = textureView.layoutParams
@@ -420,15 +432,51 @@ class MainActivity : AppCompatActivity() {
                 // display the keypoints and lines
                 result?.let { overlayView.setResults(it, mpImage.height, mpImage.width) }
 
-                // check if any keypoints are detected before processing
-                if (result != null && result.landmarks().size > 0 && result.landmarks().get(0).get(24).visibility().orElse(0.0f) > 0.6f) {
-                    // process and show results for the specified exercise
-                    seated_knee_extension(result)
-                    if (counts > COUNT_MAX && !doneExercise) {
+                // EXERCISE START
+
+                if (state == 0) {
+                    if (result != null &&
+                        result.landmarks().size > 0 &&
+                        result.landmarks()[0][24].visibility().orElse(0.0f) > 0.6f &&
+                        counts > COUNT_MAX) {
                         track_user(result, mpImage.height, mpImage.width)
                         counts = 0
                     }
+                    // update text
+                    // TODO more polish for UI
+                    leftText.text = "Step Into Camera View"
                 }
+                if (state == 1) {
+                    // no more tracking
+                    leftText.text = "Loading..."
+                    // TODO show countdown
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        state = 2
+                    }, 3000)  // 3 second count down
+                }
+                if (state == 2) {
+                    // TODO update to the instructions in the exercise class
+                    leftText.text = "1. Sit on a chair with both feet on the floor.\n\n2. Slowly bend your left knee to bring your leg up\n   a. Lift until you feel discomfort or your leg is \n        pointing straight out\n\n3. Slowly lower your leg back to the ground"
+                    // perform exercise
+                    if (result != null &&
+                        result.landmarks().size > 0 &&
+                        result.landmarks()[0][24].visibility().orElse(0.0f) > 0.6f) {
+                        seated_knee_extension(result)
+                        }
+                }
+
+
+
+
+//                // check if any keypoints are detected before processing
+//                if (result != null && result.landmarks().size > 0 && result.landmarks().get(0).get(0).visibility().orElse(0.0f) > 0.6f) {
+//                    // process and show results for the specified exercise
+//                    seated_knee_extension(result)
+//                    if (counts > COUNT_MAX && !doneExercise) {
+//                        track_user(result, mpImage.height, mpImage.width)
+//                        counts = 0
+//                    }
+//                }
 
 //                textView_reps.text = counts.toString()
                 counts += 1
@@ -528,22 +576,43 @@ class MainActivity : AppCompatActivity() {
         }
         // Get coords to send
         try {
-            // initialize python (Chaquopy)
-            val py = Python.getInstance()
-            val motorCoords = py.getModule("processing")
-                .callAttr("get_coords", allPoints.toTypedArray(), height, width, currentPos)
-
-            if (motorCoords.toString() != "DNM") {
-//                textView_knee.text = motorCoords.toString()
-                currentPos = motorCoords.toString()
-                Log.d(TAG, currentPos)
-                connectedThreadWrite.write(motorCoords.toString())
+            val motorCoords = getCoords(allPoints, height, width, currentPos)
+            if (motorCoords != "DNM") {
+                currentPos = motorCoords
+                Log.d("CUSTOMTAG", currentPos)
+                connectedThreadWrite.write(motorCoords)
+                trackUserCount = 0
+            } else if (trackUserCount >= 10) {
+                // if the camera hasn't moved for 10 iterations, stop moving camera
+                state = 1
+                trackUserCount = 0
+            } else {
+                // increase trackUserCount if not moved and less than 10
+                Log.d("CUSTOMTAG", currentPos)
+                trackUserCount += 1
             }
-
         } catch (e: Exception) {
-            // Log the stack trace to Logcat
-            Log.e("PythonError", "An error occurred:", e)
+            Log.e(TAG, "An error occurred:", e)
         }
+
+
+//        try {
+//            // initialize python (Chaquopy)
+//            val py = Python.getInstance()
+//            val motorCoords = py.getModule("processing")
+//                .callAttr("get_coords", allPoints.toTypedArray(), height, width, currentPos)
+//
+//            if (motorCoords.toString() != "DNM") {
+////                textView_knee.text = motorCoords.toString()
+//                currentPos = motorCoords.toString()
+//                Log.d(TAG, currentPos)
+//                connectedThreadWrite.write(motorCoords.toString())
+//            }
+//
+//        } catch (e: Exception) {
+//            // Log the stack trace to Logcat
+//            Log.e("PythonError", "An error occurred:", e)
+//        }
     }
 
     fun seated_knee_extension(result: PoseLandmarkerResult) {
@@ -583,17 +652,96 @@ class MainActivity : AppCompatActivity() {
 //                val reps = py.getModule("processing")
 //                    .callAttr("detect_reps", kneeAngle)
 
-                val repsList = exerciseTrackerKneeExt.detectReps(kneeAngle.toDouble())
+//                val repsList = exerciseTrackerKneeExt.detectReps(kneeAngle.toDouble())
 
                 Log.d("ExerciseTracker", kneeAngle.toDouble().toString())
 
 //                textView_knee.text = "Right Knee Angle: " + kneeAngle.toString()
-                reps_text.text = "Rep " + repsList[0].toString() + "/ 10"
+//                reps_text.text = "Rep " + repsList[0].toString() + "/ 10"
 
             } catch (e: Exception) {
                 // Log the stack trace to Logcat
                 Log.e("PythonErrorKnee", "An error occurred:", e)
             }
+        }
+    }
+
+
+    fun getMotorCoordsOffset(midpoint: Int, frameSize: Int): Double {
+        val MOTOR_RATIO = 23.0 / (frameSize / 2.0) // Distance from center to edge in motor coords (angle)
+        return (midpoint - frameSize / 2.0) * MOTOR_RATIO
+    }
+
+    fun getCoords(allPoints: List<Array<Float>>, h: Int, w: Int, current: String): String {
+        val FRAME_WIDTH = w
+        val FRAME_HEIGHT = h
+
+        val TOLERANCE_X = 80 * 23.0 / (FRAME_WIDTH / 2.0)
+        val TOLERANCE_Y = 80 * 23.0 / (FRAME_HEIGHT / 2.0)
+
+        val MAX_MOVE_DISTANCE: Int = 25
+
+        // Parse current motor positions
+        val currentSplit =
+            current.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val currentX = currentSplit[0].toInt()
+        val currentY = currentSplit[1].toInt()
+
+        var motorX = currentX // Horizontal motor
+        var motorY = currentY // Vertical motor
+
+        // Calculate the midpoint of all landmarks
+        var sumX = 0
+        var sumY = 0
+        for (point in allPoints) {
+            sumX += point[0].toInt()
+            sumY += point[1].toInt()
+        }
+        val midpointX = sumX.toDouble() / allPoints.size
+        val midpointY = sumY.toDouble() / allPoints.size
+
+        // Convert midpoint to pixel coordinates
+        val pixelMidpointX = (midpointX * w).toInt()
+        val pixelMidpointY = (midpointY * h).toInt()
+
+        // Calculate offsets from frame center
+        val offsetX = getMotorCoordsOffset(pixelMidpointX, FRAME_WIDTH)
+        val offsetY = getMotorCoordsOffset(pixelMidpointY, FRAME_HEIGHT)
+
+        // Check if offsets exceed tolerance
+        if (abs(offsetX) > TOLERANCE_X || abs(offsetY) > TOLERANCE_Y) {
+            // Update motor positions
+            if (offsetX > TOLERANCE_X && motorX > 0) {
+                motorX += min(
+                    Math.round(offsetX).toInt().toDouble(),
+                    MAX_MOVE_DISTANCE.toDouble()
+                ).toInt()
+            } else if (offsetX < -TOLERANCE_X && motorX < 180) {
+                motorX += max(
+                    Math.round(offsetX * 23).toInt().toDouble(),
+                    -MAX_MOVE_DISTANCE.toDouble()
+                ).toInt()
+            }
+
+            if (offsetY > TOLERANCE_Y && motorY > 0) {
+                motorY -= min(
+                    Math.round(offsetY).toInt().toDouble(),
+                    MAX_MOVE_DISTANCE.toDouble()
+                ).toInt()
+            } else if (offsetY < -TOLERANCE_Y && motorY < 180) {
+                motorY -= max(
+                    Math.round(offsetY).toInt().toDouble(),
+                    -MAX_MOVE_DISTANCE.toDouble()
+                ).toInt()
+            }
+
+            // Keep motor values within bounds
+            motorX = max(0.0, min(180.0, motorX.toDouble())).toInt()
+            motorY = max(0.0, min(180.0, motorY.toDouble())).toInt()
+
+            return "$motorX,$motorY" // Return updated motor coordinates
+        } else {
+            return "DNM" // Do Not Move
         }
     }
 

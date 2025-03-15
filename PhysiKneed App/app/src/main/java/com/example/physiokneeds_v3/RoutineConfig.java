@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class RoutineConfig implements Serializable {
+    private String id;
     private String name;
     private List<RoutineComponent> exercises;
     private String injury;
@@ -16,6 +17,14 @@ public class RoutineConfig implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public List<RoutineComponent> getExercises() {
