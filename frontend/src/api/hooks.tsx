@@ -47,6 +47,7 @@ export const useGetRoutineConfigById = (routineConfigId: string) => {
 };
 
 export const useAddEditRoutineConfig = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (routine: RoutineConfig) => {
             // Transform exercises to send only exercise IDs
@@ -66,17 +67,24 @@ export const useAddEditRoutineConfig = () => {
                 return request.put(`/routine-configs/${routine.id}/`, transformedData);
             }
         },
-        onSuccess: () => {
-            // queryClient.invalidateQueries([QueryKeys.ROUTINE_CONFIGS]); // Refresh list
+        onSuccess: (_, routine) => {
+            queryClient.invalidateQueries({ queryKey: [QueryKeys.ROUTINE_CONFIGS] });
+
+            if (routine.id !== "TEMP" && routine.id !== "new") {
+                queryClient.invalidateQueries({ queryKey: [QueryKeys.ROUTINE_CONFIG, routine.id] });
+            }
         },
     });
 };
 
 export const useDeleteRoutineConfig = () => {
+    const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: (id: string) => request.delete(`/routine-configs/${id}/`),
-        onSuccess: () => {
-            // queryClient.invalidateQueries(["routine-configs"]);
+        onSuccess: (_, id) => {
+            queryClient.invalidateQueries({ queryKey: [QueryKeys.ROUTINE_CONFIGS] });
+            queryClient.removeQueries({ queryKey: [QueryKeys.ROUTINE_CONFIG, id] });
         },
     });
 };
