@@ -17,7 +17,7 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <nav
       className={cn(
-        "relative hidden h-screen border-r pt-0 md:block transition-all duration-300 bg-primary-blue text-white",
+        "relative hidden h-screen border-r pt-0 md:block transition-all duration-300 bg-primary-darkblue text-white",
         isOpen ? "w-72" : "w-[72px]",
         className,
       )}
@@ -47,7 +47,7 @@ export default function Sidebar({ className }: SidebarProps) {
             className={cn(
               "flex items-center gap-3 p-4 transition hover:bg-primary-lightblue hover:text-black text-white",
               pathname === item.href && "bg-secondary-darkpink",
-              pathname != item.href && "bg-primary-blue"
+              pathname != item.href && "bg-primary-darkblue"
             )}
           >
             <item.icon className="h-6 w-6" />
