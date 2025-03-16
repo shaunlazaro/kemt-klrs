@@ -37,3 +37,18 @@ class TrackingDetail:
         self.show_alert_if_above = show_alert_if_above
         self.show_alert_if_below = show_alert_if_below
         self.alert_message = alert_message
+        
+    def to_dict(self):
+        return {
+            "tracking_type": self.tracking_type.name if isinstance(self.tracking_type, Enum) else self.tracking_type,
+            "keypoints": self.keypoints,
+            "symmetric": self.symmetric,
+            "dimensionality": self.dimensionality,
+            "goal_flexion": self.goal_flexion,
+            "goal_extension": self.goal_extension,
+            "alert_message": self.alert_message,
+            "symmetric": self.symmetric,
+            "show_alert_if_above": self.show_alert_if_above,
+            "show_alert_if_below": self.show_alert_if_below,
+            "alert_message": self.alert_message
+        }
