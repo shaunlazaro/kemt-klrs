@@ -44,24 +44,80 @@ class ExerciseDetailSerializer(serializers.ModelSerializer):
         ])
         return exercise
 
+# Desired READ behaviour 
+# class RoutineExerciseSerializer(serializers.ModelSerializer):
+#     exercise = ExerciseDetailSerializer(read_only=True)
+#     custom_tracking_details = TrackingDetailSerializer(many=True, required=False)
+
+#     class Meta:
+#         model = RoutineExercise
+#         fields = ['exercise', 'reps', 'custom_tracking_details']
+
+# Desired POST behaviour
+# class RoutineExerciseSerializer(serializers.ModelSerializer):
+#     exercise = serializers.PrimaryKeyRelatedField(queryset=ExerciseDetail.objects.all())  # Accept exercise ID
+#     custom_tracking_details = TrackingDetailSerializer(many=True, required=False)
+
+#     class Meta:
+#         model = RoutineExercise
+#         fields = ['exercise', 'reps', 'custom_tracking_details']
+
+# class RoutineExerciseSerializer(serializers.ModelSerializer):
+#     exercise_id = serializers.PrimaryKeyRelatedField(
+#         queryset=ExerciseDetail.objects.all(), write_only=True  # Accept ID for writes
+#     )
+#     exercise = ExerciseDetailSerializer(read_only=True)  # Send full object on read
+#     custom_tracking_details = TrackingDetailSerializer(many=True, required=False)
+
+#     class Meta:
+#         model = RoutineExercise
+#         fields = ['exercise', 'exercise_id', 'reps', 'custom_tracking_details']
+
 class RoutineExerciseSerializer(serializers.ModelSerializer):
-    exercise = ExerciseDetailSerializer(read_only=True)
+    exercise_id = serializers.PrimaryKeyRelatedField(
+        queryset=ExerciseDetail.objects.all(), source="exercise", write_only=True
+    )
+    exercise = ExerciseDetailSerializer(read_only=True)  # Full object on read
     custom_tracking_details = TrackingDetailSerializer(many=True, required=False)
 
     class Meta:
         model = RoutineExercise
-        fields = ['exercise', 'reps', 'custom_tracking_details']
+        fields = ['exercise_id', 'exercise', 'reps', 'custom_tracking_details']
 
 class RoutineConfigSerializer(serializers.ModelSerializer):
     exercises = RoutineExerciseSerializer(source='routineexercise_set', many=True)
 
     class Meta:
         model = RoutineConfig
-        fields = ['id', 'name', 'exercises']
+        fields = ['id', 'name', 'exercises', 'injury']
 
     def get_exercises(self, obj):
         routine_exercises = RoutineExercise.objects.filter(routine=obj).select_related('exercise').prefetch_related('custom_tracking_details')
         return RoutineExerciseSerializer(routine_exercises, many=True).data
+    
+    def create(self, validated_data):
+        exercises_data = validated_data.pop('routineexercise_set', [])  # Extract exercises
+        routine = RoutineConfig.objects.create(**validated_data)  # Create RoutineConfig
+
+        for exercise_data in exercises_data:
+            RoutineExercise.objects.create(routine=routine, **exercise_data)  # Add exercises
+
+        return routine
+
+    def update(self, instance, validated_data):
+        exercises_data = validated_data.pop('routineexercise_set', [])  # Extract exercises
+
+        # Update routine fields
+        instance.name = validated_data.get('name', instance.name)
+        instance.injury = validated_data.get('injury', instance.injury)
+        instance.save()
+
+        # Delete old exercises and recreate them (simpler than partial updates)
+        instance.routineexercise_set.all().delete()
+        for exercise_data in exercises_data:
+            RoutineExercise.objects.create(routine=instance, **exercise_data)
+
+        return instance
 
 class RepDataSerializer(serializers.ModelSerializer):
     class Meta:

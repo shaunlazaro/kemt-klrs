@@ -152,6 +152,7 @@ class ExerciseDetail(models.Model):
 
 class RoutineConfig(models.Model):
     name = models.CharField(max_length=100, default="Unnamed Routine")
+    injury = models.CharField(max_length=100, default="No Injury Specified")
     exercises = models.ManyToManyField(
         ExerciseDetail,
         through='RoutineExercise',
