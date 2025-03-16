@@ -1,5 +1,7 @@
 package com.example.physiokneeds_v3;
 
+import android.util.Log;
+
 import java.util.*;
 
 public class ExerciseTracker {
@@ -52,13 +54,14 @@ public class ExerciseTracker {
     public RepData detectReps(List<TrackingResult> trackingResults, ExerciseDetail exerciseDetail, Pose poseData) {
         RepData repEntry = null;
         TrackingDetail mainTrackingDetail = exerciseDetail.getRepTracking();
-        Double primaryAngle = getPrimaryAngle(trackingResults, mainTrackingDetail);
+
+        Double primaryAngle = getPrimaryAngle(trackingResults, exerciseDetail.getRepTracking());
 
         if (primaryAngle == null) {
-            return null;
+            return new RepData(repCount);
         }
 
-        long currentTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis() / 1000;
         updateMaxAngles(primaryAngle);
         processAlerts(trackingResults, mainTrackingDetail);
         updateProgressScore(primaryAngle, exerciseDetail.getStartAngle());
@@ -79,7 +82,12 @@ public class ExerciseTracker {
 
     private Double getPrimaryAngle(List<TrackingResult> trackingResults, TrackingDetail mainTrackingDetail) {
         for (TrackingResult entry : trackingResults) {
-            if (entry.getDetail().equals(mainTrackingDetail)) {
+            Log.d("ROUTINE_DEBUG", "Entry Detail:" + entry.getDetail().getKeypoints().toString());
+            Log.d("ROUTINE_DEBUG", "Main Detail:" + mainTrackingDetail.getKeypoints().toString());
+            Log.d("ROUTINE_DEBUG", "Angle: " + entry.getAngle().toString());
+
+            // REVISIT
+            if (entry.getDetail().getTrackingType().equals(mainTrackingDetail.getTrackingType())) {
                 return entry.getAngle();
             }
         }
@@ -182,12 +190,13 @@ public class ExerciseTracker {
     }
 
     public void printRepFeedback() {
-//        System.out.printf("Rep %d completed in %.2f sec%n", repCount, lastRepDuration);
-//        System.out.printf("Concentric: %.2f sec, Eccentric: %.2f sec%n", lastConcentricTime, lastEccentricTime);
-//        System.out.printf("Max Flexion: %.2f°, Max Extension: %.2f°%n", currentMaxFlexion, currentMaxExtension);
+        String FEEDBACK_TAG = "FeedbackForEachRep";
+        Log.d(FEEDBACK_TAG, "Rep "+ repCount + " completed in " + lastRepDuration + " sec");
+        Log.d(FEEDBACK_TAG, "Concentric: " + lastConcentricTime+ " sec, Eccentric: " + lastEccentricTime + " sec");
+        Log.d(FEEDBACK_TAG, "Max Flexion: " + currentMaxFlexion + "°, Max Extension: "+ currentMaxExtension + "°");
 
         for (String alert : alerts) {
-//            System.out.println("⚠️ " + alert);
+            Log.d(FEEDBACK_TAG,"⚠️ " + alert);
         }
     }
 

@@ -33,6 +33,10 @@ public class RepData {
         this.poses = (poses != null) ? poses : List.of(); // Default empty list
     }
 
+    public RepData(int repNumber) {
+        this.repNumber = repNumber;
+    }
+
     // Getters
     public int getRepNumber() { return repNumber; }
     public double getMaxFlexion() { return maxFlexion; }

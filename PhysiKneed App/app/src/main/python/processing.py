@@ -120,3 +120,42 @@ def get_coords(all_points, h, w, current):
         return msg
     else:
         return "DNM"
+
+def calculate_three_point_angle(a, b, c):
+    a = np.array(a)  # Point 1
+    b = np.array(b)  # Vertex point
+    c = np.array(c)  # Point 2
+
+    # Calculate vectors
+    ba = a - b
+    bc = c - b
+
+    # Calculate cosine of angle
+    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    angle = np.arccos(np.clip(cosine_angle, -1.0, 1.0))  # Radians
+
+    return np.degrees(angle)  # Convert to degrees
+
+def calculate_two_point_vertical_angle(a, b):
+    vertical = np.array([0, 1])
+    a = np.array(a)  # Point 1
+    b = np.array(b)  # Point 2
+
+    ba = a - b
+    exercise_angle = np.degrees(
+        np.arccos(np.clip(np.dot(ba, vertical) / np.linalg.norm(ba), -1.0, 1.0))
+    )
+
+    return exercise_angle
+
+def calculate_two_point_horizontal_angle(a, b):
+    horizontal = np.array([1, 0])
+    vec = a - b
+    exercise_angle = np.degrees(
+        np.arccos(np.clip(np.dot(vec, horizontal) / np.linalg.norm(vec), -1.0, 1.0))
+    )
+    return exercise_angle
+
+def smooth_angle(angle, angle_history):
+    angle_history.append(angle)
+    return sum(angle_history) / len(angle_history)

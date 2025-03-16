@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class TrackingDetail implements Serializable {
-    private TrackingType tracking_type;
+    private String tracking_type;
     private List<String> keypoints;
     private Boolean symmetric;
     private String dimensionality;
@@ -16,11 +16,11 @@ public class TrackingDetail implements Serializable {
 
     public TrackingDetail() {}
 
-    public TrackingType getTrackingType() {
+    public String getTrackingType() {
         return tracking_type;
     }
 
-    public void setTrackingType(TrackingType trackingType) {
+    public void setTrackingType(String trackingType) {
         this.tracking_type = trackingType;
     }
 

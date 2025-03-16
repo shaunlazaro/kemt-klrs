@@ -3,6 +3,7 @@ package com.example.physiokneeds_v3
 import ConnectThread
 import ConnectedThread
 import android.Manifest
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -28,36 +29,47 @@ import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.scale
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.chaquo.python.Python
 import com.google.mediapipe.framework.image.BitmapImageBuilder
+import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
+import com.google.mlkit.vision.pose.PoseLandmark
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.Optional
 import java.util.UUID
 import kotlin.math.abs
+import kotlin.math.acos
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.round
+import kotlin.math.sqrt
+import kotlin.properties.Delegates
 
 
 class MainActivity : AppCompatActivity() {
 
     // global variables
     lateinit var routineConfig: RoutineConfig
-    lateinit var exerciseTrackerKneeExt: ExerciseTracker
+    var exerciseTrackers = mutableListOf<ExerciseTracker>()
 
     lateinit var textureView: TextureView
     lateinit var cameraManager: CameraManager
@@ -81,6 +93,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var cameraCaptureSession: CameraCaptureSession
     val FRONT_CAMERA = 1
     val BACK_CAMERA = 0
+
+    val CONFIDENCE_THRESHOLD = 0.6f
 
     // set which pose estimation model being used (lite/full/heavy)
     val baseOptionsBuilder = BaseOptions.builder().setModelAssetPath("pose_landmarker_heavy.task")
@@ -110,6 +124,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var connection_text: TextView
     lateinit var send_coords: Button
 
+    lateinit var titleText: TextView
+    lateinit var popupMenu: FrameLayout
+    lateinit var exerciseTitle: TextView
+    lateinit var exerciseNumberText: TextView
+    lateinit var progressBarPopup: ProgressBar
+    lateinit var leftImage: ImageView
+
     lateinit var connectedThreadWrite: ConnectedThread
 
     var isConnected = false
@@ -125,12 +146,21 @@ class MainActivity : AppCompatActivity() {
 
     var doneExercise = false
 
+    // frame height and width
+    var frameWidth by Delegates.notNull<Int>()
+    var frameHeight by Delegates.notNull<Int>()
+
+
     // For exercise flow
-    var state = 1
+    var state = 0
     var trackUserCount = 0
+    var currentExerciseIndex = 0
 
     // set which camera the app opens first (FOR DEBUGGING)
     var current_camera = 0
+
+    // For data tracking (end)
+    lateinit var routineData: RoutineData
 
     // broadcast receiver for controlling the external display
     private var buttonPressReceiver = object : BroadcastReceiver() {
@@ -167,6 +197,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // helper map
+    val helperMap = mapOf(
+        "nose" to PoseLandmark.NOSE,
+        "left_eye_inner" to PoseLandmark.LEFT_EYE_INNER,
+        "left_eye" to PoseLandmark.LEFT_EYE,
+        "left_eye_outer" to PoseLandmark.LEFT_EYE_OUTER,
+        "right_eye_inner" to PoseLandmark.RIGHT_EYE_INNER,
+        "right_eye" to PoseLandmark.RIGHT_EYE,
+        "right_eye_inner" to PoseLandmark.RIGHT_EYE_OUTER,
+        "left_ear" to PoseLandmark.LEFT_EAR,
+        "right_ear" to PoseLandmark.RIGHT_EAR,
+        "left_mouth" to PoseLandmark.LEFT_MOUTH,
+        "right_mouth" to PoseLandmark.RIGHT_MOUTH,
+        "left_shoulder" to PoseLandmark.LEFT_SHOULDER,
+        "right_shoulder" to PoseLandmark.RIGHT_SHOULDER,
+        "left_elbow" to PoseLandmark.LEFT_ELBOW,
+        "right_elbow" to PoseLandmark.RIGHT_ELBOW,
+        "left_wrist" to PoseLandmark.LEFT_WRIST,
+        "right_wrist" to PoseLandmark.RIGHT_WRIST,
+        "left_pinky" to PoseLandmark.LEFT_PINKY,
+        "right_pinky" to PoseLandmark.RIGHT_PINKY,
+        "left_index" to PoseLandmark.LEFT_INDEX,
+        "right_index" to PoseLandmark.RIGHT_INDEX,
+        "left_thumb" to PoseLandmark.LEFT_THUMB,
+        "right_thumb" to PoseLandmark.RIGHT_THUMB,
+        "left_hip" to PoseLandmark.LEFT_HIP,
+        "right_hip" to PoseLandmark.RIGHT_HIP,
+        "left_knee" to PoseLandmark.LEFT_KNEE,
+        "right_knee" to PoseLandmark.RIGHT_KNEE,
+        "left_ankle" to PoseLandmark.LEFT_ANKLE,
+        "right_ankle" to PoseLandmark.RIGHT_ANKLE,
+        "left_heel" to PoseLandmark.LEFT_HEEL,
+        "right_heel" to PoseLandmark.RIGHT_HEEL,
+        "left_foot_index" to PoseLandmark.LEFT_FOOT_INDEX,
+        "right_foot_index" to PoseLandmark.RIGHT_FOOT_INDEX)
+
     @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -183,15 +249,21 @@ class MainActivity : AppCompatActivity() {
         routineConfig = (intent.getSerializableExtra(HomeScreen.ROUTINE_TAG) as RoutineConfig?)!!
 
         // TODO remove these hard coded values for knee extension
-        routineConfig.exercises.get(0).exercise.startInFlexion = true
-        routineConfig.exercises.get(0).exercise.thresholdExtension = 140
-        routineConfig.exercises.get(0).exercise.thresholdFlexion = 80
+//        routineConfig.exercises.get(0).exercise.startInFlexion = true
+//        routineConfig.exercises.get(0).exercise.thresholdExtension = 140
+//        routineConfig.exercises.get(0).exercise.thresholdFlexion = 80
 
-        // create exercise tracker
-        exerciseTrackerKneeExt = ExerciseTracker(routineConfig.exercises.get(0).exercise)
+        // create exercise tracker list
+        for (ex in routineConfig.exercises) {
+            exerciseTrackers.add(ExerciseTracker(ex.exercise))
+        }
 
         // Initialize rep data list for this specific exercise
         var repDataList = mutableListOf<RepData>()
+
+        // Routine Data
+        var routineComponentDataList = emptyList<RoutineComponentData>()
+        routineData = RoutineData(routineConfig, routineComponentDataList)
 
         // connect to bluetooth
         val bluetoothManager = getSystemService(BluetoothManager::class.java)
@@ -345,12 +417,14 @@ class MainActivity : AppCompatActivity() {
 
         // define global variables
         textureView = findViewById(R.id.camera_feed)
+        textureView.scaleX = -1f // mirror since front camera
 //        textureView.rotation = 90f // Rotate 90 degrees clockwise
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
         handlerThread = HandlerThread("videoThread")
         handlerThread.start()
         handler = Handler(handlerThread.looper)
         overlayView = findViewById(R.id.overlayView)
+        overlayView.scaleX = -1f // mirror since front camera
 //        overlayView.rotation = 90f // Rotate 90 degrees clockwise
         poseLandmarker = PoseLandmarker.createFromOptions(this, options)
 
@@ -359,17 +433,27 @@ class MainActivity : AppCompatActivity() {
 
         instructionsLayout = findViewById(R.id.instructions_layout)
 
+        titleText = findViewById(R.id.title_text)
+        popupMenu = findViewById(R.id.popup_panel)
+        exerciseTitle = findViewById(R.id.exercise_title)
+        exerciseNumberText = findViewById(R.id.exercise_number_text)
+        progressBarPopup = findViewById(R.id.progress_bar)
+
         // set the camera resolution to half the width
+        val screenHeight = resources.displayMetrics.heightPixels
         val screenWidth = resources.displayMetrics.widthPixels
-        val newWidth = screenWidth / 2
+        val newWidth = round(screenHeight / (1.0/1.0)).toInt()
+
+        Log.d("SCREEN_SIZE", newWidth.toString() + "x" + screenHeight)
 
         instructionsLayout.post {
             val layoutParams = instructionsLayout.layoutParams
-            layoutParams.width = newWidth
-            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT  // Keep height flexible
+            layoutParams.width = screenWidth - newWidth
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
 
             instructionsLayout.layoutParams = layoutParams
             instructionsLayout.requestLayout()
+            instructionsLayout.visibility = View.VISIBLE
         }
 
         textureView.post {
@@ -379,6 +463,7 @@ class MainActivity : AppCompatActivity() {
 
             textureView.layoutParams = layoutParams
             textureView.requestLayout()
+            textureView.visibility = View.VISIBLE
         }
 
         overlayView.post {
@@ -388,7 +473,13 @@ class MainActivity : AppCompatActivity() {
 
             overlayView.layoutParams = layoutParams
             overlayView.requestLayout()
+            overlayView.visibility = View.VISIBLE
         }
+
+        // set frame height and width
+        val layoutParams = textureView.layoutParams
+        frameHeight = layoutParams.height
+        frameWidth = layoutParams.width
 
 //        start_button = findViewById(R.id.start_button)
 //
@@ -429,44 +520,170 @@ class MainActivity : AppCompatActivity() {
                 val mpImage = BitmapImageBuilder(bitmap).build()
                 val result = poseLandmarker?.detect(mpImage)
 
+                // reset frame width and height
+                frameHeight = mpImage.height
+                frameWidth = mpImage.width
+
                 // display the keypoints and lines
                 result?.let { overlayView.setResults(it, mpImage.height, mpImage.width) }
 
                 // EXERCISE START
 
                 if (state == 0) {
-                    if (result != null &&
-                        result.landmarks().size > 0 &&
-                        result.landmarks()[0][24].visibility().orElse(0.0f) > 0.6f &&
-                        counts > COUNT_MAX) {
-                        track_user(result, mpImage.height, mpImage.width)
+                    // update text
+                    titleText.text = "Get Positioned"
+                    leftText.text = "Stand 2 m away from camera \n\n Your entire body should be visible on the screen"
+                    // TODO more polish for UI
+                    // switch image to bottom
+//                    val lastView = instructionsLayout.getChildAt(instructionsLayout.childCount - 1)
+//                    instructionsLayout.removeView(lastView)
+//                    instructionsLayout.addView(lastView, 0)
+                    // TODO update image
+
+                    if (result != null && result.landmarks().size > 0 && counts > COUNT_MAX) {
+                        val landmarks = result.landmarks()[0]
+                        val visibility = getLandmarksVisibility(landmarks)
+                        val exerciseDetail = routineConfig.exercises[currentExerciseIndex].exercise
+
+                        val keypointVisible = exerciseDetail.repKeypoints.all { kp ->
+                            (visibility[kp] ?: 0f) > CONFIDENCE_THRESHOLD
+                        }
+                        if (keypointVisible) {
+                            track_user(result, mpImage.height, mpImage.width)
+                        } else {
+                            // TODO add pop up that keypoints aren't visible (light, in frame, stay still etc.)
+                        }
                         counts = 0
                     }
-                    // update text
-                    // TODO more polish for UI
-                    leftText.text = "Step Into Camera View"
+                    // update counter
+                    counts += 1
+
+                    // TODO Remove when testing with mount
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        state = 1 // start next state
+                    }, 5000)  // update progress
                 }
                 if (state == 1) {
-                    // no more tracking
-                    leftText.text = "Loading..."
-                    // TODO show countdown
+                    // switch image to top
+//                    val lastView = instructionsLayout.getChildAt(instructionsLayout.childCount - 1)
+//                    instructionsLayout.removeView(lastView)
+//                    instructionsLayout.addView(lastView, 0)
+
+                    titleText.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
+                    leftText.text = "1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
+                    reps_text.visibility = View.VISIBLE
+
+                    popupMenu.visibility = View.VISIBLE
+                    exerciseTitle.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
+                    exerciseNumberText.text = "Exercise #" + (currentExerciseIndex+1)
+
+//                    while (progressBarPopup.progress < progressBarPopup.max) {
+//                        Thread.sleep(10)
+//                        progressBarPopup.progress += 10
+////                        Log.d("NICK_STATE", progressBarPopup.progress.toString())
+//                    }
+
+                    progressBarPopup.progress = 1000
+
                     Handler(Looper.getMainLooper()).postDelayed({
-                        state = 2
-                    }, 3000)  // 3 second count down
+                        state = 2 // start next state
+                        popupMenu.visibility = View.GONE // hide pop up
+                    }, 3000)  // update progress
                 }
                 if (state == 2) {
                     // TODO update to the instructions in the exercise class
-                    leftText.text = "1. Sit on a chair with both feet on the floor.\n\n2. Slowly bend your left knee to bring your leg up\n   a. Lift until you feel discomfort or your leg is \n        pointing straight out\n\n3. Slowly lower your leg back to the ground"
                     // perform exercise
-                    if (result != null &&
-                        result.landmarks().size > 0 &&
-                        result.landmarks()[0][24].visibility().orElse(0.0f) > 0.6f) {
-                        seated_knee_extension(result)
+                    if (result != null && result.landmarks().size > 0) {
+//                        Log.d("PORT_DEBUG", result.landmarks().toString())
+                        val landmarks = result.landmarks()[0]
+                        val visibility = getLandmarksVisibility(landmarks)
+                        val exerciseDetail = routineConfig.exercises[currentExerciseIndex].exercise
+
+                        val keypointVisible = exerciseDetail.repKeypoints.all { kp ->
+                            (visibility[kp] ?: 0f) > CONFIDENCE_THRESHOLD
                         }
+
+                        if (keypointVisible) {
+//                            Log.d("ROUTINE_DEBUG", landmarks.size.toString())
+
+                            val trackingResults = processExerciseMetrics(
+                                landmarks, exerciseDetail
+                            )
+
+                            val repData = exerciseTrackers[currentExerciseIndex]
+                                .detectReps(trackingResults, exerciseDetail, resultToPose(result))
+
+                            // update rep counter
+                            if (repData != null) {
+//                                Log.d("ROUTINE_DEBUG", repData.repNumber.toString())
+                                reps_text.text =
+                                    repData.repNumber.toString() + " / " + routineConfig.exercises[currentExerciseIndex].reps + " reps     "
+                                repDataList.add(repData)
+
+                                // check if exercise is done
+                                if (repData.repNumber == routineConfig.exercises[currentExerciseIndex].reps) {
+                                    // done exercise
+                                    if (currentExerciseIndex < routineConfig.exercises.size - 1) {
+                                        currentExerciseIndex++ // update index
+                                        state = 3 // next exercise
+                                    } else {
+                                        state = 4 // done workout
+                                    }
+                                }
+                            }
+
+                            // REVISIT
+                            val repTrackingAngle = trackingResults
+                                .firstOrNull { it.detail.trackingType == exerciseDetail.repTracking.trackingType }?.angle
+
+//                            val repTrackingAngle = trackingResults[0].angle
+
+                            Log.d(
+                                "ROUTINE_DEBUG",
+                                "repTrackingAngle " + repTrackingAngle.toString()
+                            )
+
+                            // TODO add smooth angle
+
+                            // alerts
+                        }
+                    }
                 }
+                if (state == 3) {
+                    reps_text.text =
+                        "0 / " + routineConfig.exercises[currentExerciseIndex].reps + " reps     "
+                    popupMenu.visibility = View.VISIBLE
+                    exerciseNumberText.visibility = View.GONE
+                    exerciseTitle.text = "Exercise Completed"
 
+//                    while (progressBarPopup.progress < progressBarPopup.max) {
+//                        Handler(Looper.getMainLooper()).postDelayed({
+//                            progressBarPopup.progress += 10
+//                        }, 10)  // update progress
+//                    }
 
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        state = 1 // start next state
+                        exerciseNumberText.visibility = View.VISIBLE
+//                        popupMenu.visibility = View.GONE // hide pop up
+                    }, 3000)  // update progress
+                }
+                if (state == 4) {
+                    popupMenu.visibility = View.VISIBLE
+                    exerciseTitle.text = "Workout Complete"
+                    exerciseNumberText.text = "Nice Work!"
+//                    while (progressBarPopup.progress < progressBarPopup.max) {
+//                        Handler(Looper.getMainLooper()).postDelayed({
+//                            progressBarPopup.progress += 10
+//                        }, 10)  // update progress
+//                    }
+                    // end process
 
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        finish()
+                    }, 10000)  // finish after 10 seconds
+                }
+            }
 
 //                // check if any keypoints are detected before processing
 //                if (result != null && result.landmarks().size > 0 && result.landmarks().get(0).get(0).visibility().orElse(0.0f) > 0.6f) {
@@ -479,8 +696,6 @@ class MainActivity : AppCompatActivity() {
 //                }
 
 //                textView_reps.text = counts.toString()
-                counts += 1
-            }
         }
     }
 
@@ -616,31 +831,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun seated_knee_extension(result: PoseLandmarkerResult) {
-        val RIGHT_HIP_INDEX = 24
-        val RIGHT_KNEE_INDEX = 26
-        val RIGHT_ANKLE_INDEX = 28
         val CONFIDENCE_THRESHOLD = 0.6f  // Adjust based on desired accuracy
 
         // if all points are visible with above the threshold
-        if (result.landmarks().get(0).get(RIGHT_HIP_INDEX).visibility()
+        if (result.landmarks().get(0).get(PoseLandmark.RIGHT_HIP).visibility()
                 .orElse(0.0f) > CONFIDENCE_THRESHOLD &&
-            result.landmarks().get(0).get(RIGHT_KNEE_INDEX).visibility()
+            result.landmarks().get(0).get(PoseLandmark.RIGHT_KNEE).visibility()
                 .orElse(0.0f) > CONFIDENCE_THRESHOLD &&
-            result.landmarks().get(0).get(RIGHT_ANKLE_INDEX).visibility()
+            result.landmarks().get(0).get(PoseLandmark.RIGHT_ANKLE).visibility()
                 .orElse(0.0f) > CONFIDENCE_THRESHOLD) {
 
             // get 3d keypoints of the three landmarks
-            val rightHip = listOf(result.landmarks().get(0).get(RIGHT_HIP_INDEX).x(),
-                result.landmarks().get(0).get(RIGHT_HIP_INDEX).y(),
-                result.landmarks().get(0).get(RIGHT_HIP_INDEX).z()).toTypedArray()
+            val rightHip = listOf(result.landmarks().get(0).get(PoseLandmark.RIGHT_HIP).x(),
+                result.landmarks().get(0).get(PoseLandmark.RIGHT_HIP).y(),
+                result.landmarks().get(0).get(PoseLandmark.RIGHT_HIP).z()).toTypedArray()
 
-            val rightKnee = listOf(result.landmarks().get(0).get(RIGHT_KNEE_INDEX).x(),
-                result.landmarks().get(0).get(RIGHT_KNEE_INDEX).y(),
-                result.landmarks().get(0).get(RIGHT_KNEE_INDEX).z()).toTypedArray()
+            val rightKnee = listOf(result.landmarks().get(0).get(PoseLandmark.RIGHT_KNEE).x(),
+                result.landmarks().get(0).get(PoseLandmark.RIGHT_KNEE).y(),
+                result.landmarks().get(0).get(PoseLandmark.RIGHT_KNEE).z()).toTypedArray()
 
-            val rightAnkle = listOf(result.landmarks().get(0).get(RIGHT_ANKLE_INDEX).x(),
-                result.landmarks().get(0).get(RIGHT_ANKLE_INDEX).y(),
-                result.landmarks().get(0).get(RIGHT_ANKLE_INDEX).z()).toTypedArray()
+            val rightAnkle = listOf(result.landmarks().get(0).get(PoseLandmark.RIGHT_ANKLE).x(),
+                result.landmarks().get(0).get(PoseLandmark.RIGHT_ANKLE).y(),
+                result.landmarks().get(0).get(PoseLandmark.RIGHT_ANKLE).z()).toTypedArray()
 
             // calculate the angle and count reps
             try {
@@ -745,4 +957,156 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun extractKeypointsDynamic(
+        landmarks: List<NormalizedLandmark>,
+        keypoints: List<String>,
+        mode: String = "2D"): List<List<Float>> {
+
+        require(mode != "3D" || (frameWidth != null && frameHeight != null)) {
+            "Frame width and height must be provided for 3D mode."
+        }
+
+        val extractedPoints = mutableListOf<List<Float>>()
+
+        for (kp in keypoints) {
+            val landmark = landmarks[helperMap.get(kp)!!]
+
+            if (mode == "3D") {
+                val refZ = landmarks[helperMap.get(keypoints[0])!!].z()
+                extractedPoints.add(
+                    listOf(
+                        landmark.x() * frameWidth,
+                        landmark.y() * frameHeight,
+                        landmark.z() - refZ
+                    )
+                )
+            } else if (mode == "2D") {
+                extractedPoints.add(
+                    listOf(
+                        landmark.x() * frameWidth,
+                        landmark.y() * frameHeight
+                    )
+                )
+            }
+        }
+
+        return extractedPoints
+    }
+
+    fun detectLeadingSide(landmarks: List<NormalizedLandmark>): String {
+        val rightKneeZ = landmarks[PoseLandmark.RIGHT_KNEE].z()
+        val leftKneeZ = landmarks[PoseLandmark.LEFT_KNEE].z()
+        return if (rightKneeZ < leftKneeZ) "right" else "left"
+    }
+
+    fun processExerciseMetrics(
+        landmarks: List<NormalizedLandmark>,
+        exerciseDetail: ExerciseDetail): List<TrackingResult> {
+
+        val trackingResults = mutableListOf<TrackingResult>()
+
+        for (trackingDetail in exerciseDetail.defaultTrackingDetails) {
+            val keypoints = if (trackingDetail.symmetric) {
+                val side = detectLeadingSide(landmarks)
+                trackingDetail.keypoints.map { "${side}_$it" }.also {
+                    if (trackingDetail == exerciseDetail.repTracking) {
+                        exerciseDetail.repKeypoints = it
+                    }
+                }
+            } else trackingDetail.keypoints
+
+            val extractedLandmarks = extractKeypointsDynamic(
+                landmarks, keypoints, trackingDetail.dimensionality
+            )
+
+            try {
+                // initialize python (Chaquopy)
+                val py = Python.getInstance()
+
+                val exerciseAngle = when (trackingDetail.trackingType) {
+                    // TODO trackingType is a string rn
+                    "Angle of three points" ->
+                        py.getModule("processing")
+                            .callAttr(
+                                "calculate_three_point_angle",
+                                extractedLandmarks[0].toTypedArray(),
+                                extractedLandmarks[1].toTypedArray(),
+                                extractedLandmarks[2].toTypedArray())
+                    "Angle with vertical" ->
+                        py.getModule("processing")
+                            .callAttr(
+                                "calculate_two_point_vertical_angle",
+                                extractedLandmarks[0].toTypedArray(),
+                                extractedLandmarks[1].toTypedArray())
+                    "Angle with horizontal" ->
+                        py.getModule("processing")
+                            .callAttr(
+                                "calculate_two_point_horizontal_angle",
+                                extractedLandmarks[0].toTypedArray(),
+                                extractedLandmarks[1].toTypedArray())
+                    else -> throw IllegalArgumentException("Unsupported tracking type: ${trackingDetail.trackingType}")
+                }
+
+                trackingResults.add(TrackingResult(trackingDetail, exerciseAngle.toDouble()))
+
+            } catch (e: Exception) {
+                // Log the stack trace to Logcat
+                Log.e("PythonErrorProcessExerciseMetrics", "An error occurred:", e)
+            }
+        }
+
+        return trackingResults
+    }
+
+    fun getLandmarksVisibility(
+        landmarks: List<NormalizedLandmark>): Map<String, Float> {
+
+        val landmarkMap = mapOf(
+            "nose" to landmarks[PoseLandmark.NOSE].visibility().orElse(0f),
+            "left_eye_inner" to landmarks[PoseLandmark.LEFT_EYE_INNER].visibility().orElse(0f),
+            "left_eye" to landmarks[PoseLandmark.LEFT_EYE].visibility().orElse(0f),
+            "left_eye_outer" to landmarks[PoseLandmark.LEFT_EYE_OUTER].visibility().orElse(0f),
+            "right_eye_inner" to landmarks[PoseLandmark.RIGHT_EYE_INNER].visibility().orElse(0f),
+            "right_eye" to landmarks[PoseLandmark.RIGHT_EYE].visibility().orElse(0f),
+            "right_eye_inner" to landmarks[PoseLandmark.RIGHT_EYE_OUTER].visibility().orElse(0f),
+            "left_ear" to landmarks[PoseLandmark.LEFT_EAR].visibility().orElse(0f),
+            "right_ear" to landmarks[PoseLandmark.RIGHT_EAR].visibility().orElse(0f),
+            "left_mouth" to landmarks[PoseLandmark.LEFT_MOUTH].visibility().orElse(0f),
+            "right_mouth" to landmarks[PoseLandmark.RIGHT_MOUTH].visibility().orElse(0f),
+            "left_shoulder" to landmarks[PoseLandmark.LEFT_SHOULDER].visibility().orElse(0f),
+            "right_shoulder" to landmarks[PoseLandmark.RIGHT_SHOULDER].visibility().orElse(0f),
+            "left_elbow" to landmarks[PoseLandmark.LEFT_ELBOW].visibility().orElse(0f),
+            "right_elbow" to landmarks[PoseLandmark.RIGHT_ELBOW].visibility().orElse(0f),
+            "left_wrist" to landmarks[PoseLandmark.LEFT_WRIST].visibility().orElse(0f),
+            "right_wrist" to landmarks[PoseLandmark.RIGHT_WRIST].visibility().orElse(0f),
+            "left_pinky" to landmarks[PoseLandmark.LEFT_PINKY].visibility().orElse(0f),
+            "right_pinky" to landmarks[PoseLandmark.RIGHT_PINKY].visibility().orElse(0f),
+            "left_index" to landmarks[PoseLandmark.LEFT_INDEX].visibility().orElse(0f),
+            "right_index" to landmarks[PoseLandmark.RIGHT_INDEX].visibility().orElse(0f),
+            "left_thumb" to landmarks[PoseLandmark.LEFT_THUMB].visibility().orElse(0f),
+            "right_thumb" to landmarks[PoseLandmark.RIGHT_THUMB].visibility().orElse(0f),
+            "left_hip" to landmarks[PoseLandmark.LEFT_HIP].visibility().orElse(0f),
+            "right_hip" to landmarks[PoseLandmark.RIGHT_HIP].visibility().orElse(0f),
+            "left_knee" to landmarks[PoseLandmark.LEFT_KNEE].visibility().orElse(0f),
+            "right_knee" to landmarks[PoseLandmark.RIGHT_KNEE].visibility().orElse(0f),
+            "left_ankle" to landmarks[PoseLandmark.LEFT_ANKLE].visibility().orElse(0f),
+            "right_ankle" to landmarks[PoseLandmark.RIGHT_ANKLE].visibility().orElse(0f),
+            "left_heel" to landmarks[PoseLandmark.LEFT_HEEL].visibility().orElse(0f),
+            "right_heel" to landmarks[PoseLandmark.RIGHT_HEEL].visibility().orElse(0f),
+            "left_foot_index" to landmarks[PoseLandmark.LEFT_FOOT_INDEX].visibility().orElse(0f),
+            "right_foot_index" to landmarks[PoseLandmark.RIGHT_FOOT_INDEX].visibility().orElse(0f))
+
+        return landmarkMap
+    }
+
+    fun resultToPose(results : PoseLandmarkerResult): Pose? {
+        if (results.landmarks()[0] != null) {
+            val landmarksList = results.landmarks()[0].mapIndexed { i, lm ->
+                Landmark(i, lm.x(), lm.y(), lm.z(), lm.visibility().orElse(0f))
+            }
+            return Pose(landmarksList)
+        } else {
+            return null
+        }
+    }
 }

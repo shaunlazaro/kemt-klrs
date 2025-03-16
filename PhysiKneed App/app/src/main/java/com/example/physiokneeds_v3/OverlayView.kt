@@ -54,11 +54,11 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
         results?.let { poseLandmarkerResult ->
             for(landmark in poseLandmarkerResult.landmarks()) {
                 for(normalizedLandmark in landmark.drop(23).take(6)) {
-                    canvas.drawPoint(
-                        normalizedLandmark.x() * imageWidth * scaleFactor,
-                        normalizedLandmark.y() * imageHeight * scaleFactor,
-                        pointPaint
-                    )
+//                    canvas.drawPoint(
+//                        normalizedLandmark.x() * imageWidth * scaleFactor,
+//                        normalizedLandmark.y() * imageHeight * scaleFactor,
+//                        pointPaint
+//                    )
                 }
 
                 val connections = setOf(Connection.create(23,25), Connection.create(24,26), Connection.create(25,27), Connection.create(26,28))
