@@ -6,19 +6,25 @@ import { ExercisePlanListMock } from "../../testData/exercisePlans";
 import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
-import { injuryValueList } from "../../common/utils";
+import { defaultInjuryValueList, getUniqueInjuryValues } from "../../common/utils";
 import { useNavigate } from "react-router-dom";
 import { ADDEDIT_EXERCISES_PATH, ADDEDIT_EXERCISES_PATH_NEW } from "../../routes";
+import { useGetRoutineConfigs } from "../../api/hooks";
 
 const Exercises: React.FC = () => {
   const navigate = useNavigate();
-  const baseExercisePlanList = ExercisePlanListMock
-  const [ExercisePlanList, setExercisePlanList] = useState<RoutineConfig[]>(baseExercisePlanList);
+
+  const { data: exercisePlanData } = useGetRoutineConfigs();
+  console.log(exercisePlanData);
+
+  const [fullExercisePlanList, setFullExercisePlanList] = useState<RoutineConfig[]>(ExercisePlanListMock)
+  const [ExercisePlanList, setExercisePlanList] = useState<RoutineConfig[]>(fullExercisePlanList);
   const [searchString, setSearchString] = useState<string>("");
   const [selectedFilter, setSelectedFilter] = useState<string>("");
+  const [injuryValueList, setInjuryValueList] = useState<string[]>(defaultInjuryValueList);
 
   const applyListFilters = () => {
-    setExercisePlanList(baseExercisePlanList.filter((routineConfig) => routineConfig.name.includes(searchString)
+    setExercisePlanList(fullExercisePlanList.filter((routineConfig) => routineConfig.name.includes(searchString)
       && (selectedFilter == "" || routineConfig.injury == selectedFilter)));
   }
 
@@ -26,6 +32,18 @@ const Exercises: React.FC = () => {
     () => { applyListFilters(); },
     [searchString, selectedFilter]
   )
+
+  useEffect(() => {
+    if (exercisePlanData && exercisePlanData.length > 0) {
+      setFullExercisePlanList(exercisePlanData);
+      setExercisePlanList(exercisePlanData);
+      setInjuryValueList(getUniqueInjuryValues(exercisePlanData))
+    } else {
+      // If no data, use our demo data.
+      setFullExercisePlanList(ExercisePlanListMock);
+      setExercisePlanList(ExercisePlanListMock);
+    }
+  }, [exercisePlanData]);
 
   const onSearchChange = (searchVal: string) => {
     setSearchString(searchVal);

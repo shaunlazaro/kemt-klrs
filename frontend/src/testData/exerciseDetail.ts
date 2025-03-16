@@ -33,4 +33,4 @@ export const ExerciseMockD: ExerciseDetail = {
     start_in_flexion: true,
 }
 
-export const ExerciseList: ExerciseDetail[] = [ExerciseMockA, ExerciseMockB, ExerciseMockC, ExerciseMockD]
+export const MockExerciseList: ExerciseDetail[] = [ExerciseMockA, ExerciseMockB, ExerciseMockC, ExerciseMockD]

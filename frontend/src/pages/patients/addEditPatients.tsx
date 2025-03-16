@@ -8,7 +8,7 @@ import Button from "../../components/button";
 import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import DatePicker from "../../components/datepicker/datepicker";
 import { WideSelect } from "../../components/select/select";
-import { injuryValueList } from "../../common/utils";
+import { defaultInjuryValueList } from "../../common/utils";
 import { RoutineConfigList } from "../../testData/exercisePlans";
 
 const NEW_PATIENT_ID = "new"
@@ -99,7 +99,7 @@ const AddEditPatients: React.FC = () => {
                     </div>
                     <div className="pb-4">
                         <div className="font-base text-sm text-primary-gray pb-1"> Condition </div>
-                        <WideSelect items={injuryValueList} value={patientInjury ?? injuryValueList[0]} onChange={(e) => setPatientInjury(e.target.value)} />
+                        <WideSelect items={defaultInjuryValueList} value={patientInjury ?? defaultInjuryValueList[0]} onChange={(e) => setPatientInjury(e.target.value)} />
                         {/* <Input className="border-2 border-primary-gray" placeholder="CON TODO" /> */}
                     </div>
                     <div className="pb-4">

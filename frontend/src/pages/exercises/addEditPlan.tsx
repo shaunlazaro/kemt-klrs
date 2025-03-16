@@ -8,14 +8,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { CiCircleInfo } from "react-icons/ci";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdDragHandle } from "react-icons/md";
-import { ExerciseList } from "../../testData/exerciseDetail";
+import { MockExerciseList } from "../../testData/exerciseDetail";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { ExerciseDetail } from "../../interfaces/exerciseDetail.interface";
 import { EXERCISES_PATH } from "../../routes";
-import { injuryValueList } from "../../common/utils";
+import { defaultInjuryValueList, getUniqueInjuryValues } from "../../common/utils";
+import { useAddEditRoutineConfig, useDeleteRoutineConfig, useGetExerciseDetails, useGetRoutineConfigById, useGetRoutineConfigs } from "../../api/hooks";
 
 const NEW_PLAN_ID = "new"
-const TEST_PLAN = TestRoutineConfig2;
 
 const BLANK_PLAN: RoutineConfig = {
     id: "TEMP",
@@ -25,7 +25,7 @@ const BLANK_PLAN: RoutineConfig = {
 }
 const BLANK_EXERCISE: RoutineComponent = {
     reps: 0,
-    exercise: ExerciseList[0]
+    exercise: MockExerciseList[0]
 }
 
 
@@ -34,18 +34,18 @@ const AddEditPlan: React.FC = () => {
     const { id: planId } = useParams();
     const navigate = useNavigate();
 
+    const { data: exercisePlanData } = useGetRoutineConfigById(planId ?? "new");
+    const { data: allExercisePlanData } = useGetRoutineConfigs(); // TODO: Dedicate an endpoint for this so we don't need to grab every routineConfig just to list injuries...
+    const { data: allExerciseDetailData } = useGetExerciseDetails();
 
-    const getPlanData = (id: string): RoutineConfig => {
-        return id == NEW_PLAN_ID ? BLANK_PLAN : TEST_PLAN; // TODO Back end integration
-    }
-
-    const [plan, setPlan] = useState<RoutineConfig>(getPlanData(planId ?? NEW_PLAN_ID));
-
-    console.log(plan);
+    const [plan, setPlan] = useState<RoutineConfig>(BLANK_PLAN);
 
     const [planName, setPlanName] = useState<string>(plan.name);
     const [planInjury, setPlanInjury] = useState<string>(plan.injury);
     const [planComponents, setPlanComponents] = useState<RoutineComponent[]>(plan.exercises);
+
+    const [injuryValueList, setInjuryValueList] = useState<string[]>(defaultInjuryValueList)
+    const [exerciseList, setExerciseList] = useState<ExerciseDetail[]>(MockExerciseList)
 
     useEffect(
         () => {
@@ -59,6 +59,33 @@ const AddEditPlan: React.FC = () => {
         },
         [planName, planInjury, planComponents]
     )
+
+    useEffect(
+        () => {
+            if (exercisePlanData) {
+                setPlan(exercisePlanData);
+                setPlanName(exercisePlanData.name);
+                setPlanInjury(exercisePlanData.injury);
+                setPlanComponents(exercisePlanData.exercises);
+            }
+        },
+        [exercisePlanData]
+    )
+
+    useEffect(
+        () => {
+            if (allExerciseDetailData) {
+                setExerciseList(allExerciseDetailData);
+            }
+        },
+        [allExerciseDetailData]
+    )
+
+    useEffect(() => {
+        if (allExercisePlanData && allExercisePlanData.length > 0) {
+            setInjuryValueList(getUniqueInjuryValues(allExercisePlanData))
+        }
+    }, [allExercisePlanData]);
 
     const onClickInfo = (exercise: ExerciseDetail) => {
         alert("Unimplemented: Show Display for " + exercise.display_name);
@@ -78,10 +105,36 @@ const AddEditPlan: React.FC = () => {
     const onClickCancel = () => {
         navigate(EXERCISES_PATH);
     }
+
+    const { mutate: saveRoutineConfig } = useAddEditRoutineConfig();
+    const deleteRoutine = useDeleteRoutineConfig();
+
     const onClickSubmit = () => {
-        alert("TODO: Save changes...");
-        navigate(EXERCISES_PATH);
+        saveRoutineConfig(plan, {
+            onSuccess: () => {
+                navigate(EXERCISES_PATH);
+            },
+            onError: (error) => {
+                alert("Failed to save: " + error);
+            },
+        });
+    };
+
+    const onClickDeleteEntireRoutine = () => {
+        if (!confirm("Delete this exercise plan?"))
+            return;
+        if (!planId)
+            return;
+
+        deleteRoutine.mutate(planId, {
+            onSuccess: () => navigate(EXERCISES_PATH),
+        });
     }
+
+    // const onClickSubmit = () => {
+    //     alert("TODO: Save changes...");
+    //     navigate(EXERCISES_PATH);
+    // }
 
 
     return (
@@ -127,13 +180,13 @@ const AddEditPlan: React.FC = () => {
                                 <div className="col-start-3 w-full text-sm pr-2 font-semibold"> reps </div>
                                 <div className="col-start-4 col-span-6 w-full">
                                     <WideSelect
-                                        items={ExerciseList}
+                                        items={exerciseList}
                                         valueKey="display_name"
                                         label="display_name"
                                         value={planComponent.exercise.display_name}
                                         onChange={(e) => {
                                             const newPlanComponents = [...planComponents];
-                                            const newExercise = ExerciseList.find((ex) => ex.display_name == e.target.value) ?? ExerciseList[0]
+                                            const newExercise = exerciseList.find((ex) => ex.display_name == e.target.value) ?? exerciseList[0]
                                             newPlanComponents[index] = { ...newPlanComponents[index], exercise: newExercise }
                                             setPlanComponents(newPlanComponents);
                                         }}
@@ -158,12 +211,21 @@ const AddEditPlan: React.FC = () => {
                     <div className="flex pt-12 gap-x-4 text-sm font-semibold">
                         <Button variant="primary-outline" className="border-2 font-bold w-[150px]" onClick={() => onClickCancel()}> Cancel </Button>
                         <Button variant="primary" className="w-[150px]" onClick={() => onClickSubmit()}> Save</Button>
+                        {planId !== NEW_PLAN_ID && (
+                            <Button
+                                className="bg-red-500 hover:bg-red-600"
+                                onClick={() => { onClickDeleteEntireRoutine(); }}
+                            >
+                                Delete
+                            </Button>
+                        )}
                     </div>
                 </div>
                 <div className="col-span-2 rounded-lg bg-primary-lightblue h-auto w-full">
                 </div>
             </div>
         </div>
+
     );
 }
 

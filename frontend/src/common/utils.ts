@@ -9,12 +9,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Utility function, should probably be done by server, or create a "injury" table.
-const getUniqueInjuryValues = (routineConfigs: RoutineConfig[]): string[] => {
-  return [...new Set(routineConfigs.map((routineConfig) => routineConfig.injury))]
+export const getUniqueInjuryValues = (routineConfigs: RoutineConfig[]): string[] => {
+  const uniqueInjuries = [...new Set(routineConfigs.map((routineConfig) => routineConfig.injury))];
+
+  if (!uniqueInjuries.includes("Ankle")) {
+    uniqueInjuries.push("Ankle");
+  }
+  if (!uniqueInjuries.includes("Knee")) {
+    uniqueInjuries.push("Knee");
+  }
+
+  return uniqueInjuries;
 }
 
 // Hard coded!
-export const injuryValueList = getUniqueInjuryValues(ExercisePlanListMock);
+export const defaultInjuryValueList = getUniqueInjuryValues(ExercisePlanListMock);
 
 export const getPatientAge = (patient: Patient) => {
   const today = new Date()
