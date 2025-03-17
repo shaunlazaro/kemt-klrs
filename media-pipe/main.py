@@ -121,8 +121,8 @@ routine_config = RoutineConfig(
 
 # Initialize the list to store all RoutineComponentData
 routine_data = RoutineData(
-    routineConfig=routine_config,
-    routineComponentData=[]
+    routine_config=routine_config,
+    routine_component_data=[]
 )
 
 # Define current exercise index (progressing through the routine)
@@ -337,13 +337,13 @@ for routine_component in routine_config.exercises:
             elif keypressed & 0xFF == KEYCODE_ENTER and results.pose_landmarks:
                 n = add_pose_to_routine(result_to_pose_json(results))
                 print(f"Saved pose into routine, {n} poses currently saved.")
-        
-        routine_component_data = RoutineComponentData(routine_component=routine_component, rep_data=rep_data_list)
+
+        routine_component_data = RoutineComponentData(exercise_detail=exercise_detail, rep_data=rep_data_list)
         routine_component_data_list.append(routine_component_data)
         
 cap.release()
 
-routine_data.routineComponentData = routine_component_data_list
+routine_data.routine_component_data = routine_component_data_list
 
 
 # ----------------------- SAVE ROUTINE DATA TO JSON (OPTIONAL) -----------------------
@@ -356,9 +356,9 @@ print("Routine data saved to routine_data.json")
 
     
 # Calc the score for each exercise in the routine
-for routine_component_data in routine_data.routineComponentData:
-    print("routien component data: ", routine_component_data)
-    print(f"Scoring for {routine_component_data.routine_component.exercise.display_name}:")
+for routine_component_data in routine_data.routine_component_data:
+    print("Routine component data: ", routine_component_data)
+    print(f"Scoring for {routine_component_data.exercise_detail.display_name}:")
     
     score, avg_peak_angle, target_range_of_motion, warning = score_routine_component(routine_component_data)
     
