@@ -70,6 +70,8 @@ class ExerciseTracker:
 
         self.poses_buffer = []
         self.last_pose_capture_time = 0
+        self.score = 0
+        self.max_score = 0
 
     def detect_reps(self, tracking_results, exercise_detail, pose_data):
         """Detects repetitions based on tracking results."""
@@ -130,6 +132,7 @@ class ExerciseTracker:
             progress = (primary_angle - start_angle) / (target_angle - start_angle)
 
         self.score = max(0, min(1, progress))
+        self.max_score = max(self.max_score, self.score)
         # print(f"Progress: {self.score:.2%}")
 
     def _update_state(self, primary_angle, current_time):
@@ -201,7 +204,7 @@ class ExerciseTracker:
             total_time=self.last_rep_duration,
             goal_flexion_met=flexion_goal_met,
             goal_extension_met=extension_goal_met,
-            score=self.score,
+            max_score=self.max_score,
             alerts=list(self.last_rep_alerts),
             poses=self.poses_buffer
         )
@@ -225,3 +228,5 @@ class ExerciseTracker:
         self.alerts.clear()
         self.poses_buffer = []
         self.last_pose_capture_time = 0
+        self.max_score = 0
+        self.score = 0
