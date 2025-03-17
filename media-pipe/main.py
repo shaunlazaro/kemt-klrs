@@ -1,11 +1,13 @@
 import cv2
+import json
 import mediapipe as mp
 from poseapi import add_pose_to_routine, upload_current_routine
 from pipeutil import result_to_pose_json
 from collections import deque
 from physio_tools import calculate_three_point_angle, calculate_two_point_vertical_angle, calculate_two_point_horizontal_angle, smooth_angle
 from display import draw_pose_landmarks, display_text, flip_image  # Import functions from display.py
-import pprint
+from scoring import score_routine_component
+
 
 
 from physio_tools import ExerciseTracker
@@ -30,7 +32,6 @@ smoothed_angle = 0
 
 # ----------------------- ROUTINE CONFIGURATION [HARDCODED FOR NOW] -----------------------
 
-# TODO: hardcode the params for each exercise
 
 # tracking details
 right_leg_extension_angle_tracking = TrackingDetail(
@@ -49,8 +50,8 @@ right_leg_extension = ExerciseDetail(
     rep_tracking=right_leg_extension_angle_tracking,
     start_angle=90,
     min_rep_time=1.5,
-    threshold_flexion=100, # TODO: move to trackingDetail
-    threshold_extension=130, # TODO: move to trackingDetail
+    threshold_flexion=100,
+    threshold_extension=130,
     display_name="Leg Extension",
     start_in_flexion=True,
     body_alignment="side",
@@ -266,6 +267,13 @@ for routine_component in routine_config.exercises:
             
                 # TODO: make this check all keypoints involved (not just for rep detection)
                 # Check rep detection keypoints for the current exercise are visible
+                # Note: this isn't optimized for symmetric exercises
+                
+                # Update rep tracking keypoints for symmetric exercises
+                if exercise_detail.rep_tracking.symmetric:
+                    side = detect_leading_side(landmarks, mp_pose.PoseLandmark)  
+                    exercise_detail.rep_keypoints = [f"{side}_{kp}" for kp in exercise_detail.rep_tracking.keypoints]
+                
                 keypoints_visible = all(
                     visibility.get(kp, 0) > CONFIDENCE_THRESHOLD
                     for kp in exercise_detail.rep_keypoints
@@ -278,7 +286,8 @@ for routine_component in routine_config.exercises:
                     )
 
                     rep_data = tracker.detect_reps(tracking_results, exercise_detail, result_to_pose_json(results))
-                    rep_data_list.append(rep_data)
+                    if rep_data:
+                        rep_data_list.append(rep_data)
 
                     # Extract the rep tracking angle dynamically
                     rep_tracking_angle = next(
@@ -290,15 +299,10 @@ for routine_component in routine_config.exercises:
                     smoothed_angle = smooth_angle(rep_tracking_angle, angle_history)
 
             # Extract latest rep data if available
-            if rep_data:
-                last_rep = rep_data  # Get the most recent completed rep
-                rep_count = last_rep.rep_number
-                last_rep_duration = last_rep.total_time
-                alert_message = last_rep.alerts[0] if last_rep.alerts else None
-            else:
-                rep_count = tracker.rep_count
-                last_rep_duration = tracker.last_rep_duration
-                alert_message = alert_message = ", ".join(tracker.last_rep_alerts) if tracker.last_rep_alerts else None
+            rep_count = tracker.rep_count
+            last_rep_duration = tracker.last_rep_duration
+            alert_message = ", ".join(tracker.alerts) if tracker.alerts else None
+            concurrent_score = tracker.score
                 
             # ---------------------- Display Output ----------------------
             
@@ -311,7 +315,7 @@ for routine_component in routine_config.exercises:
             
             # Display text (exercise, reps, time, angle)
             display_text(flipped_image, exercise_detail.display_name, exercise_detail.body_alignment, 
-                rep_count, last_rep_duration, smoothed_angle, alert_message)
+                rep_count, last_rep_duration, smoothed_angle, concurrent_score, alert_message)
 
             # Show the flipped image
             cv2.imshow('MediaPipe Pose', flipped_image)
@@ -337,6 +341,29 @@ for routine_component in routine_config.exercises:
         routine_component_data = RoutineComponentData(routine_component=routine_component, rep_data=rep_data_list)
         routine_component_data_list.append(routine_component_data)
         
+cap.release()
+
 routine_data.routineComponentData = routine_component_data_list
 
-cap.release()
+
+# ----------------------- SAVE ROUTINE DATA TO JSON (OPTIONAL) -----------------------
+# Convert routine_data to a dictionary
+routine_data_dict = routine_data.to_dict()
+with open("routine_data.json", "w") as json_file:
+    json.dump(routine_data_dict, json_file, indent=4)
+print("Routine data saved to routine_data.json")
+
+
+    
+# Calc the score for each exercise in the routine
+for routine_component_data in routine_data.routineComponentData:
+    print("routien component data: ", routine_component_data)
+    print(f"Scoring for {routine_component_data.routine_component.exercise.display_name}:")
+    
+    score, avg_peak_angle, target_range_of_motion, warning = score_routine_component(routine_component_data)
+    
+    print(f"Score: {score:.2f}")
+    print(f"Avg peak angle: {avg_peak_angle:.2f}")
+    print(f"Target range of motion: {target_range_of_motion}")
+    print(f"Warning: {warning}")
+        

@@ -22,7 +22,7 @@ def draw_pose_landmarks(image, landmarks):
         landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style()
     )
 
-def display_text(image, exercise_name, body_alignment, rep_count, last_rep_duration, exercise_angle, alert):
+def display_text(image, exercise_name, body_alignment, rep_count, last_rep_duration, exercise_angle, concurrent_score, alert):
     """Display text on the image."""
         
     # Display exercise name
@@ -34,10 +34,12 @@ def display_text(image, exercise_name, body_alignment, rep_count, last_rep_durat
     # Display last rep duration
     cv2.putText(image, f"Last Rep Time: {last_rep_duration:.2f} sec", (50, 200), FONT, FONT_SCALE, TEXT_COLOR, THICKNESS, LINE_TYPE)
     # Display knee angle
-    cv2.putText(image, f"Angle: {exercise_angle:.0f} deg", (50, 250), FONT, FONT_SCALE, TEXT_COLOR, THICKNESS, LINE_TYPE)
+    cv2.putText(image, f"Rep angle: {exercise_angle:.0f} deg", (50, 250), FONT, FONT_SCALE, TEXT_COLOR, THICKNESS, LINE_TYPE)
+    # Display knee angle
+    cv2.putText(image, f"Angle Score: {concurrent_score:.2f}", (50, 300), FONT, FONT_SCALE, TEXT_COLOR, THICKNESS, LINE_TYPE)
     # Display alert message
     if alert:
-        cv2.putText(image, f"{alert}", (50, 300), FONT, FONT_SCALE, TEXT_COLOR, THICKNESS, LINE_TYPE)
+        cv2.putText(image, f"{alert}", (50, 350), FONT, FONT_SCALE, TEXT_COLOR, THICKNESS, LINE_TYPE)
 
 def flip_image(image):
     """Flip the image horizontally (for selfie view)."""
