@@ -1,5 +1,5 @@
 from typing import List
-from .workout_config import RoutineComponent, RoutineConfig
+from .workout_config import RoutineComponent, RoutineConfig, ExerciseDetail
 
 class RepData:
     def __init__(
@@ -46,15 +46,15 @@ class RepData:
 class RoutineComponentData:
     def __init__(
         self,
-        routine_component: RoutineComponent,
+        exercise_detail: ExerciseDetail,
         rep_data: List[RepData]
     ):
-        self.routine_component = routine_component
+        self.exercise_detail = exercise_detail
         self.rep_data = rep_data if rep_data is not None else []
         
     def to_dict(self):
         return {
-            "routine_component": self.routine_component.to_dict(),
+            "exercise_detail": self.exercise_detail.to_dict(),
             "rep_data": [rep.to_dict() for rep in self.rep_data if rep is not None]
         }
 
@@ -62,14 +62,14 @@ class RoutineComponentData:
 class RoutineData:
     def __init__(
         self,
-        routineConfig: RoutineConfig,
-        routineComponentData: List[RoutineComponentData]
+        routine_config: RoutineConfig,
+        routine_component_data: List[RoutineComponentData]
     ):
-        self.routineConfig = routineConfig
-        self.routineComponentData = routineComponentData
+        self.routine_config = routine_config
+        self.routine_component_data = routine_component_data
 
     def to_dict(self):
         return {
-            "routineConfig":self.routineConfig.to_dict(),
-            "routineComponentData": [rcd.to_dict() for rcd in self.routineComponentData]
+            "routine_config": self.routine_config.to_dict(),
+            "routine_component_data": [rcd.to_dict() for rcd in self.routine_component_data]
         }
