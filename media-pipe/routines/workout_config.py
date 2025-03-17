@@ -28,6 +28,22 @@ class ExerciseDetail:
         self.body_alignment = body_alignment
         self.default_tracking_details = default_tracking_details
         self.instruction = instruction
+        
+    def to_dict(self):
+        return {
+            "rep_keypoints": self.rep_keypoints,
+            "rep_tracking": self.rep_tracking.to_dict(),  # Convert TrackingDetail to dict
+            "start_angle": self.start_angle,
+            "min_rep_time": self.min_rep_time,
+            "threshold_flexion": self.threshold_flexion,
+            "threshold_extension": self.threshold_extension,
+            "display_name": self.display_name,
+            "start_in_flexion": self.start_in_flexion,
+            "body_alignment": self.body_alignment,
+            "default_tracking_details": [td.to_dict() for td in self.default_tracking_details],
+            "instruction": self.instruction
+        }
+
 
 
 class RoutineComponent:
@@ -40,6 +56,13 @@ class RoutineComponent:
         self.exercise = exercise
         self.reps = reps
         self.custom_tracking_details = custom_tracking_details
+    
+    def to_dict(self):
+        return {
+            "exercise": self.exercise.to_dict(),
+            "reps": self.reps,
+            "custom_tracking_details": [td.to_dict() for td in self.custom_tracking_details]
+        }
         
 
         
@@ -68,4 +91,11 @@ class RoutineConfig:
             if component.exercise.display_name == exercise_name:
                 return component
         return None
+    
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "exercises": [ex.to_dict() for ex in self.exercises],
+            "injury": self.injury
+        }
 
