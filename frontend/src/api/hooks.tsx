@@ -89,13 +89,48 @@ export const useDeleteRoutineConfig = () => {
     });
 };
 
-// TODO: Get patients into the server.
-export const useGetPatients = (reportId: string) => {
+export const useGetPatients = () => {
     return useQuery({
-        queryKey: [QueryKeys.PATIENTS, reportId],
+        queryKey: [QueryKeys.PATIENTS],
         queryFn: () =>
             request.get(`/patients`) as Promise<Patient[]>,
         staleTime: 10000,
-        enabled: !!reportId,
+        // enabled: !!reportId,
+    });
+};
+
+export const useGetPatientById = (patientId: string) => {
+    return useQuery({
+        queryKey: [QueryKeys.PATIENT, patientId],
+        queryFn: () =>
+            request.get(`/patients/${patientId}`) as Promise<Patient>,
+        staleTime: 10000,
+        enabled: !!patientId && patientId != "new",
+    });
+};
+
+export const useAddEditPatient = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (patient: Patient) => {
+            const patientCleaned = {
+                ...patient,
+                date_of_birth: patient.date_of_birth.toISOString().split('T')[0], // Ensure proper date format
+                exercises_id: patient.exercises ? patient.exercises.id : null, // Extract only the ID
+            };
+
+            const { id, exercises, ...rest } = patientCleaned;
+            return id === "TEMP" || id === "new"
+                ? request.post(`/patients/`, rest) // Create new patient
+                : request.put(`/patients/${id}/`, rest); // Update existing
+        },
+        onSuccess: (_, patient) => {
+            queryClient.invalidateQueries({ queryKey: [QueryKeys.PATIENTS] });
+            queryClient.invalidateQueries({ queryKey: [QueryKeys.PATIENT, patient.id] });
+        },
+        onError: (error) => {
+            console.error("Error:", `${error.name}: ${error.message}`);
+        },
     });
 };

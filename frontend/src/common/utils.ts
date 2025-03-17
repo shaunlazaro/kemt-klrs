@@ -27,11 +27,11 @@ export const defaultInjuryValueList = getUniqueInjuryValues(ExercisePlanListMock
 
 export const getPatientAge = (patient: Patient) => {
   const today = new Date()
-  const timeDistance = Math.abs(today.getTime() - patient.dateOfBirth.getTime());
+  const timeDistance = Math.abs(today.getTime() - new Date(patient.date_of_birth).getTime());
   const age = Math.floor((timeDistance / (1000 * 60 * 60 * 24) / 365))
   return age
 }
 
 export const getPatientName = (patient: Patient) => {
-  return `${patient.firstName} ${patient.lastName}`
+  return `${patient.first_name} ${patient.last_name}`
 }

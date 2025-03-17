@@ -1,15 +1,12 @@
 import { RoutineConfig } from "./exercisePlan.interface";
 
 export interface Patient {
-    userId: string;
-    // name: string;
-    firstName: string;
-    lastName: string;
+    id: string;
+    first_name: string;
+    last_name: string;
     email: string;
-    dateOfBirth: Date;
-    // age: number; replaced by DOB
+    date_of_birth: Date;
     sex: string;
-    condition: string; // TODO
-    exercises?: RoutineConfig; // TODO
-    weeklyProgress: number; // out of 7?
+    condition: string;
+    exercises?: RoutineConfig;
 }

@@ -35,7 +35,7 @@ const AddEditPlan: React.FC = () => {
     const navigate = useNavigate();
 
     const { data: exercisePlanData } = useGetRoutineConfigById(planId ?? "new");
-    const { data: allExercisePlanData } = useGetRoutineConfigs(); // TODO: Dedicate an endpoint for this so we don't need to grab every routineConfig just to list injuries...
+    const { data: allExercisePlanData } = useGetRoutineConfigs(); // TODO: Dedicate an endpoint for these so we don't need to grab every routineConfig just to list injuries...
     const { data: allExerciseDetailData } = useGetExerciseDetails();
 
     const [plan, setPlan] = useState<RoutineConfig>(BLANK_PLAN);

@@ -8,21 +8,23 @@ import Button from "../../components/button";
 import { RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import DatePicker from "../../components/datepicker/datepicker";
 import { WideSelect } from "../../components/select/select";
-import { defaultInjuryValueList } from "../../common/utils";
+import { defaultInjuryValueList, getUniqueInjuryValues } from "../../common/utils";
 import { RoutineConfigList } from "../../testData/exercisePlans";
+import { useAddEditPatient, useGetPatientById, useGetRoutineConfigs } from "../../api/hooks";
+import { ExerciseDetail } from "../../interfaces/exerciseDetail.interface";
+import { MockExerciseList } from "../../testData/exerciseDetail";
 
 const NEW_PATIENT_ID = "new"
-const patientData = MockPatients
 const BLANK_PATIENT: Patient = {
-    userId: "NA",
-    firstName: "",
-    lastName: "",
+    id: "TEMP",
+    first_name: "",
+    last_name: "",
     email: "",
-    dateOfBirth: new Date(),
-    sex: "",
+    date_of_birth: new Date(),
+    sex: "M",
     condition: "",
     exercises: undefined,
-    weeklyProgress: 0
+    // weeklyProgress: 0
 }
 
 const AddEditPatients: React.FC = () => {
@@ -30,48 +32,79 @@ const AddEditPatients: React.FC = () => {
     const { id: patientId } = useParams();
     const navigate = useNavigate();
 
-    const noPatientFound = () => {
-        alert("No patient found.");
-        navigate(PATIENTS_PATH);
-        return BLANK_PATIENT // TODO: this doesn't work...
-    }
-    const getPatientData = (id: string): Patient => {
-        return id == NEW_PATIENT_ID ? BLANK_PATIENT : patientData.find((patient) => patient.userId == id) ?? noPatientFound()
-    }
+    const { data: patientData } = useGetPatientById(patientId ?? "")
+    const mutatePatient = useAddEditPatient();
 
-    const [patient, setPatient] = useState<Patient>(getPatientData(patientId ?? "N/A"));
+    const { data: allExercisePlanData } = useGetRoutineConfigs(); // TODO: Dedicate an endpoint for these so we don't need to grab every routineConfig just to list injuries...
+
+    const [injuryValueList, setInjuryValueList] = useState<string[]>(defaultInjuryValueList);
+    const [routineConfigs, setRoutineConfigs] = useState<RoutineConfig[]>(RoutineConfigList);
+
+    const [patient, setPatient] = useState<Patient>(BLANK_PATIENT);
     const [patientEmail, setPatientEmail] = useState<string>(patient.email);
-    const [patientFirstName, setPatientFirstName] = useState<string>(patient.firstName);
-    const [patientLastName, setPatientLastName] = useState<string>(patient.lastName);
-    const [patientDOB, setPatientDOB] = useState<Date>(patient.dateOfBirth);
+    const [patientFirstName, setPatientFirstName] = useState<string>(patient.first_name);
+    const [patientLastName, setPatientLastName] = useState<string>(patient.last_name);
+    const [patientDOB, setPatientDOB] = useState<Date>(patient.date_of_birth);
     const [patientInjury, setPatientInjury] = useState<string>(patient.condition);
     const [patientExercise, setPatientExercise] = useState<RoutineConfig | undefined>(patient.exercises);
+    const SEX_OPTIONS = [
+        { value: "M", label: "Male" },
+        { value: "F", label: "Female" },
+        { value: "O", label: "Other / Prefer not to say" },
+    ];
+    const [patientSex, setPatientSex] = useState<string>(patient.sex);
+
+
+    useEffect(
+        () => {
+            if (patientData) {
+                setPatient(patientData);
+                setPatientEmail(patientData.email);
+                setPatientFirstName(patientData.first_name);
+                setPatientLastName(patientData.last_name);
+                setPatientDOB(new Date(patientData.date_of_birth))
+                setPatientInjury(patientData.condition);
+                setPatientExercise(patientData.exercises);
+                setPatientSex(patientData.sex)
+            }
+        },
+        [patientData]
+    )
 
     useEffect(
         () => {
             const newPatient: Patient = {
-                userId: patient.userId,
-                sex: patient.sex,
-                weeklyProgress: patient.weeklyProgress,
+                id: patient.id,
+                user_id: patient.user_id,
+                // weeklyProgress: patient.weeklyProgress,
                 // -------
                 email: patientEmail,
-                firstName: patientFirstName,
-                lastName: patientLastName,
-                dateOfBirth: patientDOB,
+                first_name: patientFirstName,
+                last_name: patientLastName,
+                date_of_birth: patientDOB,
                 condition: patientInjury,
                 exercises: patientExercise,
+                sex: patientSex,
             }
             setPatient(newPatient);
         },
-        [patientEmail, patientFirstName, patientLastName, patientDOB, patientInjury, patientExercise]
+        [patientEmail, patientFirstName, patientLastName, patientDOB, patientInjury, patientExercise, patientSex]
     )
 
-    const onClickCancel = () => {
+    useEffect(() => {
+        if (allExercisePlanData && allExercisePlanData.length > 0) {
+            setRoutineConfigs(allExercisePlanData);
+            setInjuryValueList(getUniqueInjuryValues(allExercisePlanData));
+        }
+    }, [allExercisePlanData]);
 
-    }
+    const onClickCancel = () => navigate(PATIENTS_PATH);
+
     const onClickSubmit = () => {
-
-    }
+        mutatePatient.mutate(patient, {
+            onSuccess: () => navigate(PATIENTS_PATH),
+        });
+    };
 
     return (<>
         <div className="h-auto bg-white pb-20 px-8">
@@ -98,19 +131,29 @@ const AddEditPatients: React.FC = () => {
                         <DatePicker date={patientDOB} onDateChange={(date: Date) => { setPatientDOB(date ?? new Date()); }} />
                     </div>
                     <div className="pb-4">
+                        <div className="font-base text-sm text-primary-gray pb-1"> Sex </div>
+                        <WideSelect
+                            items={SEX_OPTIONS}
+                            valueKey="value"
+                            label="label"
+                            value={patient.sex}
+                            onChange={(e) => setPatientSex(e.target.value)}
+                        />
+                    </div>
+                    <div className="pb-4">
                         <div className="font-base text-sm text-primary-gray pb-1"> Condition </div>
-                        <WideSelect items={defaultInjuryValueList} value={patientInjury ?? defaultInjuryValueList[0]} onChange={(e) => setPatientInjury(e.target.value)} />
+                        <WideSelect items={injuryValueList} value={patientInjury ?? defaultInjuryValueList[0]} onChange={(e) => setPatientInjury(e.target.value)} />
                         {/* <Input className="border-2 border-primary-gray" placeholder="CON TODO" /> */}
                     </div>
                     <div className="pb-4">
                         <div className="font-base text-sm text-primary-gray pb-1"> Exercise </div>
                         <WideSelect
-                            items={RoutineConfigList}
+                            items={routineConfigs}
                             valueKey="name"
                             label="name"
                             value={patient.exercises?.name ?? ""}
                             onChange={(e) => {
-                                setPatientExercise(RoutineConfigList.find((ex) => ex.name == e.target.value) ?? RoutineConfigList[0])
+                                setPatientExercise(routineConfigs.find((ex) => ex.name == e.target.value) ?? routineConfigs[0])
                             }}
                         />
                     </div>

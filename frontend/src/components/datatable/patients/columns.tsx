@@ -94,7 +94,7 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
     },
     {
         id: "weeklyProgress",
-        accessorFn: (patient) => patient.weeklyProgress,
+        accessorFn: (_) => 0,
         header: () => (
             <div className="w-full cursor-default text-center">Weekly Progress</div>
         ),
@@ -129,7 +129,7 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
                     Copy payment ID
                     </DropdownMenuItem>
                     <DropdownMenuSeparator /> */}
-                        <DropdownMenuItem onClick={() => navigate(ADDEDIT_PATIENTS_PATH.replace(":id", patient.userId))}>Edit Patient Info</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(ADDEDIT_PATIENTS_PATH.replace(":id", patient.id))}>Edit Patient Info</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => alert("Unimplemented!\nTODO: Delete patient functionality")}>Delete Patient</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu >
