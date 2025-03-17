@@ -3,6 +3,7 @@ package com.example.physiokneeds_v3
 import ConnectThread
 import ConnectedThread
 import android.Manifest
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -58,6 +59,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.ObjectOutputStream
 import java.util.UUID
 import kotlin.math.abs
 import kotlin.math.max
@@ -417,14 +422,14 @@ class MainActivity : AppCompatActivity() {
 
         // define global variables
         textureView = findViewById(R.id.camera_feed)
-        textureView.scaleX = -1f // mirror since front camera
+//        textureView.scaleX = -1f // mirror since front camera
 //        textureView.rotation = 90f // Rotate 90 degrees clockwise
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
         handlerThread = HandlerThread("videoThread")
         handlerThread.start()
         handler = Handler(handlerThread.looper)
         overlayView = findViewById(R.id.overlayView)
-        overlayView.scaleX = -1f // mirror since front camera
+//        overlayView.scaleX = -1f // mirror since front camera
 //        overlayView.rotation = 90f // Rotate 90 degrees clockwise
         poseLandmarker = PoseLandmarker.createFromOptions(this, options)
 
@@ -552,9 +557,11 @@ class MainActivity : AppCompatActivity() {
                         val keypointVisible = exerciseDetail.repKeypoints.all { kp ->
                             (visibility[kp] ?: 0f) > CONFIDENCE_THRESHOLD
                         }
+
                         if (keypointVisible) {
-                            track_user(result, mpImage.height, mpImage.width)
+                            track_user(result, mpImage.height, mpImage.width, true)
                         } else {
+                            track_user(result, mpImage.height, mpImage.width, false)
                             // TODO add pop up that keypoints aren't visible (light, in frame, stay still etc.)
                         }
                         counts = 0
@@ -577,20 +584,17 @@ class MainActivity : AppCompatActivity() {
                     exerciseTitle.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
                     exerciseNumberText.text = "Exercise #" + (currentExerciseIndex+1)
 
-//                    while (progressBarPopup.progress < progressBarPopup.max) {
-//                        Thread.sleep(10)
-//                        progressBarPopup.progress += 10
-////                        Log.d("NICK_STATE", progressBarPopup.progress.toString())
-//                    }
+                    state = -1
+                    val loadingDuration = 3000
 
-                    progressBarPopup.progress = 1000
+                    moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
 
                     Handler(Looper.getMainLooper()).postDelayed({
                         state = 2 // start next state
                         popupMenu.visibility = View.GONE // hide pop up
-                    }, 3000)  // update progress
+                    }, loadingDuration.toLong())  // update progress
 
-                    startTime = System.currentTimeMillis() / 1000
+                    startTime = (System.currentTimeMillis() / 1000) + 3
                 }
                 else if (state == 2) {
 
@@ -686,48 +690,51 @@ class MainActivity : AppCompatActivity() {
                     exerciseNumberText.visibility = View.GONE
                     exerciseTitle.text = "Exercise Completed"
 
-//                    while (progressBarPopup.progress < progressBarPopup.max) {
-//                        Handler(Looper.getMainLooper()).postDelayed({
-//                            progressBarPopup.progress += 10
-//                        }, 10)  // update progress
-//                    }
+                    state = -1
+                    val loadingDuration = 3000
+                    moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
 
                     Handler(Looper.getMainLooper()).postDelayed({
                         state = 1 // start next state
                         exerciseNumberText.visibility = View.VISIBLE
 //                        popupMenu.visibility = View.GONE // hide pop up
-                    }, 3000)  // update progress
+                    }, loadingDuration.toLong())  // update progress
                 }
                 else if (state == 4) {
                     popupMenu.visibility = View.VISIBLE
                     exerciseTitle.text = "Workout Complete"
                     exerciseNumberText.text = "Nice Work!"
-//                    while (progressBarPopup.progress < progressBarPopup.max) {
-//                        Handler(Looper.getMainLooper()).postDelayed({
-//                            progressBarPopup.progress += 10
-//                        }, 10)  // update progress
-//                    }
-                    // end process
+
+//                    connectedThreadWrite.write("90,45")
+//                    currentPos = "90,45"
+
+                    state = -1
+                    val loadingDuration = 10000
+                    moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
 
                     // send data format
-                    var routineDataList = mutableListOf<RoutineComponentData>()
+                    var routineDataList = mutableListOf<RoutineComponentDataUpload>()
                     var index = 0
                     for (repDataList in repDataLists) {
-                        val routineComponentData = RoutineComponentData(routineConfig.exercises[index], repDataList)
+                        val routineComponentData = RoutineComponentDataUpload(routineConfig.exercises[index].exercise.id, repDataList)
                         routineDataList.add(routineComponentData)
                         index++
+                        val gson = Gson()
+                        val jsonData = gson.toJson(repDataList) // Serialize the data
+                        Log.d("JSON_REPDATA", "repData Pose size: " + repDataList.get(0).poses.size);
+                        Log.d("JSON_REPDATA", "json " + jsonData)
                     }
 
-                    val routineData = RoutineData(routineConfig, routineDataList)
-//                    sendData(routineData)
+                    val routineData = RoutineDataUpload(routineConfig.id, routineDataList)
+                    sendData(routineData)
+
+
 
                     Handler(Looper.getMainLooper()).postDelayed({
-                        val intent = Intent(applicationContext, WorkoutComplete::class.java)
-                        intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig)
-
-                        startActivity(intent)
+                        val intent = Intent("com.example.END_WORKOUT")
+                        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
                         finish()
-                    }, 10000)  // finish after 10 seconds
+                    }, loadingDuration.toLong())  // finish after 10 seconds
                 }
             }
 
@@ -743,6 +750,13 @@ class MainActivity : AppCompatActivity() {
 
 //                textView_reps.text = counts.toString()
         }
+    }
+
+    fun moveProgressBar(startVal: Int, endVal: Int, duration: Long) {
+        val animator: ObjectAnimator =
+            ObjectAnimator.ofInt(progressBarPopup, "progress", startVal, endVal)
+        animator.setDuration(duration)
+        animator.start()
     }
 
     private fun updateRepTimer() {
@@ -773,8 +787,9 @@ class MainActivity : AppCompatActivity() {
             }
             isReceiverRegistered = false
         }
-        // close socket
-//        connectedThreadWrite.cancel()
+
+        val intent = Intent("com.example.CLOSE_EXTERNAL_ACTIVITY")
+        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -846,7 +861,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun track_user(result: PoseLandmarkerResult, height: Int, width: Int) {
+    fun track_user(result: PoseLandmarkerResult, height: Int, width: Int, changeState: Boolean) {
         // Get coordinates of all points
         val allPoints = mutableListOf<Array<Float>>()
         for (landmark in result.landmarks()[0]) {
@@ -854,13 +869,17 @@ class MainActivity : AppCompatActivity() {
         }
         // Get coords to send
         try {
-            val motorCoords = getCoords(allPoints, height, width, currentPos)
+//            val motorCoords = getCoords(allPoints, height, width, currentPos)
+            val py = Python.getInstance()
+            val motorCoords = py.getModule("processing")
+                .callAttr("get_coords", allPoints.toTypedArray(), height, width, currentPos).toString()
+
             if (motorCoords != "DNM") {
                 currentPos = motorCoords
                 Log.d("CUSTOMTAG", currentPos)
                 connectedThreadWrite.write(motorCoords)
                 trackUserCount = 0
-            } else if (trackUserCount >= 10) {
+            } else if (trackUserCount >= 10 && changeState) {
                 // if the camera hasn't moved for 10 iterations, stop moving camera
                 state = 1
                 trackUserCount = 0
@@ -1173,7 +1192,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendData(data: RoutineData) {
+    private fun sendData(data: RoutineDataUpload) {
         // create retrofit instance
         val retrofit = Retrofit.Builder()
             .baseUrl("http://140.238.151.117:8000/api/routine-data/")
@@ -1185,14 +1204,34 @@ class MainActivity : AppCompatActivity() {
         // send routine-data
         val call = apiService.sendData(data)
 
-        call?.enqueue(object : Callback<RoutineData> {
+        val gson = Gson()
+        val jsonData = gson.toJson(data) // Serialize the data
+
+        try {
+            // Save to internal storage
+            // serialize
+            val file = File(getExternalFilesDir("debug"), "json_data.json")
+            val fos = FileOutputStream(file)
+            val oos = ObjectOutputStream(fos)
+            oos.writeObject(jsonData)
+            oos.close()
+            fos.close()
+
+        } catch (e: IOException) {
+            Log.e("FileSave", "Error saving data: ${e.message}")
+        }
+
+        call?.enqueue(object : Callback<RoutineDataUpload> {
             override fun onResponse(
-                call: Call<RoutineData>,
-                response: Response<RoutineData>
+                call: Call<RoutineDataUpload>,
+                response: Response<RoutineDataUpload>
             ) {
                 if (!response.isSuccessful) {
                     // Handle the error scenario here
                     Log.e(HomeScreen.TAG_API, "Response Code: " + response.code())
+                    Log.e(HomeScreen.TAG_API, "Response Message: " + response.errorBody())
+                    Log.e(HomeScreen.TAG_API, "Response Message: " + (response.errorBody()?.string()
+                        ?: ""))
                     Log.d(HomeScreen.TAG_API, call.request().url.toString())
                     return
                 } else {
@@ -1200,7 +1239,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<RoutineData>, t: Throwable) {
+            override fun onFailure(call: Call<RoutineDataUpload>, t: Throwable) {
                 Log.e(HomeScreen.TAG_API, t.toString())
             }
         })

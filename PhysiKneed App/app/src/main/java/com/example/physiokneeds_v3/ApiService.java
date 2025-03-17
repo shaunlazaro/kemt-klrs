@@ -12,6 +12,6 @@ public interface ApiService {
     @GET("/api/routine-configs")
     Call<List<RoutineConfig>> getRoutine();
 
-    @POST("/api/routine-data")
-    Call<RoutineData> sendData(@Body RoutineData data);
+    @POST("/api/routine-data/")
+    Call<RoutineDataUpload> sendData(@Body RoutineDataUpload data);
 }

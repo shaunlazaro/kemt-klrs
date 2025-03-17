@@ -3,16 +3,16 @@ package com.example.physiokneeds_v3;
 import java.util.List;
 
 public class RoutineComponentData {
-    private RoutineComponent routineComponent;
+    private ExerciseDetail exerciseDetail ;
     private List<RepData> repData;
 
     // Constructor
-    public RoutineComponentData(RoutineComponent routineComponent, List<RepData> repData) {
-        this.routineComponent = routineComponent;
+    public RoutineComponentData(ExerciseDetail exerciseDetail, List<RepData> repData) {
+        this.exerciseDetail = exerciseDetail;
         this.repData = repData;
     }
 
     // Getters
-    public RoutineComponent getRoutineComponent() { return routineComponent; }
+    public ExerciseDetail getRoutineComponent() { return exerciseDetail; }
     public List<RepData> getRepData() { return repData; }
 }

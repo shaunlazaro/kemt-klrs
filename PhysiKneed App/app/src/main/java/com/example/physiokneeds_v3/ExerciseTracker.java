@@ -9,7 +9,7 @@ public class ExerciseTracker {
     private String state;
     private boolean justCompletedRep;
     private long repStartTime;
-    private long lastRepDuration;
+    private double lastRepDuration;
     private double flexionThreshold;
     private double extensionThreshold;
     private boolean startInFlexion;
@@ -19,13 +19,13 @@ public class ExerciseTracker {
     private Double goalExtension;
     private Set<String> alerts;
     private Set<String> lastRepAlerts;
-    private long phase1StartTime;
-    private long phase2StartTime;
-    private long lastConcentricTime;
-    private long lastEccentricTime;
+    private double phase1StartTime;
+    private double phase2StartTime;
+    private double lastConcentricTime;
+    private double lastEccentricTime;
     private List<Pose> posesBuffer;
-    private long lastPoseCaptureTime;
-    private Float score;
+    private double lastPoseCaptureTime;
+    private double score;
 
     public ExerciseTracker(ExerciseDetail exerciseDetail) {
         this.repCount = 0;
@@ -61,12 +61,15 @@ public class ExerciseTracker {
             return null;
         }
 
-        long currentTime = System.currentTimeMillis() / 1000;
+        double currentTime = (double) System.currentTimeMillis() / 1000;
         updateMaxAngles(primaryAngle);
         processAlerts(trackingResults, mainTrackingDetail);
         updateProgressScore(primaryAngle, exerciseDetail.getStartAngle());
 
-        if (currentTime - lastPoseCaptureTime >= 100) {
+        if (currentTime*1000 - lastPoseCaptureTime >= 100) {
+            Log.d("ROUTINE_DEBUG", "Pose Captured");
+            Log.d("ROUTINE_DEBUG", "Pose Example X:" + poseData.getLandmarks().get(0).getX());
+            Log.d("ROUTINE_DEBUG", "Poses Size:" + poseData.getLandmarks().size());
             posesBuffer.add(poseData);
             lastPoseCaptureTime = currentTime;
         }
@@ -122,10 +125,10 @@ public class ExerciseTracker {
             progress = (primaryAngle - startAngle) / (goalFlexion - startAngle);
         }
 
-        score = (float) Math.max(0, Math.min(1, progress));
+        score = Math.max(0, Math.min(1, progress));
     }
 
-    private void updateState(double primaryAngle, long currentTime) {
+    private void updateState(double primaryAngle, double currentTime) {
         switch (state) {
             case "rest":
                 if (isStartOfRep(primaryAngle)) startNewRep(currentTime);
@@ -151,7 +154,7 @@ public class ExerciseTracker {
         return (startInFlexion && angle < flexionThreshold) || (!startInFlexion && angle > extensionThreshold);
     }
 
-    private void startNewRep(long currentTime) {
+    private void startNewRep(double currentTime) {
         state = "phase_1";
         phase1StartTime = currentTime;
         currentMaxFlexion = Double.POSITIVE_INFINITY;
@@ -160,13 +163,13 @@ public class ExerciseTracker {
         justCompletedRep = false;
     }
 
-    private void startPhase2(long currentTime) {
+    private void startPhase2(double currentTime) {
         state = "phase_2";
         phase2StartTime = currentTime;
         lastConcentricTime = currentTime - phase1StartTime;
     }
 
-    private void completeRep(long currentTime) {
+    private void completeRep(double currentTime) {
         state = "rest";
         lastEccentricTime = currentTime - phase2StartTime;
         lastRepDuration = lastConcentricTime + lastEccentricTime;
@@ -174,7 +177,7 @@ public class ExerciseTracker {
         justCompletedRep = true;
     }
 
-    private RepData finalizeRep(long currentTime, TrackingDetail mainTrackingDetail, Float minRepTime) {
+    private RepData finalizeRep(double currentTime, TrackingDetail mainTrackingDetail, Float minRepTime) {
         boolean flexionGoalMet = goalFlexion == null || currentMaxFlexion <= goalFlexion;
         boolean extensionGoalMet = goalExtension == null || currentMaxExtension >= goalExtension;
 
@@ -183,7 +186,9 @@ public class ExerciseTracker {
 
         lastRepAlerts = new HashSet<>(alerts);
 
+        Log.d("ROUTINE_DEBUG", "poseBufferSize: " + posesBuffer.size());
         RepData repEntry = new RepData(repCount, currentMaxFlexion, currentMaxExtension, lastConcentricTime, lastEccentricTime, lastRepDuration, flexionGoalMet, extensionGoalMet, score, new ArrayList<>(lastRepAlerts), posesBuffer);
+        Log.d("ROUTINE_DEBUG", "Pose Size: " + repEntry.getPoses().size());
 
         printRepFeedback();
         resetRepTracking(currentTime);
@@ -202,7 +207,7 @@ public class ExerciseTracker {
         }
     }
 
-    public void resetRepTracking(long currentTime) {
+    public void resetRepTracking(double currentTime) {
         currentMaxFlexion = Float.POSITIVE_INFINITY;
         currentMaxExtension = Float.NEGATIVE_INFINITY;
         phase1StartTime = currentTime;

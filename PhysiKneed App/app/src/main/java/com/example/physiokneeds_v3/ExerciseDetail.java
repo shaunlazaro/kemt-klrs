@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ExerciseDetail implements Serializable {
+    private String id;
     private TrackingDetail rep_tracking;
     private List<String> rep_keypoints;
     private Float start_angle;
@@ -21,6 +22,14 @@ public class ExerciseDetail implements Serializable {
 
     public TrackingDetail getRepTracking() {
         return rep_tracking;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public void setRepTracking(TrackingDetail repTracking) {

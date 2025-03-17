@@ -1,8 +1,10 @@
 package com.example.physiokneeds_v3
 
 import android.app.ActivityOptions
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Bundle
@@ -20,6 +22,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
+
 class PerfromExercises : AppCompatActivity() {
 
     lateinit var searchButton: Button
@@ -27,6 +30,9 @@ class PerfromExercises : AppCompatActivity() {
     lateinit var startTrackingButton: Button
     lateinit var progressBar: ProgressBar
     lateinit var status: TextView
+    lateinit var endWorkoutButton: Button
+
+    var isReceiverRegistered = false
 
     var displayCount = 0
 
@@ -48,6 +54,15 @@ class PerfromExercises : AppCompatActivity() {
         }
     }
 
+    // broadcast receiver for controlling the external display
+    private var buttonPressReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "com.example.END_WORKOUT") {
+                endWorkoutButton.performClick() // Simulate button press
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,12 +78,20 @@ class PerfromExercises : AppCompatActivity() {
         searchButton = findViewById(R.id.search_devices_button)
         connectButton = findViewById(R.id.connect_button)
         startTrackingButton = findViewById(R.id.start_tracking_button)
+        endWorkoutButton = findViewById(R.id.end_workout)
 
         progressBar = findViewById(R.id.progressBar)
         status = findViewById(R.id.status)
 
         // get routine from previous screen
         val routineConfig = intent.getSerializableExtra(HomeScreen.ROUTINE_TAG) as RoutineConfig?
+
+        // broadcast receivers for external display control
+        val endFilter = IntentFilter("com.example.END_WORKOUT")
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, endFilter)
+
+        isReceiverRegistered = true
 
         // automatic bluetooth
         Handler(Looper.getMainLooper()).postDelayed({
@@ -88,6 +111,21 @@ class PerfromExercises : AppCompatActivity() {
         }, 5000)  // Clicks after 10 seconds
 
         // set clickListeners
+
+        endWorkoutButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                val intent = Intent(applicationContext, WorkoutComplete::class.java)
+                if (routineConfig != null) {
+                    intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig)
+                }
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+                displayManager.unregisterDisplayListener(displayListener)
+                applicationContext.startActivity(intent)
+            }
+        })
+
         searchButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {
                 Log.d("NickDebug", "search")
@@ -139,5 +177,14 @@ class PerfromExercises : AppCompatActivity() {
         val intent = Intent("com.example.CLOSE_EXTERNAL_ACTIVITY")
         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
         displayManager.unregisterDisplayListener(displayListener)
+
+        if (isReceiverRegistered) {
+            try {
+                unregisterReceiver(buttonPressReceiver)
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+            }
+            isReceiverRegistered = false
+        }
     }
 }
