@@ -80,12 +80,12 @@ class PerfromExercises : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             if (displayCount >= 2) {
                 connectButton.performClick()
-                status.text = "Look at the TV to perform your exercises"
+                status.text = "Complete the workout on your external monitor or TV."
                 progressBar.visibility = ProgressBar.GONE
 //            connectButton.visibility = Button.VISIBLE
 //            connectButton.text = "Reconnect"
             }
-        }, 10000)  // Clicks after 10 seconds
+        }, 5000)  // Clicks after 10 seconds
 
         // set clickListeners
         searchButton.setOnClickListener(object : View.OnClickListener {

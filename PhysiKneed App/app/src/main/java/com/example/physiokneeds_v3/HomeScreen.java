@@ -26,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeScreen extends AppCompatActivity {
 
-    String TAG_API = "ApiError";
+    public static final String TAG_API = "ApiError";
     public static final String ROUTINE_TAG = "ROUTINE";
 
     RoutineConfig routineConfig;

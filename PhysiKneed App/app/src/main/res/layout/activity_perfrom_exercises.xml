@@ -8,75 +8,198 @@
     android:background="@color/white"
     tools:context=".PerfromExercises">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="60dp">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Connecting..."
-            android:fontFamily="@font/source_sans"
-            android:textSize="20sp"
-            android:textColor="@color/blue"
-            android:textStyle="bold"
-            android:padding="10dp"
-            android:layout_marginTop="150dp"
-            android:layout_gravity="center"
-            android:gravity="center"/>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="300px"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/blue"
-            android:layout_gravity="center"/>
+            android:layout_height="100dp"
+            android:background="@color/blue" />
 
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/search_devices_button"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:text="Search Devices"
-            android:textColor="@color/white"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:background="@drawable/blue_button"
-            android:fontFamily="@font/source_sans"
-            android:visibility="invisible"/>
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/connect_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="Connect To Mount"
-            android:textColor="@color/white"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:background="@drawable/blue_button"
-            android:fontFamily="@font/source_sans"
-            android:visibility="invisible"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:orientation="horizontal">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/start_tracking_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/blue_button"
-            android:text="Start Camera Tracking"
-            android:textColor="@color/white"
-            android:textAllCaps="false"
-            android:textStyle="bold"
-            android:fontFamily="@font/source_sans"
-            android:visibility="invisible"/>
+                <ImageButton
+                    android:id="@+id/back_button_blue"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@color/blue"
+                    android:src="@drawable/white_back_arrow"
+                    android:contentDescription="Next"
+                    android:layout_marginStart="24dp" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Workout In Progress"
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="24sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:layout_marginStart="10dp"/>
 
-    </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Connecting..."
+                android:fontFamily="@font/source_sans"
+                android:textSize="20sp"
+                android:textColor="@color/blue"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:layout_marginTop="70dp"
+                android:layout_gravity="center"
+                android:gravity="center"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="300px"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="@color/blue"
+                android:layout_gravity="center"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/view_instructions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:text="View Exercise Instructions"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/source_sans"
+                android:textStyle="bold"
+                android:background="@drawable/blue_button"
+                android:padding="10dp"
+                android:enabled="false"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/view_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:text="View Exercise List"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="@color/blue"
+                android:fontFamily="@font/source_sans"
+                android:textStyle="bold"
+                android:background="@drawable/outline_button"
+                android:padding="10dp"
+                android:enabled="false"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/setup_instructions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:text="Setup Instructions"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="@color/blue"
+                android:fontFamily="@font/source_sans"
+                android:textStyle="bold"
+                android:background="@drawable/outline_button"
+                android:padding="10dp"
+                android:enabled="false"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/skip_workout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:text="Skip this exercise"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="@color/pink"
+                android:fontFamily="@font/source_sans"
+                android:textStyle="bold"
+                android:background="@drawable/pink_outline"
+                android:padding="10dp"
+                android:enabled="false"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/end_workout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:text="End Workout"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/source_sans"
+                android:textStyle="bold"
+                android:background="@drawable/pink_button"
+                android:padding="10dp"
+                android:enabled="false"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/search_devices_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="100dp"
+                android:text="Search Devices"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:background="@drawable/blue_button"
+                android:fontFamily="@font/source_sans"
+                android:visibility="gone"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/connect_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="Connect To Mount"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:background="@drawable/blue_button"
+                android:fontFamily="@font/source_sans"
+                android:visibility="gone"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/start_tracking_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/blue_button"
+                android:text="Start Camera Tracking"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:fontFamily="@font/source_sans"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </RelativeLayout>

@@ -50,7 +50,24 @@
                     android:background="@drawable/blue_rounded_textbox"
                     android:padding="30dp"
                     android:layout_gravity="right"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="50dp"
+                    android:elevation="10dp"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/rep_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="   0:00   "
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:background="@drawable/pink_textbox"
+                    android:padding="10dp"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="30dp"
                     android:elevation="10dp"
                     android:visibility="gone"/>
 
@@ -167,6 +184,25 @@
                 android:max="3000"/>
 
         </FrameLayout>
+
+        <TextView
+            android:id="@+id/alert_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="700dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="650dp"
+            android:padding="30dp"
+            android:text="Extend Further!"
+            android:textSize="24sp"
+            android:textColor="@android:color/black"
+            android:fontFamily="@font/source_sans"
+            android:textStyle="bold"
+            android:background="@drawable/alert_box"
+            android:drawablePadding="70dp"
+            android:enabled="false"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/baseline_error_outline_24" />
 
     </FrameLayout>
 

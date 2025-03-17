@@ -2,9 +2,9 @@ package com.example.physiokneeds_v3;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -39,7 +39,6 @@ public class MyExercises extends AppCompatActivity {
 
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         Button startExercises = findViewById(R.id.start_button);
-        Button startCastExercises = findViewById(R.id.start_cast_button);
 
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         ImageButton backButton = findViewById(R.id.back_button);
@@ -59,12 +58,21 @@ public class MyExercises extends AppCompatActivity {
             linearLayout.setOrientation(LinearLayout.HORIZONTAL);
             linearLayout.setPadding(0, dpToPx(25), 0, 0);
 
+            // Create a text LinearLayout
+            LinearLayout linearLayoutText = new LinearLayout(this);
+            linearLayoutText.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+            linearLayoutText.setOrientation(LinearLayout.VERTICAL);
+//            linearLayoutText.setPadding(0, dpToPx(25), 0, 0);
+
             // Create ImageView
             // TODO make imageViews buttons for more exercise instructions and custom images
             ImageView imageView = new ImageView(this);
             LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-                    dpToPx(48),
-                    dpToPx(48));
+                    dpToPx(58),
+                    dpToPx(58));
+            imageParams.gravity = Gravity.CENTER;
             imageParams.setMargins(dpToPx(40), 0, 0, 0); // layout_marginStart="40dp"
             imageView.setLayoutParams(imageParams);
             imageView.setBackgroundResource(R.drawable.outline_button); // Set background drawable
@@ -83,11 +91,22 @@ public class MyExercises extends AppCompatActivity {
             textView.setTextSize(20);
             textView.setTypeface(ResourcesCompat.getFont(this, R.font.source_sans), Typeface.BOLD);
             textView.setTextColor(ContextCompat.getColor(this, R.color.black));
-            textView.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10));
+            textView.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(5));
+
+            // create rep textview
+            TextView repsText = new TextView(this);
+            repsText.setLayoutParams(textParams);
+            repsText.setText(routineConfig.getExercises().get(i).getReps() + " reps");
+            repsText.setTextSize(14);
+            repsText.setTypeface(ResourcesCompat.getFont(this, R.font.source_sans));
+            repsText.setTextColor(ContextCompat.getColor(this, R.color.black));
+            repsText.setPadding(dpToPx(10), dpToPx(0), dpToPx(0), dpToPx(0));
 
             // Add views to the LinearLayout
+            linearLayoutText.addView(textView);
+            linearLayoutText.addView(repsText);
             linearLayout.addView(imageView);
-            linearLayout.addView(textView);
+            linearLayout.addView(linearLayoutText);
 
             // Add the LinearLayout to the parent layout
             layoutEx.addView(linearLayout, 1+i);
@@ -97,16 +116,6 @@ public class MyExercises extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MyExercises.this, SetUpDevice.class);
                 intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig);
-                intent.putExtra(IS_CASTED, true);
-
-                MyExercises.this.startActivity(intent);
-            }
-        });
-
-        startCastExercises.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(MyExercises.this, SetUpDevice.class);
-
                 intent.putExtra(IS_CASTED, true);
 
                 MyExercises.this.startActivity(intent);

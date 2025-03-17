@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="#F0F0F0"
+        android:src="@drawable/baseline_person_24"
+        android:scaleType="centerInside"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/instructionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Place the tracking mount on a flat surface in front of your TV"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:fontFamily="@font/source_sans"
+        android:textAlignment="center"/>
+</LinearLayout>

@@ -3,7 +3,6 @@ package com.example.physiokneeds_v3
 import ConnectThread
 import ConnectedThread
 import android.Manifest
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -39,11 +38,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.graphics.scale
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.chaquo.python.Python
+import com.google.gson.Gson
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
 import com.google.mediapipe.tasks.core.BaseOptions
@@ -54,14 +53,16 @@ import com.google.mlkit.vision.pose.PoseLandmark
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.Optional
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.UUID
 import kotlin.math.abs
-import kotlin.math.acos
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
-import kotlin.math.sqrt
 import kotlin.properties.Delegates
 
 
@@ -70,6 +71,7 @@ class MainActivity : AppCompatActivity() {
     // global variables
     lateinit var routineConfig: RoutineConfig
     var exerciseTrackers = mutableListOf<ExerciseTracker>()
+    var repDataLists = mutableListOf<MutableList<RepData>>()
 
     lateinit var textureView: TextureView
     lateinit var cameraManager: CameraManager
@@ -130,8 +132,12 @@ class MainActivity : AppCompatActivity() {
     lateinit var exerciseNumberText: TextView
     lateinit var progressBarPopup: ProgressBar
     lateinit var leftImage: ImageView
+    lateinit var alertBox: TextView
+    lateinit var repTimer: TextView
 
     lateinit var connectedThreadWrite: ConnectedThread
+
+    var startTime = 0.0.toLong()
 
     var isConnected = false
 
@@ -173,6 +179,7 @@ class MainActivity : AppCompatActivity() {
             }
             if (intent?.action == "com.example.PRESS_CONNECT_BUTTON") {
                 bt_button.performClick() // Simulate button press
+                state = 1 // TODO remove when using mount
             }
             if (intent?.action == "com.example.PRESS_START_BUTTON") {
                 Log.d(TAG, "Start Tracking Called")
@@ -248,18 +255,11 @@ class MainActivity : AppCompatActivity() {
         // get routine from previous screen
         routineConfig = (intent.getSerializableExtra(HomeScreen.ROUTINE_TAG) as RoutineConfig?)!!
 
-        // TODO remove these hard coded values for knee extension
-//        routineConfig.exercises.get(0).exercise.startInFlexion = true
-//        routineConfig.exercises.get(0).exercise.thresholdExtension = 140
-//        routineConfig.exercises.get(0).exercise.thresholdFlexion = 80
-
-        // create exercise tracker list
+        // create exercise tracker list and routine data tracker
         for (ex in routineConfig.exercises) {
             exerciseTrackers.add(ExerciseTracker(ex.exercise))
+            repDataLists.add(mutableListOf<RepData>())
         }
-
-        // Initialize rep data list for this specific exercise
-        var repDataList = mutableListOf<RepData>()
 
         // Routine Data
         var routineComponentDataList = emptyList<RoutineComponentData>()
@@ -438,6 +438,8 @@ class MainActivity : AppCompatActivity() {
         exerciseTitle = findViewById(R.id.exercise_title)
         exerciseNumberText = findViewById(R.id.exercise_number_text)
         progressBarPopup = findViewById(R.id.progress_bar)
+        alertBox = findViewById(R.id.alert_box)
+        repTimer = findViewById(R.id.rep_timer)
 
         // set the camera resolution to half the width
         val screenHeight = resources.displayMetrics.heightPixels
@@ -514,6 +516,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSurfaceTextureUpdated(p0: SurfaceTexture) {
 
+                Log.d("STATE_INFO", state.toString())
+
                 // process each image from the camera feed
                 bitmap = textureView.bitmap!!
 
@@ -557,13 +561,8 @@ class MainActivity : AppCompatActivity() {
                     }
                     // update counter
                     counts += 1
-
-                    // TODO Remove when testing with mount
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        state = 1 // start next state
-                    }, 5000)  // update progress
                 }
-                if (state == 1) {
+                else if (state == 1) {
                     // switch image to top
 //                    val lastView = instructionsLayout.getChildAt(instructionsLayout.childCount - 1)
 //                    instructionsLayout.removeView(lastView)
@@ -572,6 +571,7 @@ class MainActivity : AppCompatActivity() {
                     titleText.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
                     leftText.text = "1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
                     reps_text.visibility = View.VISIBLE
+                    repTimer.visibility = View.VISIBLE
 
                     popupMenu.visibility = View.VISIBLE
                     exerciseTitle.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
@@ -589,8 +589,14 @@ class MainActivity : AppCompatActivity() {
                         state = 2 // start next state
                         popupMenu.visibility = View.GONE // hide pop up
                     }, 3000)  // update progress
+
+                    startTime = System.currentTimeMillis() / 1000
                 }
-                if (state == 2) {
+                else if (state == 2) {
+
+                    // update rep timer
+                    updateRepTimer()
+
                     // TODO update to the instructions in the exercise class
                     // perform exercise
                     if (result != null && result.landmarks().size > 0) {
@@ -613,43 +619,67 @@ class MainActivity : AppCompatActivity() {
                             val repData = exerciseTrackers[currentExerciseIndex]
                                 .detectReps(trackingResults, exerciseDetail, resultToPose(result))
 
-                            // update rep counter
+                            // update rep data
                             if (repData != null) {
-//                                Log.d("ROUTINE_DEBUG", repData.repNumber.toString())
-                                reps_text.text =
-                                    repData.repNumber.toString() + " / " + routineConfig.exercises[currentExerciseIndex].reps + " reps     "
-                                repDataList.add(repData)
+                                repDataLists[currentExerciseIndex].add(repData)
 
-                                // check if exercise is done
-                                if (repData.repNumber == routineConfig.exercises[currentExerciseIndex].reps) {
-                                    // done exercise
-                                    if (currentExerciseIndex < routineConfig.exercises.size - 1) {
-                                        currentExerciseIndex++ // update index
-                                        state = 3 // next exercise
-                                    } else {
-                                        state = 4 // done workout
+                                // show alerts from repData (kinda jank)
+                                Log.d("ALERT_LOG", "Rep Number: " + repData.repNumber)
+                                Log.d("ALERT_LOG", "Max Angle: " + repData.maxExtension)
+                                Log.d("ALERT_LOG", "Alert Size: " + repData.alerts.size.toString())
+
+                                if (repData.alerts.size > 0) {
+                                    var alertText = ""
+                                    var alertCount = 1
+                                    for (alert in repData.alerts) {
+                                        if (alertCount == repData.alerts.size) {
+                                            alertText = alertText + alert
+                                        } else {
+                                            alertText = alertText + alert + " & "
+                                        }
+                                        Log.d("ALERT_LOG", "Alert:" + alert)
+                                        alertCount++
                                     }
+                                    alertBox.text = alertText
+                                    alertBox.visibility = View.VISIBLE
+
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        alertBox.visibility = View.GONE
+                                    }, 1500)  // update progress
                                 }
                             }
 
-                            // REVISIT
-                            val repTrackingAngle = trackingResults
-                                .firstOrNull { it.detail.trackingType == exerciseDetail.repTracking.trackingType }?.angle
-
-//                            val repTrackingAngle = trackingResults[0].angle
-
-                            Log.d(
-                                "ROUTINE_DEBUG",
-                                "repTrackingAngle " + repTrackingAngle.toString()
-                            )
-
                             // TODO add smooth angle
+                            // REVISIT the equals check condition
+//                            val repTrackingAngle = trackingResults
+//                                .firstOrNull { it.detail.trackingType == exerciseDetail.repTracking.trackingType }?.angle
+//
+////                            val repTrackingAngle = trackingResults[0].angle
+//
+//                            Log.d(
+//                                "ROUTINE_DEBUG",
+//                                "repTrackingAngle " + repTrackingAngle.toString()
+//                            )
+                        }
+                    }
 
-                            // alerts
+                    // even when keypoints aren't visible we will still update UI
+                    reps_text.text =
+                        exerciseTrackers[currentExerciseIndex].repCount.toString() +
+                                " / " + routineConfig.exercises[currentExerciseIndex].reps + " reps     "
+
+                    // check if exercise is done
+                    if (exerciseTrackers[currentExerciseIndex].repCount == routineConfig.exercises[currentExerciseIndex].reps) {
+                        // done exercise
+                        if (currentExerciseIndex < routineConfig.exercises.size - 1) {
+                            currentExerciseIndex++ // update index
+                            state = 3 // next exercise
+                        } else {
+                            state = 4 // done workout
                         }
                     }
                 }
-                if (state == 3) {
+                else if (state == 3) {
                     reps_text.text =
                         "0 / " + routineConfig.exercises[currentExerciseIndex].reps + " reps     "
                     popupMenu.visibility = View.VISIBLE
@@ -668,7 +698,7 @@ class MainActivity : AppCompatActivity() {
 //                        popupMenu.visibility = View.GONE // hide pop up
                     }, 3000)  // update progress
                 }
-                if (state == 4) {
+                else if (state == 4) {
                     popupMenu.visibility = View.VISIBLE
                     exerciseTitle.text = "Workout Complete"
                     exerciseNumberText.text = "Nice Work!"
@@ -679,7 +709,23 @@ class MainActivity : AppCompatActivity() {
 //                    }
                     // end process
 
+                    // send data format
+                    var routineDataList = mutableListOf<RoutineComponentData>()
+                    var index = 0
+                    for (repDataList in repDataLists) {
+                        val routineComponentData = RoutineComponentData(routineConfig.exercises[index], repDataList)
+                        routineDataList.add(routineComponentData)
+                        index++
+                    }
+
+                    val routineData = RoutineData(routineConfig, routineDataList)
+//                    sendData(routineData)
+
                     Handler(Looper.getMainLooper()).postDelayed({
+                        val intent = Intent(applicationContext, WorkoutComplete::class.java)
+                        intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig)
+
+                        startActivity(intent)
                         finish()
                     }, 10000)  // finish after 10 seconds
                 }
@@ -696,6 +742,23 @@ class MainActivity : AppCompatActivity() {
 //                }
 
 //                textView_reps.text = counts.toString()
+        }
+    }
+
+    private fun updateRepTimer() {
+        val time = (System.currentTimeMillis() / 1000 - startTime).toInt()
+        if (time < 60) {
+            if (time < 10) {
+                repTimer.text = "   0:0" + time.toString() + "   "
+            } else {
+                repTimer.text = "   0:" + time.toString() + "   "
+            }
+        } else {
+            if (time%60 < 10) {
+                repTimer.text = "   "+ time.floorDiv(60) + ":0" + time%60 + "   "
+            } else {
+                repTimer.text = "   "+ time.floorDiv(60) + ":" + time%60 + "   "
+            }
         }
     }
 
@@ -1108,5 +1171,38 @@ class MainActivity : AppCompatActivity() {
         } else {
             return null
         }
+    }
+
+    private fun sendData(data: RoutineData) {
+        // create retrofit instance
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://140.238.151.117:8000/api/routine-data/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val apiService = retrofit.create(ApiService::class.java)
+
+        // send routine-data
+        val call = apiService.sendData(data)
+
+        call?.enqueue(object : Callback<RoutineData> {
+            override fun onResponse(
+                call: Call<RoutineData>,
+                response: Response<RoutineData>
+            ) {
+                if (!response.isSuccessful) {
+                    // Handle the error scenario here
+                    Log.e(HomeScreen.TAG_API, "Response Code: " + response.code())
+                    Log.d(HomeScreen.TAG_API, call.request().url.toString())
+                    return
+                } else {
+                    Log.d(HomeScreen.TAG_API, "Data Sent Successfully")
+                }
+            }
+
+            override fun onFailure(call: Call<RoutineData>, t: Throwable) {
+                Log.e(HomeScreen.TAG_API, t.toString())
+            }
+        })
     }
 }

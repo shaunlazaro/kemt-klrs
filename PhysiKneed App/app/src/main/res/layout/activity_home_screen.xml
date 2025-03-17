@@ -55,7 +55,7 @@
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:fontFamily="@font/source_sans"
-                android:text="User"
+                android:text="user"
                 android:id="@+id/username" />
 
             <FrameLayout
@@ -82,7 +82,7 @@
                         android:background="@drawable/today_exercises_textbox"
                         android:padding="16dp"
                         android:text="\n\n\n"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:textAllCaps="false"
                         android:gravity="left"
                         android:fontFamily="@font/source_sans"
@@ -125,7 +125,7 @@
                         android:layout_height="match_parent"
                         android:text="Your Exercise Streak"
                         android:fontFamily="@font/source_sans"
-                        android:textSize="22sp"
+                        android:textSize="28sp"
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         android:padding="10dp"
@@ -137,7 +137,7 @@
                         android:layout_height="match_parent"
                         android:text="5 of 7 Days"
                         android:fontFamily="@font/source_sans"
-                        android:textSize="20sp"
+                        android:textSize="26sp"
                         android:textColor="@color/white"
                         android:padding="10dp"
                         android:layout_gravity="center"/>

@@ -55,10 +55,10 @@ public class ExerciseTracker {
         RepData repEntry = null;
         TrackingDetail mainTrackingDetail = exerciseDetail.getRepTracking();
 
-        Double primaryAngle = getPrimaryAngle(trackingResults, exerciseDetail.getRepTracking());
+        Double primaryAngle = getPrimaryAngle(trackingResults, mainTrackingDetail);
 
         if (primaryAngle == null) {
-            return new RepData(repCount);
+            return null;
         }
 
         long currentTime = System.currentTimeMillis() / 1000;
@@ -104,7 +104,7 @@ public class ExerciseTracker {
             TrackingDetail detail = entry.getDetail();
             double value = entry.getAngle();
 
-            if (detail.equals(mainTrackingDetail)) continue;
+            if (entry.getDetail().getTrackingType().equals(mainTrackingDetail.getTrackingType())) continue;
             if (detail.getShowAlertIfAbove() != null && value > detail.getShowAlertIfAbove()) {
                 alerts.add(detail.getAlertMessage());
             }
@@ -183,10 +183,12 @@ public class ExerciseTracker {
 
         lastRepAlerts = new HashSet<>(alerts);
 
+        RepData repEntry = new RepData(repCount, currentMaxFlexion, currentMaxExtension, lastConcentricTime, lastEccentricTime, lastRepDuration, flexionGoalMet, extensionGoalMet, score, new ArrayList<>(lastRepAlerts), posesBuffer);
+
         printRepFeedback();
         resetRepTracking(currentTime);
 
-        return new RepData(repCount, currentMaxFlexion, currentMaxExtension, lastConcentricTime, lastEccentricTime, lastRepDuration, flexionGoalMet, extensionGoalMet, score, new ArrayList<>(lastRepAlerts), posesBuffer);
+        return repEntry;
     }
 
     public void printRepFeedback() {
@@ -207,5 +209,13 @@ public class ExerciseTracker {
         alerts.clear();
         posesBuffer.clear();
         lastPoseCaptureTime = 0;
+    }
+
+    public int getRepCount() {
+        return repCount;
+    }
+
+    public Set<String> getLastRepAlerts() {
+        return lastRepAlerts;
     }
 }
