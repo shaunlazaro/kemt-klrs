@@ -13,6 +13,7 @@ import request from "./request";
 import { Patient } from "../interfaces/patient.interface";
 import { RoutineConfig } from "../interfaces/exercisePlan.interface";
 import { ExerciseDetail } from "../interfaces/exerciseDetail.interface";
+import { RoutineData } from "../interfaces/routineData.interface";
 
 
 export const useGetRoutineConfigs = () => {
@@ -128,6 +129,57 @@ export const useAddEditPatient = () => {
         onSuccess: (_, patient) => {
             queryClient.invalidateQueries({ queryKey: [QueryKeys.PATIENTS] });
             queryClient.invalidateQueries({ queryKey: [QueryKeys.PATIENT, patient.id] });
+        },
+        onError: (error) => {
+            console.error("Error:", `${error.name}: ${error.message}`);
+        },
+    });
+};
+
+export const useDeletePatient = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => request.delete(`/patients/${id}/`),
+        onSuccess: (_, id) => {
+            queryClient.invalidateQueries({ queryKey: [QueryKeys.PATIENTS] });
+            queryClient.removeQueries({ queryKey: [QueryKeys.PATIENT, id] });
+        },
+    });
+};
+
+export const useAddRoutineData = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (routineData: RoutineData) => {
+            // const cleanedRoutineData: any = {
+            //     ...routineData,
+            //     routineConfig_id: routineData.routineConfig.id, // Add routineConfig ID under new name
+            //     routine_component_data: routineData.routine_component_data,
+            // };
+            const cleanedRoutineData: any = {
+                ...routineData,
+                routineConfig_id: routineData.routine_config.id, // Map routineConfig to its ID
+                routine_component_data: routineData.routine_component_data.map((componentData) => ({
+                    // exercise_detail: componentData.exercise_detail.id, // Map ExerciseDetail to its ID
+                    exercise_detail: "1", // Map ExerciseDetail to its ID
+                    rep_data: componentData.rep_data.map((repData) => ({
+                        ...repData,
+                        poses: repData.poses
+                    })),
+                })),
+            };
+
+            delete cleanedRoutineData.routine_config; // Drop the original "routineConfig" field
+
+            const { id, ...rest } = cleanedRoutineData;
+            console.log(cleanedRoutineData)
+            return request.post(`/routine-data/`, rest) // Create new routine
+        },
+        onSuccess: (_, routine) => {
+            queryClient.invalidateQueries({ queryKey: ["routines"] });
+            queryClient.invalidateQueries({ queryKey: ["routine", routine.id] });
         },
         onError: (error) => {
             console.error("Error:", `${error.name}: ${error.message}`);

@@ -119,24 +119,148 @@ class RoutineConfigSerializer(serializers.ModelSerializer):
 
         return instance
 
+# class RepDataSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = RepData
+#         fields = '__all__'
+
+# class RoutineComponentDataSerializer(serializers.ModelSerializer):
+#     rep_data = RepDataSerializer(many=True)
+
+#     class Meta:
+#         model = RoutineComponentData
+#         fields = '__all__'
+
+# class RoutineDataSerializer(serializers.ModelSerializer):
+#     routine_component_data = RoutineComponentDataSerializer(many=True)
+
+#     class Meta:
+#         model = RoutineData
+#         fields = '__all__'
+
+class PoseSerializer(serializers.ModelSerializer):
+    """Serializer for Pose model."""
+    class Meta:
+        model = Pose
+        fields = '__all__'
+
 class RepDataSerializer(serializers.ModelSerializer):
+    """Serializer for RepData, allowing creation of new RepData with nested poses."""
+    poses = PoseSerializer(many=True)  # Expect full Pose objects in the JSON payload
+
     class Meta:
         model = RepData
         fields = '__all__'
 
+    def create(self, validated_data):
+        """Custom create function for RepData with nested poses."""
+        pose_data_list = validated_data.pop('poses', [])
+        rep_data_instance = RepData.objects.create(**validated_data)  # Create RepData object
+
+        for pose_data in pose_data_list:
+            pose_instance = Pose.objects.create(**pose_data)  # Create Pose objects from JSON
+            rep_data_instance.poses.add(pose_instance)  # Link Pose objects to RepData instance
+
+        return rep_data_instance
+
+
 class RoutineComponentDataSerializer(serializers.ModelSerializer):
-    rep_data = RepDataSerializer(many=True)
+    """Serializer for RoutineComponentData with nested RepData."""
+    exercise_detail = serializers.PrimaryKeyRelatedField(
+        queryset=ExerciseDetail.objects.all()
+    )  # Reference ExerciseDetail by ID
+    rep_data = RepDataSerializer(many=True)  # Accept full RepData objects
 
     class Meta:
         model = RoutineComponentData
         fields = '__all__'
 
+    def create(self, validated_data):
+        """Custom create function for RoutineComponentData with nested RepData."""
+        rep_data_list = validated_data.pop('rep_data', [])
+        routine_component_data_instance = RoutineComponentData.objects.create(**validated_data)
+
+        for rep_data in rep_data_list:
+            rep_data_instance = RepDataSerializer().create(rep_data)  # Use RepDataSerializer to create objects
+            routine_component_data_instance.rep_data.add(rep_data_instance)  # Link RepData to RoutineComponentData
+
+        return routine_component_data_instance
+
 class RoutineDataSerializer(serializers.ModelSerializer):
-    routine_component_data = RoutineComponentDataSerializer(many=True)
+    """Serializer for RoutineData with full routine_component_data objects."""
+    routineConfig_id = serializers.PrimaryKeyRelatedField(
+        queryset=RoutineConfig.objects.all(),
+        source="routine_config",  # Map to the routine_config field on the model
+        write_only=True  # For deserialization only
+    )
+    routine_component_data = RoutineComponentDataSerializer(many=True)  # Accept full nested objects
 
     class Meta:
         model = RoutineData
-        fields = '__all__'
+        fields = ['id', 'routineConfig_id', 'routine_component_data', 'created_at']
+
+    # def create(self, validated_data):
+    #     """Custom create to handle nested routine_component_data."""
+    #     routine_component_data = validated_data.pop('routine_component_data')
+    #     routine_data = RoutineData.objects.create(**validated_data)
+
+    #     for component_data in routine_component_data:
+    #         rep_data_list = component_data.pop('rep_data')
+    #         routine_component = RoutineComponentData.objects.create(
+    #             **component_data, routine_data=routine_data
+    #         )
+    #         for rep_data in rep_data_list:
+    #             pose_list = rep_data.pop('poses', [])
+    #             rep = RepData.objects.create(**rep_data)
+    #             rep.poses.set(pose_list)  # Add poses to the ManyToMany field
+    #             routine_component.rep_data.add(rep)
+    #         routine_data.routine_component_data.add(routine_component)
+
+    #     return routine_data
+
+    def create(self, validated_data):
+        """Custom create function for RoutineData with nested RoutineComponentData."""
+        routine_component_data_list = validated_data.pop('routine_component_data')
+        routine_data_instance = RoutineData.objects.create(**validated_data)
+
+        for component_data in routine_component_data_list:
+            component_instance = RoutineComponentDataSerializer().create(component_data)
+            routine_data_instance.routine_component_data.add(component_instance)  # Link RoutineComponentData
+
+        return routine_data_instance
+
+    def update(self, instance, validated_data):
+        """Custom update to handle nested routine_component_data."""
+        routine_component_data = validated_data.pop('routine_component_data', None)
+        instance.routine_config = validated_data.get('routine_config', instance.routine_config)
+        instance.save()
+
+        if routine_component_data:
+            # Clear and recreate nested routine_component_data
+            instance.routine_component_data.clear()
+            for component_data in routine_component_data:
+                rep_data_list = component_data.pop('rep_data')
+                routine_component = RoutineComponentData.objects.create(
+                    **component_data, routine_data=instance
+                )
+                for rep_data in rep_data_list:
+                    pose_list = rep_data.pop('poses', [])
+                    rep = RepData.objects.create(**rep_data)
+                    rep.poses.set(pose_list)  # Add poses to the ManyToMany field
+                    routine_component.rep_data.add(rep)
+                instance.routine_component_data.add(routine_component)
+
+        return instance
+
+    def to_representation(self, instance):
+        """Customize the serialized output."""
+        representation = super().to_representation(instance)
+        representation['routineConfig_id'] = instance.routine_config.id  # Add routineConfig ID
+        representation['routine_component_data'] = RoutineComponentDataSerializer(
+            instance.routine_component_data.all(), many=True
+        ).data  # Serialize full routine_component_data
+        return representation
+
 
 class PatientSerializer(serializers.ModelSerializer):
     exercises = RoutineConfigSerializer(read_only=True)

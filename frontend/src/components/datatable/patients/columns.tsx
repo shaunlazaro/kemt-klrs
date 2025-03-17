@@ -11,10 +11,11 @@ import {
     // DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "../../dropdown/dropdown"
-import { ADDEDIT_PATIENTS_PATH } from "../../../routes";
+import { ADDEDIT_PATIENTS_PATH, PATIENTS_PATH } from "../../../routes";
 import { useNavigate } from "react-router-dom";
 import { RoutineConfig } from "../../../interfaces/exercisePlan.interface";
 import { getPatientAge, getPatientName } from "../../../common/utils";
+import { useDeletePatient } from "../../../api/hooks";
 
 
 export const PatientTableColumnDef: ColumnDef<Patient>[] = [
@@ -22,11 +23,11 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
         id: "name",
         accessorFn: (patient) => getPatientName(patient),
         header: () => (
-            <div className="w-full cursor-default text-center">Name</div>
+            <div className="w-full cursor-default">Name</div>
         ),
         cell: ({ cell }) => (
             <div
-                className={`rounded-md py-1 text-center font-semibold text-sm`}
+                className={`rounded-md py-1`}
             >
                 {`${cell.getValue()}`}
             </div>
@@ -36,11 +37,11 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
         id: "age",
         accessorFn: (patient) => getPatientAge(patient),
         header: () => (
-            <div className="w-full cursor-default text-center">Age</div>
+            <div className="w-full cursor-default">Age</div>
         ),
         cell: ({ cell }) => (
             <div
-                className={`rounded-md py-1 text-center font-semibold text-sm`}
+                className={`rounded-md py-1`}
             >
                 {`${cell.getValue()}`}
             </div>
@@ -50,11 +51,11 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
         id: "sex",
         accessorFn: (patient) => patient.sex,
         header: () => (
-            <div className="w-full cursor-default text-center">Sex</div>
+            <div className="w-full cursor-default">Sex</div>
         ),
         cell: ({ cell }) => (
             <div
-                className={`rounded-md py-1 text-center font-semibold text-sm`}
+                className={`rounded-md py-1`}
             >
                 {`${cell.getValue()}`}
             </div>
@@ -64,13 +65,13 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
         id: "condition",
         accessorFn: (patient) => patient.condition,
         header: () => (
-            <div className="w-full cursor-default text-center">Condition</div>
+            <div className="w-full cursor-default">Condition</div>
         ),
         cell: ({ cell }) => (
             <div
-                className={`rounded-md py-1 text-center font-semibold text-sm flex justify-center`}
+                className={`rounded-md py-1 font-semibold text-sm flex`}
             >
-                <div className="rounded-2xl border text-white bg-primary px-4 py-1">{`${cell.getValue()}`}</div>
+                <div className="rounded-2xl border text-white bg-secondary-darkpink px-4 py-1">{`${cell.getValue()}`}</div>
             </div>
         ),
     },
@@ -78,17 +79,13 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
         id: "exercises",
         accessorFn: (patient) => patient.exercises,
         header: () => (
-            <div className="w-full cursor-default text-center">Exercises</div>
+            <div className="w-full cursor-default">Exercises</div>
         ),
         cell: ({ cell }) => (
             <div
-                className={`rounded-md py-1 text-center font-semibold text-sm`}
+                className={`rounded-md py-1 font-semibold text-sm flex`}
             >
-                {(cell.getValue() as RoutineConfig)?.name &&
-                    <div className="rounded-2xl border text-white bg-primary px-4 py-1">
-                        {(cell.getValue() as RoutineConfig)?.name}
-                    </div>
-                }
+                <div className="rounded-2xl border text-white bg-secondary-darkpink px-4 py-1">{`${(cell.getValue() as RoutineConfig)?.name}`}</div>
             </div>
         ),
     },
@@ -96,11 +93,11 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
         id: "weeklyProgress",
         accessorFn: (_) => 0,
         header: () => (
-            <div className="w-full cursor-default text-center">Weekly Progress</div>
+            <div className="w-full cursor-default">Weekly Progress</div>
         ),
         cell: ({ cell }) => (
             <div
-                className={`rounded-md py-1 text-center font-semibold text-sm`}
+                className={`rounded-md py-1`}
             >
                 {`${cell.getValue()}`}/7
             </div>
@@ -109,9 +106,13 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
     {
         id: "actions",
         enableHiding: false,
+        header: () => (
+            <div className="w-full cursor-default">Action</div>
+        ),
         cell: ({ row }) => {
             const patient = row.original
             const navigate = useNavigate();
+            const deletePatient = useDeletePatient();
 
             return (
                 <DropdownMenu>
@@ -130,7 +131,13 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
                     </DropdownMenuItem>
                     <DropdownMenuSeparator /> */}
                         <DropdownMenuItem onClick={() => navigate(ADDEDIT_PATIENTS_PATH.replace(":id", patient.id))}>Edit Patient Info</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => alert("Unimplemented!\nTODO: Delete patient functionality")}>Delete Patient</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                            if (!confirm("Delete this patient?"))
+                                return;
+                            deletePatient.mutate(patient.id, {
+                                onSuccess: () => navigate(PATIENTS_PATH),
+                            });
+                        }}>Delete Patient</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu >
             )

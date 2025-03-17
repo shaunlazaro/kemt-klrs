@@ -14,6 +14,7 @@ import { ExerciseDetail } from "../../interfaces/exerciseDetail.interface";
 import { EXERCISES_PATH } from "../../routes";
 import { defaultInjuryValueList, getUniqueInjuryValues } from "../../common/utils";
 import { useAddEditRoutineConfig, useDeleteRoutineConfig, useGetExerciseDetails, useGetRoutineConfigById, useGetRoutineConfigs } from "../../api/hooks";
+import { MdOutlineDragIndicator } from "react-icons/md";
 
 const NEW_PLAN_ID = "new"
 
@@ -162,7 +163,7 @@ const AddEditPlan: React.FC = () => {
                         {/* Row */}
                         {planComponents.map((planComponent, index) => (
                             <>
-                                <div className="col-start-1 w-full text-center flex justify-center"> <MdDragHandle className="w-7 h-auto" /> </div>
+                                <div className="col-start-1 w-full text-center flex justify-center"> <MdOutlineDragIndicator className="w-7 h-auto" /> </div>
                                 <div className="col-start-2 w-full h-full">
                                     <Input
                                         // type="number"

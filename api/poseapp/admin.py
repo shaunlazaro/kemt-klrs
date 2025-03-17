@@ -38,7 +38,7 @@ class RepDataAdmin(admin.ModelAdmin):
 
 @admin.register(RoutineComponentData)
 class RoutineComponentDataAdmin(admin.ModelAdmin):
-    list_display = ('routine_component',)
+    list_display = ('exercise_detail',)
     filter_horizontal = ('rep_data',)
 
 @admin.register(RoutineData)

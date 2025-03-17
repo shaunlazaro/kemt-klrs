@@ -10,3 +10,14 @@ export interface Patient {
     condition: string;
     exercises?: RoutineConfig;
 }
+export const NEW_PATIENT_ID = "new"
+export const BLANK_PATIENT: Patient = {
+    id: "TEMP",
+    first_name: "",
+    last_name: "",
+    email: "",
+    date_of_birth: new Date(),
+    sex: "M",
+    condition: "",
+    exercises: undefined,
+}

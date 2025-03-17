@@ -91,7 +91,9 @@ class RepData(models.Model):
         return f"Rep {self.rep_number}: Score {self.max_score}"
 
 class RoutineComponentData(models.Model):
-    routine_component = models.ForeignKey('RoutineExercise', on_delete=models.CASCADE)
+    # routine_component = models.ForeignKey('RoutineExercise', on_delete=models.CASCADE)
+    # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHH
+    exercise_detail = models.ForeignKey('ExerciseDetail', on_delete=models.CASCADE, null=True) # Don't null this...
     rep_data = models.ManyToManyField(RepData)
 
     def __str__(self):
@@ -104,7 +106,6 @@ class RoutineData(models.Model):
 
     def __str__(self):
         return f"Routine Data for {self.routine_config.name}"
-
 
 # ----
 # Workout Routine/Config Data

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { MockPatients } from "../../testData/patient";
-import { Patient } from "../../interfaces/patient.interface";
+import { BLANK_PATIENT, NEW_PATIENT_ID, Patient } from "../../interfaces/patient.interface";
 import { PATIENTS_PATH } from "../../routes";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../components/input/input";
@@ -11,21 +10,6 @@ import { WideSelect } from "../../components/select/select";
 import { defaultInjuryValueList, getUniqueInjuryValues } from "../../common/utils";
 import { RoutineConfigList } from "../../testData/exercisePlans";
 import { useAddEditPatient, useGetPatientById, useGetRoutineConfigs } from "../../api/hooks";
-import { ExerciseDetail } from "../../interfaces/exerciseDetail.interface";
-import { MockExerciseList } from "../../testData/exerciseDetail";
-
-const NEW_PATIENT_ID = "new"
-const BLANK_PATIENT: Patient = {
-    id: "TEMP",
-    first_name: "",
-    last_name: "",
-    email: "",
-    date_of_birth: new Date(),
-    sex: "M",
-    condition: "",
-    exercises: undefined,
-    // weeklyProgress: 0
-}
 
 const AddEditPatients: React.FC = () => {
 
@@ -75,7 +59,7 @@ const AddEditPatients: React.FC = () => {
         () => {
             const newPatient: Patient = {
                 id: patient.id,
-                user_id: patient.user_id,
+                // user_id: patient.user_id,
                 // weeklyProgress: patient.weeklyProgress,
                 // -------
                 email: patientEmail,
