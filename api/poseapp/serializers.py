@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise, RepData, RoutineComponentData, RoutineData
+from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise, RepData, RoutineComponentData, RoutineData, Patient
 
 class PoseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -137,3 +137,13 @@ class RoutineDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoutineData
         fields = '__all__'
+
+class PatientSerializer(serializers.ModelSerializer):
+    exercises = RoutineConfigSerializer(read_only=True)
+    exercises_id = serializers.PrimaryKeyRelatedField(
+        queryset=RoutineConfig.objects.all(), source="exercises", write_only=True, required=False
+    )
+
+    class Meta:
+        model = Patient
+        fields = ["id", "first_name", "last_name", "email", "date_of_birth", "sex", "condition", "exercises", "exercises_id"]

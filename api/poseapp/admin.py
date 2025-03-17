@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise, RepData, RoutineComponentData, RoutineData
+from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise, RepData, RoutineComponentData, RoutineData, Patient
 
 # Customizing Pose admin view
 @admin.register(Pose)
@@ -45,3 +45,5 @@ class RoutineComponentDataAdmin(admin.ModelAdmin):
 class RoutineDataAdmin(admin.ModelAdmin):
     list_display = ('routine_config', 'created_at')
     filter_horizontal = ('routine_component_data',)
+
+admin.site.register(Patient)

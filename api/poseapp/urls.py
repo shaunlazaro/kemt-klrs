@@ -10,6 +10,7 @@ from .views import (
     RepDataViewSet,
     RoutineComponentDataViewSet,
     RoutineDataViewSet,
+    PatientViewSet,
 )
 
 # Initialize the router and register your viewsets
@@ -23,6 +24,7 @@ router.register(r'routine-exercises', RoutineExerciseViewSet)
 router.register(r'rep-data', RepDataViewSet)
 router.register(r'routine-component-data', RoutineComponentDataViewSet)
 router.register(r'routine-data', RoutineDataViewSet)
+router.register(r'patients', PatientViewSet)
 
 # Define the app's URL patterns
 urlpatterns = [

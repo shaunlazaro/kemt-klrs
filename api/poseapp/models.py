@@ -173,4 +173,22 @@ class RoutineExercise(models.Model):
 
     def __str__(self):
         return f"{self.routine} - {self.exercise.display_name}"
-    
+
+class Patient(models.Model):
+    SEX_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other'),
+    ]
+
+    # user_id = models.CharField(max_length=255)  # External user identifier
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+    date_of_birth = models.DateField()
+    sex = models.CharField(max_length=1, choices=SEX_CHOICES)
+    condition = models.TextField()
+    exercises = models.ForeignKey(RoutineConfig, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
