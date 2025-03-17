@@ -88,7 +88,7 @@ class ExerciseTracker:
         self._update_progress_score(primary_angle, exercise_detail.start_angle)
 
         if current_time - self.last_pose_capture_time >= 0.1:
-            self.poses_buffer = {"landmarks": pose_data}
+            self.poses_buffer.append({"landmarks": pose_data})
             self.last_pose_capture_time = current_time
 
         self._update_state(primary_angle, current_time)
@@ -206,7 +206,7 @@ class ExerciseTracker:
             goal_extension_met=extension_goal_met,
             max_score=self.max_score,
             alerts=list(self.last_rep_alerts),
-            poses={"landmarks": self.poses_buffer["landmarks"]} if self.poses_buffer else {}
+            poses=self.poses_buffer if self.poses_buffer else []
         )
 
         self._print_rep_feedback()
