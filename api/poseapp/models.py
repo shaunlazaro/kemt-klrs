@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 # ----
 # Workout Result Data  (DEPRECATED)
 # ----
-# DEPRECATED
+# Not deprecated
 class Pose(models.Model):
     # Store the entire list of landmarks as a JSON field
     landmarks = models.JSONField(default=list)
@@ -83,12 +83,12 @@ class RepData(models.Model):
     total_time = models.FloatField()
     goal_flexion_met = models.BooleanField()
     goal_extension_met = models.BooleanField()
-    score = models.FloatField()
+    max_score = models.FloatField()
     alerts = models.JSONField(default=list)  # List of alert messages
     poses = models.ManyToManyField('Pose', blank=True)  # Link to Pose model
 
     def __str__(self):
-        return f"Rep {self.rep_number}: Score {self.score}"
+        return f"Rep {self.rep_number}: Score {self.max_score}"
 
 class RoutineComponentData(models.Model):
     routine_component = models.ForeignKey('RoutineExercise', on_delete=models.CASCADE)

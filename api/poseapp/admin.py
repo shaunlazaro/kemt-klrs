@@ -33,7 +33,7 @@ admin.site.register(RoutineExercise)
 
 @admin.register(RepData)
 class RepDataAdmin(admin.ModelAdmin):
-    list_display = ('rep_number', 'score', 'goal_flexion_met', 'goal_extension_met')
+    list_display = ('rep_number', 'max_score', 'goal_flexion_met', 'goal_extension_met')
     search_fields = ('rep_number',)
 
 @admin.register(RoutineComponentData)
