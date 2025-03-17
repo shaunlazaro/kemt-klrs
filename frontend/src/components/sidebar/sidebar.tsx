@@ -36,7 +36,9 @@ export default function Sidebar({ className }: SidebarProps) {
             />
         </div> */}
       <div className="pb-6 flex items-center px-5 pt-6">
-        <div className="w-14 h-14 border-2 border-white rounded-lg"></div>
+        <div className="w-8 h-8 border-0 border-white rounded-lg flex items-center justify-center overflow-hidden">
+          <img src="/logo-stick-pink.png" alt="Logo" className="w-full h-full object-contain" />
+        </div>
         <span className="h-auto ml-3 font-semibold text-2xl mb-1">RePose</span>
       </div>
       <div className="space-y-2 pb-2 h-full overflow-y-auto">
