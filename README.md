@@ -1,4 +1,4 @@
-<img src="graphics/RePoseter.png">
+<img src="assets/RePoseter.png">
 
 # RePose: Computer Vision-Assisted Physiotherapy Tool
 
