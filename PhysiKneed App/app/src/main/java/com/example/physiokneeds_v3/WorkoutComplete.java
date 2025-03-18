@@ -91,7 +91,7 @@ public class WorkoutComplete extends AppCompatActivity {
                     nextButton.setVisibility(View.GONE);
                 } else {
                     // TODO send user to workout summary
-                    Intent intent = new Intent(WorkoutComplete.this, MainMenu.class);
+                    Intent intent = new Intent(WorkoutComplete.this, WorkoutSummary.class);
                     intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig);
                     WorkoutComplete.this.startActivity(intent);
                 }

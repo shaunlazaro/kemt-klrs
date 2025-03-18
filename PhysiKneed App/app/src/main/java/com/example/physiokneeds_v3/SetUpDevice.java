@@ -42,7 +42,6 @@ class InstructionItem {
 
 public class SetUpDevice extends AppCompatActivity {
 
-    boolean isConnected = false;
     boolean readyToBegin = false;
 
     @Override
@@ -61,9 +60,9 @@ public class SetUpDevice extends AppCompatActivity {
         WormDotsIndicator dotsIndicator = findViewById(R.id.dotsIndicator);
 
         List<InstructionItem> instructions = new ArrayList<>();
-        instructions.add(new InstructionItem(R.drawable.baseline_home_24, "Place the tracking mount on a flat surface in front of your TV"));
-        instructions.add(new InstructionItem(R.drawable.baseline_bar_chart_24, "Plug in the power for the mount"));
-        instructions.add(new InstructionItem(R.drawable.baseline_person_24, "Plug in the HDMI cable to your TV or monitor"));
+        instructions.add(new InstructionItem(R.drawable.setup_1, "Place the tracking mount on a flat surface in front of your TV"));
+        instructions.add(new InstructionItem(R.drawable.setup_2, "Plug in the power for the mount"));
+        instructions.add(new InstructionItem(R.drawable.setup_3, "Plug in the HDMI cable to your TV or monitor"));
 
         InstructionsAdapter adapter = new InstructionsAdapter(instructions);
         viewPager.setAdapter(adapter);
@@ -82,7 +81,7 @@ public class SetUpDevice extends AppCompatActivity {
         skipText.setOnClickListener(v -> {
             titleTop.setText("Ready to begin");
             List<InstructionItem> instructionsNew = new ArrayList<>();
-            instructionsNew.add(new InstructionItem(R.drawable.baseline_home_24, "Place your phone in the mount. Secure tightly"));
+            instructionsNew.add(new InstructionItem(R.drawable.setup_4, "Place your phone in the mount. Secure tightly"));
             InstructionsAdapter adapterNew = new InstructionsAdapter(instructionsNew);
             viewPager.setAdapter(adapterNew);
             nextButton.setText("Begin Exercises");
@@ -92,9 +91,6 @@ public class SetUpDevice extends AppCompatActivity {
         });
 
         DisplayManager displayManager = (DisplayManager) getSystemService(this.DISPLAY_SERVICE);
-        if (displayManager.getDisplays().length >= 2) {
-            isConnected = true;
-        }
 
         RoutineConfig routineConfig = (RoutineConfig) getIntent().getSerializableExtra(HomeScreen.ROUTINE_TAG);
 
@@ -103,14 +99,14 @@ public class SetUpDevice extends AppCompatActivity {
                 int nextItem = viewPager.getCurrentItem() + 1;
                 if (nextItem < viewPager.getAdapter().getItemCount()) {
                     viewPager.setCurrentItem(nextItem);
-                } else if (readyToBegin && isConnected){
+                } else if (readyToBegin && displayManager.getDisplays().length >= 2){
                     Intent intent = new Intent(SetUpDevice.this, PerfromExercises.class);
                     intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig);
                     SetUpDevice.this.startActivity(intent);
                 } else {
                     titleTop.setText("Ready to begin");
                     List<InstructionItem> instructions = new ArrayList<>();
-                    instructions.add(new InstructionItem(R.drawable.baseline_home_24, "Place your phone in the mount. Secure tightly"));
+                    instructions.add(new InstructionItem(R.drawable.setup_4, "Place your phone in the mount. Secure tightly"));
                     InstructionsAdapter adapter = new InstructionsAdapter(instructions);
                     viewPager.setAdapter(adapter);
                     nextButton.setText("Begin Exercises");

@@ -75,6 +75,7 @@
                 android:layout_gravity="center"/>
 
             <androidx.appcompat.widget.AppCompatButton
+                android:visibility="gone"
                 android:id="@+id/view_instructions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,6 +92,7 @@
                 android:padding="10dp" />
 
             <androidx.appcompat.widget.AppCompatButton
+                android:visibility="gone"
                 android:id="@+id/view_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -107,6 +109,7 @@
                 android:padding="10dp" />
 
             <androidx.appcompat.widget.AppCompatButton
+                android:visibility="gone"
                 android:id="@+id/setup_instructions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -123,6 +126,7 @@
                 android:padding="10dp" />
 
             <androidx.appcompat.widget.AppCompatButton
+                android:visibility="gone"
                 android:id="@+id/skip_workout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -142,7 +146,7 @@
                 android:id="@+id/end_workout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="235dp"
                 android:layout_marginStart="40dp"
                 android:layout_marginEnd="40dp"
                 android:text="End Workout"

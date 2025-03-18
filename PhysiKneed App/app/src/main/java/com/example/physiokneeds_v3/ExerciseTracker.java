@@ -193,6 +193,8 @@ public class ExerciseTracker {
         printRepFeedback();
         resetRepTracking(currentTime);
 
+        Log.d("ROUTINE_DEBUG", "Pose Size After: " + repEntry.getPoses().size());
+
         return repEntry;
     }
 
@@ -212,7 +214,7 @@ public class ExerciseTracker {
         currentMaxExtension = Float.NEGATIVE_INFINITY;
         phase1StartTime = currentTime;
         alerts.clear();
-        posesBuffer.clear();
+        posesBuffer = new ArrayList<>();
         lastPoseCaptureTime = 0;
     }
 

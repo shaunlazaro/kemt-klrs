@@ -1,8 +1,9 @@
 package com.example.physiokneeds_v3;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class RoutineDataUpload {
+public class RoutineDataUpload implements Serializable {
     private String routineConfig_id;
     private List<RoutineComponentDataUpload> routine_component_data;
 

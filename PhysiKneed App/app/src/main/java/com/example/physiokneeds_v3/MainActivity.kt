@@ -139,6 +139,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var leftImage: ImageView
     lateinit var alertBox: TextView
     lateinit var repTimer: TextView
+    lateinit var tipText: TextView
 
     lateinit var connectedThreadWrite: ConnectedThread
 
@@ -445,6 +446,7 @@ class MainActivity : AppCompatActivity() {
         progressBarPopup = findViewById(R.id.progress_bar)
         alertBox = findViewById(R.id.alert_box)
         repTimer = findViewById(R.id.rep_timer)
+        tipText = findViewById(R.id.tips_text)
 
         // set the camera resolution to half the width
         val screenHeight = resources.displayMetrics.heightPixels
@@ -575,6 +577,7 @@ class MainActivity : AppCompatActivity() {
 //                    instructionsLayout.removeView(lastView)
 //                    instructionsLayout.addView(lastView, 0)
 
+                    tipText.visibility = View.VISIBLE
                     titleText.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
                     leftText.text = "1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
                     reps_text.visibility = View.VISIBLE
@@ -625,7 +628,9 @@ class MainActivity : AppCompatActivity() {
 
                             // update rep data
                             if (repData != null) {
+                                Log.d("NICK_AHHHH", repData.poses.size.toString())
                                 repDataLists[currentExerciseIndex].add(repData)
+                                Log.d("NICK_AHHHH", repDataLists[currentExerciseIndex][repDataLists[currentExerciseIndex].size - 1].poses.size.toString())
 
                                 // show alerts from repData (kinda jank)
                                 Log.d("ALERT_LOG", "Rep Number: " + repData.repNumber)
@@ -715,23 +720,33 @@ class MainActivity : AppCompatActivity() {
                     // send data format
                     var routineDataList = mutableListOf<RoutineComponentDataUpload>()
                     var index = 0
+
+                    val gson = Gson()
+                    val jsonDataFull = gson.toJson(repDataLists) // Serialize the data
+                    Log.d("JSON_REPDATA", "jsonFull " + jsonDataFull)
+
                     for (repDataList in repDataLists) {
                         val routineComponentData = RoutineComponentDataUpload(routineConfig.exercises[index].exercise.id, repDataList)
                         routineDataList.add(routineComponentData)
                         index++
                         val gson = Gson()
                         val jsonData = gson.toJson(repDataList) // Serialize the data
-                        Log.d("JSON_REPDATA", "repData Pose size: " + repDataList.get(0).poses.size);
+
+                        for (repData in repDataList) {
+                            Log.d("NICK_AHHHH", "Poses data: " + Gson().toJson(repData.poses))
+                        }
+
+                        Log.d("JSON_REPDATA", "repData Pose size: " + repDataList[0].poses.size)
                         Log.d("JSON_REPDATA", "json " + jsonData)
                     }
 
                     val routineData = RoutineDataUpload(routineConfig.id, routineDataList)
                     sendData(routineData)
 
-
-
                     Handler(Looper.getMainLooper()).postDelayed({
                         val intent = Intent("com.example.END_WORKOUT")
+                        // send rep data
+                        intent.putExtra("routineData", routineData)
                         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
                         finish()
                     }, loadingDuration.toLong())  // finish after 10 seconds
@@ -1204,22 +1219,22 @@ class MainActivity : AppCompatActivity() {
         // send routine-data
         val call = apiService.sendData(data)
 
-        val gson = Gson()
-        val jsonData = gson.toJson(data) // Serialize the data
-
-        try {
-            // Save to internal storage
-            // serialize
-            val file = File(getExternalFilesDir("debug"), "json_data.json")
-            val fos = FileOutputStream(file)
-            val oos = ObjectOutputStream(fos)
-            oos.writeObject(jsonData)
-            oos.close()
-            fos.close()
-
-        } catch (e: IOException) {
-            Log.e("FileSave", "Error saving data: ${e.message}")
-        }
+//        val gson = Gson()
+//        val jsonData = gson.toJson(data) // Serialize the data
+//
+//        try {
+//            // Save to internal storage
+//            // serialize
+//            val file = File(getExternalFilesDir("debug"), "json_data.json")
+//            val fos = FileOutputStream(file)
+//            val oos = ObjectOutputStream(fos)
+//            oos.writeObject(jsonData)
+//            oos.close()
+//            fos.close()
+//
+//        } catch (e: IOException) {
+//            Log.e("FileSave", "Error saving data: ${e.message}")
+//        }
 
         call?.enqueue(object : Callback<RoutineDataUpload> {
             override fun onResponse(

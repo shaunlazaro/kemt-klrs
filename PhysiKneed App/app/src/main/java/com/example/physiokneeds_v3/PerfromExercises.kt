@@ -32,6 +32,8 @@ class PerfromExercises : AppCompatActivity() {
     lateinit var status: TextView
     lateinit var endWorkoutButton: Button
 
+    lateinit var routineData: RoutineDataUpload
+
     var isReceiverRegistered = false
 
     var displayCount = 0
@@ -58,6 +60,7 @@ class PerfromExercises : AppCompatActivity() {
     private var buttonPressReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "com.example.END_WORKOUT") {
+                routineData = (intent.getSerializableExtra("routineData") as RoutineDataUpload?)!!
                 endWorkoutButton.performClick() // Simulate button press
             }
         }
@@ -119,7 +122,11 @@ class PerfromExercises : AppCompatActivity() {
                     intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig)
                 }
 
+                intent.putExtra("routineData", routineData)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+                val intentClose = Intent("com.example.CLOSE_EXTERNAL_ACTIVITY")
+                LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentClose)
 
                 displayManager.unregisterDisplayListener(displayListener)
                 applicationContext.startActivity(intent)

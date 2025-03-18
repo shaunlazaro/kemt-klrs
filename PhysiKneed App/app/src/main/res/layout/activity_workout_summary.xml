@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".WorkoutSummary">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/blue" />
+
+        <LinearLayout
+            android:id="@+id/completeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Workout Summary"
+                android:fontFamily="@font/source_sans"
+                android:textSize="24sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:layout_gravity="left"
+                android:layout_marginTop="25dp"
+                android:layout_marginStart="30dp"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="40dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Time Spent"
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_gravity="start" />
+
+                <TextView
+                    android:id="@+id/time_spent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="0m 30s"
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:padding="10dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_gravity="end" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/exercise_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Stretches Completed"
+                android:fontFamily="@font/source_sans"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:layout_marginStart="40dp"
+                android:layout_gravity="start" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                android:layout_marginTop="20dp"
+
+                android:background="@color/black" />
+
+            <LinearLayout
+                android:id="@+id/linear_layout_score"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Overall Score"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="20dp"
+                    android:fontFamily="@font/source_sans"
+                    android:textColor="@color/black"
+                    android:gravity="center"/>
+
+                <ProgressBar
+                    android:id="@+id/progress_circular"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progressDrawable="@drawable/circular_progress"
+                    android:progress="85" />
+
+                <TextView
+                    android:id="@+id/score_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="85"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:fontFamily="@font/source_sans"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="-70dp" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="60dp">
+
+                    <TextView
+                        android:text="Stretch"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/source_sans"
+                        android:textColor="@color/black"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"/>
+
+                    <TextView
+                        android:text="Score"
+                        android:textStyle="bold"
+                        android:gravity="end"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/source_sans"
+                        android:textColor="@color/black"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"/>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Common errors"
+                android:fontFamily="@font/source_sans"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:layout_marginStart="40dp"
+                android:layout_gravity="start" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/finish_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:text="Finish"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/source_sans"
+                android:textStyle="bold"
+                android:background="@drawable/blue_button"
+                android:padding="10dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</RelativeLayout>
