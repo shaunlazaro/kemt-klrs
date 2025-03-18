@@ -12,6 +12,7 @@ import { FaHistory } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import { MonthlyCharts, WeeklyCharts } from "./patientCharts";
 import Button from "../../components/button";
+import { PATIENT_REPORT_SINGLE_PATH } from "../../routes";
 
 const PatientReport: React.FC = () => {
 
@@ -43,6 +44,11 @@ const PatientReport: React.FC = () => {
         },
         [routineDataReturn]
     )
+
+    const onClickReport = (workoutReport: RoutineData) => {
+        const path = PATIENT_REPORT_SINGLE_PATH.replace(":id", patientId ?? "-1").replace(":reportId", workoutReport.id);
+        navigate(path);
+    }
 
     return (
         <>
@@ -153,7 +159,7 @@ const PatientReport: React.FC = () => {
                                     <div className="col-start-4 col-end-6">{getTotalAlerts(routineData)}</div>
                                     <div className="col-start-6 col-end-9">{getPercentCompleted(routineData)}</div>
                                     <div className="col-start-9 col-end-11">{getAverageScore(routineData).toFixed(1)}</div>
-                                    <div className="col-start-12"> <FaChevronRight /></div>
+                                    <div className="col-start-12 cursor-pointer" onClick={() => onClickReport(routineData)}> <FaChevronRight /></div>
                                 </>))}
                             </div>
                         </div>
