@@ -88,7 +88,7 @@ class RepData(models.Model):
     poses = models.ManyToManyField('Pose', blank=True)  # Link to Pose model
 
     def __str__(self):
-        return f"Rep {self.rep_number}: Score {self.max_score}"
+        return f"{self.id} - Rep {self.rep_number}: Score {self.max_score}"
 
 class RoutineComponentData(models.Model):
     # routine_component = models.ForeignKey('RoutineExercise', on_delete=models.CASCADE)
@@ -97,7 +97,7 @@ class RoutineComponentData(models.Model):
     rep_data = models.ManyToManyField(RepData)
 
     def __str__(self):
-        return f"Routine Component {self.routine_component}"
+        return f"{self.id} - Routine Component {self.exercise_detail}"
 
 class RoutineData(models.Model):
     routine_config = models.ForeignKey('RoutineConfig', on_delete=models.CASCADE)
@@ -105,7 +105,7 @@ class RoutineData(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Routine Data for {self.routine_config.name}"
+        return f"{self.id} - Routine Data for {self.routine_config.name}"
 
 # ----
 # Workout Routine/Config Data

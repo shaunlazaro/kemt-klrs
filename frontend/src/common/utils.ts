@@ -3,7 +3,7 @@ import { type ClassValue, clsx } from "clsx";
 import { ExercisePlanListMock } from "../testData/exercisePlans";
 import { RoutineConfig } from "../interfaces/exercisePlan.interface";
 import { Patient } from "../interfaces/patient.interface";
-import { RoutineData } from "../interfaces/routineData.interface";
+import { RepData, RoutineComponentData, RoutineData } from "../interfaces/routineData.interface";
 import { ExerciseDetail } from "../interfaces/exerciseDetail.interface";
 
 export function cn(...inputs: ClassValue[]) {
@@ -85,9 +85,22 @@ export function getTotalAlerts(routineData: RoutineData): number {
   }, 0);
 }
 
+export const REP_ALERT_PENALTY = 0.2
+
+// export function getRepScore(rep: RepData): number {
+//   return rep.max_score - REP_ALERT_PENALTY * rep.alerts.length
+// }
+
+// We deduct the REP_ALERT_PENALTY for each alert, except if the alert is the rep tracking alert.
+export function getRepScore(rep: RepData, exercise: ExerciseDetail): number {
+  if (rep.alerts.find((alert) => alert == exercise.rep_tracking?.alert_message))
+    return rep.max_score - REP_ALERT_PENALTY * (rep.alerts.length - 1);
+  return rep.max_score - REP_ALERT_PENALTY * rep.alerts.length
+}
+
 export function getAverageScore(routineData: RoutineData): number {
   const componentScores = routineData.routine_component_data.map(componentData => {
-    const totalScore = componentData.rep_data.reduce((sum, rep) => sum + rep.max_score, 0);
+    const totalScore = componentData.rep_data.reduce((sum, rep) => sum + getRepScore(rep, componentData.exercise_detail), 0);
     return componentData.rep_data.length > 0 ? totalScore / componentData.rep_data.length : 0;
   });
 
@@ -107,4 +120,30 @@ export function getPercentCompleted(routineData: RoutineData): number {
   const averageCompletion = componentCompletion.length > 0 ? totalCompletion / componentCompletion.length : 0;
 
   return averageCompletion * 100; // Convert to percentage
+}
+
+// Not straightforward to do this, since we need to match exerciseDetails.
+export const getRoutineConfigRepsByComponentData = (componentData: RoutineComponentData, routineData: RoutineData) => {
+  return routineData?.routine_config?.exercises?.find((component) => component?.exercise?.display_name ?? ""
+    == componentData?.exercise_detail?.display_name ?? "")?.reps ?? 0;
+}
+
+export const getAverageScoreOfComponentData = (componentData: RoutineComponentData, routineData: RoutineData) => {
+  const simplifiedRoutineData = {
+    ...routineData,
+    routine_component_data: [componentData],
+  }
+  return getAverageScore(simplifiedRoutineData);
+}
+
+export const getAverageFlexion = (componentData: RoutineComponentData) => {
+  if (!componentData || !componentData.rep_data || componentData.rep_data.length < 1)
+    return;
+  return componentData.rep_data.reduce((sum, rep) => sum + rep.max_flexion, 0) / componentData.rep_data.length;
+}
+
+export const getAverageExtension = (componentData: RoutineComponentData) => {
+  if (!componentData || !componentData.rep_data || componentData.rep_data.length < 1)
+    return;
+  return componentData.rep_data.reduce((sum, rep) => sum + rep.max_extension, 0) / componentData.rep_data.length;
 }
