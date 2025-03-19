@@ -145,18 +145,16 @@ class ExerciseTracker:
         if self.state == "rest":
             if self._is_full_rep_completed(primary_angle):
                 self.rep_ready = True 
-
-            if self.rep_ready and self._is_start_of_rep(primary_angle):
                 self._start_new_rep(current_time)
-                self.rep_ready = False
 
-        elif self.state == "phase_1":
+        elif self.state == "phase_1" and self.rep_ready:
             if self._is_half_rep_completed(primary_angle):
                 self._start_phase_2(current_time)
 
-        elif self.state == "phase_2":
+        elif self.state == "phase_2" and self.rep_ready:
             if self._is_full_rep_completed(primary_angle):
                 self._complete_rep(current_time)
+                self.rep_ready = False 
 
     def _is_start_of_rep(self, angle):
         return (self.start_in_flexion and angle > self.flexion_threshold) or \
