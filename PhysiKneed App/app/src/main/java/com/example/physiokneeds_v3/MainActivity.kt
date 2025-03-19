@@ -541,9 +541,9 @@ class MainActivity : AppCompatActivity() {
 //                    leftImage.setImageResource(R.drawable.positioned)
                     videoFeed.visibility = View.VISIBLE
                     // update text
-                    titleText.text = "Get Positioned"
+                    titleText.text = "Get Positioned in Frame"
                     leftText.visibility = View.VISIBLE
-//                    leftText.text = "Stand 2 m away from camera \n\n Your entire body should be visible on the screen \n\n Your first exercise will start automatically once tracking is completed"
+//                    leftText.text = "Stand 2 m away from the camera. \n\n Exercises start automatically once your entire body is visible on screen."
                     // TODO more polish for UI
                     // TODO update image with GIF
 
@@ -577,7 +577,7 @@ class MainActivity : AppCompatActivity() {
 //                    tipText.visibility = View.VISIBLE
 //                    tipText.text = "TIPS"
                     titleText.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
-                    leftText.text = "TIPS \n\n1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
+                    leftText.text = "TIPS \n\n1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly."
                     if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Seated Leg Extension (Left)") {
                         val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.seated_leg_extension)
                         videoFeed.setVideoURI(videoUri)
