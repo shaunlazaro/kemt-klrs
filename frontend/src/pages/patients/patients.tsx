@@ -2,7 +2,6 @@ import Button from "../../components/button";
 import Searchbar from "../../components/searchbar";
 import { DataTable } from "../../components/datatable/data-table";
 import { PatientTableColumnDef } from "../../components/datatable";
-import { MockPatients } from "../../testData/patient";
 import { MdAddCircleOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { ADDEDIT_PATIENTS_PATH_NEW } from "../../routes";

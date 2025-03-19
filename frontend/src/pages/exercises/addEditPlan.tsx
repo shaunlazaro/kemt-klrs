@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import Button from "../../components/button"
 import { WideSelect } from "../../components/select/select"
 import { Input } from "../../components/input/input";
-import { TestRoutineConfig2 } from "../../testData/exercisePlans";
 import { RoutineComponent, RoutineConfig } from "../../interfaces/exercisePlan.interface";
 import { useNavigate, useParams } from "react-router-dom";
 import { CiCircleInfo } from "react-icons/ci";
 import { IoIosCloseCircleOutline } from "react-icons/io";
-import { MdDragHandle } from "react-icons/md";
 import { MockExerciseList } from "../../testData/exerciseDetail";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { ExerciseDetail } from "../../interfaces/exerciseDetail.interface";
