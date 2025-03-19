@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-k8nucojjy!sc5!g)jalu=2b#afz+emckqn3+ypqs3w*dnuh#g+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['129.153.49.30', '127.0.0.1', '140.238.151.117', 'localhost',]
+ALLOWED_HOSTS = ['129.153.49.30', '127.0.0.1', '140.238.151.117', 'localhost', '5010-140-238-151-117.ngrok-free.app',]
 
 
 # Application definition
@@ -139,10 +139,13 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
 }
-
+from corsheaders.defaults import default_headers
 # Evil CORS Settings
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # Allow requests from testing
 ]
 # Last resort!
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "ngrok-skip-browser-warning",
+]

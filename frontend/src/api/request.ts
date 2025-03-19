@@ -1,7 +1,7 @@
 import axios from "axios";
 // import { useSessionStore } from "./session";
 
-const apiBase = "http://140.238.151.117:8000/api";
+const apiBase = "https://5010-140-238-151-117.ngrok-free.app/api/";
 // const apiBase = "http://127.0.0.1:8000/api";
 
 const axiosInstance = axios.create({
@@ -37,7 +37,7 @@ const request = {
             method,
             url,
             data: body,
-            headers: { ...axiosInstance.defaults.headers.common, ...customHeaders },
+            headers: { ...axiosInstance.defaults.headers.common, "ngrok-skip-browser-warning": "true", ...customHeaders },
         }).then((response) => response.data),
 
     get: <TResponse>(url: string, customHeaders?: Record<string, string>) =>
