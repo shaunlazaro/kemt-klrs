@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useGetPatientById } from "../../api/hooks";
+import { useGetPatientById, useGetRoutineData } from "../../api/hooks";
 import Loader from "../../components/loader/loader";
 import { BLANK_PATIENT, Patient } from "../../interfaces/patient.interface";
 import { getAverageScore, getPatientAge, getPatientName, getPercentCompleted, getTotalAlerts, getUniqueExercisesWithAlerts } from "../../common/utils";
@@ -19,8 +19,9 @@ const PatientReport: React.FC = () => {
     const { id: patientId } = useParams();
     const navigate = useNavigate();
 
-    const routineDataReturn = useTestRoutineData();
+    // const routineDataReturn = useTestRoutineData();
 
+    const { data: routineDataReturn } = useGetRoutineData();
     const { data: patientData, isLoading: patientLoading } = useGetPatientById(patientId ?? "");
 
     const [patient, setPatient] = useState<Patient>(BLANK_PATIENT);
@@ -37,8 +38,8 @@ const PatientReport: React.FC = () => {
     useEffect(
         () => {
             if (routineDataReturn) {
-                routineDataReturn.created_at = new Date().toISOString().split("T")[0]
-                setWorkoutHistory([routineDataReturn])
+                // routineDataReturn.created_at = new Date().toISOString().split("T")[0]
+                setWorkoutHistory(routineDataReturn)
             }
             console.log(routineDataReturn)
         },

@@ -4,4 +4,5 @@ export enum QueryKeys {
     ROUTINE_CONFIGS = "routineConfigs",
     ROUTINE_CONFIG = "routineConfig",
     EXERCISE_DETAILS = "exerciseDetails",
+    ROUTINE_DATA = "routineData",
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAddRoutineData, useGetPatientById } from "../../api/hooks";
+import { useAddRoutineData, useGetPatientById, useGetRoutineDataById } from "../../api/hooks";
 import Loader from "../../components/loader/loader";
 import { BLANK_PATIENT, Patient } from "../../interfaces/patient.interface";
 import { getAverageExtension, getAverageFlexion, getAverageScore, getAverageScoreOfComponentData, getPatientName, getRepScore, getRoutineConfigRepsByComponentData } from "../../common/utils";
@@ -16,9 +16,10 @@ const PatientSingleWorkoutReport: React.FC = () => {
     const { id: patientId, reportId: reportId } = useParams();
     const navigate = useNavigate();
 
-    const routineDataReturn = useTestRoutineData(); // TODO: Fetch report with id = reportID
+    // const routineDataReturn = useTestRoutineData(); // TODO: Fetch report with id = reportID
     const uploadRoutineData = useAddRoutineData();
 
+    const { data: routineDataReturn } = useGetRoutineDataById(reportId ?? "");
     const { data: patientData, isLoading: patientLoading } = useGetPatientById(patientId ?? "");
 
     const [patient, setPatient] = useState<Patient>(BLANK_PATIENT);
@@ -38,10 +39,8 @@ const PatientSingleWorkoutReport: React.FC = () => {
     useEffect(
         () => {
             if (routineDataReturn) {
-                routineDataReturn.created_at = new Date().toISOString().split("T")[0]
                 setRoutineData(routineDataReturn);
             }
-            console.log(routineDataReturn)
         },
         [routineDataReturn]
     )
@@ -81,7 +80,7 @@ const PatientSingleWorkoutReport: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-x-4">
                     <div>
-                        {routineData?.routine_component_data.map((componentData) => (
+                        {routineData?.routine_component_data?.map((componentData) => (
                             <div className="pb-4">
                                 <div className="font-semibold text-primary-darkblue text-xl pb-2 pt-2"> {componentData?.exercise_detail?.display_name} </div>
                                 <div className="grid grid-cols-3 gap-x-2 text-center pb-4">
@@ -124,7 +123,7 @@ const PatientSingleWorkoutReport: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <button onClick={testFunction}>test</button>
+                {/* <button onClick={testFunction}>test</button> */}
             </div>
         </>
     );

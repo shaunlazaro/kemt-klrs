@@ -186,3 +186,23 @@ export const useAddRoutineData = () => {
         },
     });
 };
+
+export const useGetRoutineData = () => {
+    return useQuery({
+        queryKey: [QueryKeys.ROUTINE_DATA],
+        queryFn: () =>
+            request.get(`/routine-data`) as Promise<RoutineData[]>,
+        staleTime: 10000,
+        // enabled: !!routineDataId && routineDataId != ""
+    });
+};
+
+export const useGetRoutineDataById = (routineDataId: string) => {
+    return useQuery({
+        queryKey: [QueryKeys.ROUTINE_DATA],
+        queryFn: () =>
+            request.get(`/routine-data/${routineDataId}`) as Promise<RoutineData>,
+        staleTime: 10000,
+        enabled: !!routineDataId && routineDataId != ""
+    });
+};
