@@ -1,4 +1,4 @@
-import { Bar, BarChart, CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { getAverageScore, getPercentCompleted } from '../../common/utils';
 import { RoutineData } from '../../interfaces/routineData.interface';
 

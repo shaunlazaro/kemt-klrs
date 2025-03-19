@@ -1,5 +1,5 @@
 import { ExerciseDetail } from "./exerciseDetail.interface";
-import { RoutineComponent, RoutineConfig } from "./exercisePlan.interface";
+import { RoutineConfig } from "./exercisePlan.interface";
 
 export interface Pose {
     // id: number; // Assuming DRF includes an ID field

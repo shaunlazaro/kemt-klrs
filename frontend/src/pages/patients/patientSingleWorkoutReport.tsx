@@ -1,23 +1,20 @@
 import { useEffect, useState } from "react";
-import { useAddRoutineData, useGetPatientById, useGetRoutineDataById } from "../../api/hooks";
+import { useGetPatientById, useGetRoutineDataById } from "../../api/hooks";
 import Loader from "../../components/loader/loader";
 import { BLANK_PATIENT, Patient } from "../../interfaces/patient.interface";
-import { getAverageExtension, getAverageFlexion, getAverageScore, getAverageScoreOfComponentData, getPatientName, getRepScore, getRoutineConfigRepsByComponentData } from "../../common/utils";
-import { useNavigate, useParams } from "react-router-dom";
-import { useTestRoutineData } from "../../testData/routineData";
+import { getAverageExtension, getAverageFlexion, getAverageScoreOfComponentData, getPatientName, getRepScore, getRoutineConfigRepsByComponentData } from "../../common/utils";
+import { useParams } from "react-router-dom";
 import { RepData, RoutineComponentData, RoutineData } from "../../interfaces/routineData.interface";
-import Button from "../../components/button";
-import { HOME_PATH } from "../../routes";
 import { FaSearch } from "react-icons/fa";
 import PatientSingleRepPanel from "./patientSingleRepPanel";
 
 const PatientSingleWorkoutReport: React.FC = () => {
 
     const { id: patientId, reportId: reportId } = useParams();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     // const routineDataReturn = useTestRoutineData(); // TODO: Fetch report with id = reportID
-    const uploadRoutineData = useAddRoutineData();
+    // const uploadRoutineData = useAddRoutineData();
 
     const { data: routineDataReturn } = useGetRoutineDataById(reportId ?? "");
     const { data: patientData, isLoading: patientLoading } = useGetPatientById(patientId ?? "");
@@ -46,14 +43,14 @@ const PatientSingleWorkoutReport: React.FC = () => {
     )
 
     // Used to upload a routineData.  Kept as an example.
-    const testFunction = () => {
-        if (!routineDataReturn)
-            return;
+    // const testFunction = () => {
+    //     if (!routineDataReturn)
+    //         return;
 
-        uploadRoutineData.mutate(routineDataReturn, {
-            onSuccess: () => navigate(HOME_PATH),
-        });
-    }
+    //     uploadRoutineData.mutate(routineDataReturn, {
+    //         onSuccess: () => navigate(HOME_PATH),
+    //     });
+    // }
 
     const onClickRep = (repData: RepData, repComponent: RoutineComponentData) => {
         setSelectedRep(repData);

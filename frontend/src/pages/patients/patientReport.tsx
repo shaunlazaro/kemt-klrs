@@ -4,7 +4,6 @@ import Loader from "../../components/loader/loader";
 import { BLANK_PATIENT, Patient } from "../../interfaces/patient.interface";
 import { getAverageScore, getPatientAge, getPatientName, getPercentCompleted, getTotalAlerts, getUniqueExercisesWithAlerts } from "../../common/utils";
 import { useNavigate, useParams } from "react-router-dom";
-import { useTestRoutineData } from "../../testData/routineData";
 import { RoutineData } from "../../interfaces/routineData.interface";
 import { GiProgression } from "react-icons/gi";
 import { TbAlertCircle } from "react-icons/tb";
