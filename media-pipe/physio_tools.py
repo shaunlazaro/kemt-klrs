@@ -47,6 +47,7 @@ class ExerciseTracker:
     def __init__(self, exercise_detail):
         self.rep_count = 0
         self.state = "rest"
+        self.rep_ready = True
         self.just_completed_rep = False
         self.rep_start_time = None
         self.last_rep_duration = 0
@@ -119,8 +120,12 @@ class ExerciseTracker:
                 continue
             if detail.show_alert_if_above and value > detail.show_alert_if_above:
                 self.alerts.add(detail.alert_message)
-            if detail.show_alert_if_below and value < detail.show_alert_if_below:
+                self.last_rep_alerts.add(detail.alert_message)
+            elif detail.show_alert_if_below and value < detail.show_alert_if_below:
                 self.alerts.add(detail.alert_message)
+                self.last_rep_alerts.add(detail.alert_message)
+            else:
+                self.alerts.discard(detail.alert_message)
 
     def _update_progress_score(self, primary_angle, start_angle):
         """Computes a normalized rep completion score (0 to 1) based on progress from start_angle to goal."""
@@ -138,16 +143,18 @@ class ExerciseTracker:
     def _update_state(self, primary_angle, current_time):
         """Handles state transitions based on detected movement."""
         if self.state == "rest":
-            if self._is_start_of_rep(primary_angle):
+            if self._is_full_rep_completed(primary_angle):
+                self.rep_ready = True 
                 self._start_new_rep(current_time)
 
-        elif self.state == "phase_1":
+        elif self.state == "phase_1" and self.rep_ready:
             if self._is_half_rep_completed(primary_angle):
                 self._start_phase_2(current_time)
 
-        elif self.state == "phase_2":
+        elif self.state == "phase_2" and self.rep_ready:
             if self._is_full_rep_completed(primary_angle):
                 self._complete_rep(current_time)
+                self.rep_ready = False 
 
     def _is_start_of_rep(self, angle):
         return (self.start_in_flexion and angle > self.flexion_threshold) or \
@@ -193,7 +200,7 @@ class ExerciseTracker:
         if self.last_concentric_time + self.last_eccentric_time < min_rep_time:
             self.alerts.add("Slow down your movement")
 
-        self.last_rep_alerts = self.alerts.copy()
+        self.last_rep_alerts.update(self.alerts)
 
         rep_entry = RepData(
             rep_number=self.rep_count,
@@ -230,3 +237,4 @@ class ExerciseTracker:
         self.last_pose_capture_time = 0
         self.max_score = 0
         self.score = 0
+        self.last_rep_alerts.clear()

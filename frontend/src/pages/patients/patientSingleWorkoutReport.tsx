@@ -53,6 +53,7 @@ const PatientSingleWorkoutReport: React.FC = () => {
     // }
 
     const onClickRep = (repData: RepData, repComponent: RoutineComponentData) => {
+        console.log(repData);
         setSelectedRep(repData);
         setSelectedRepComponent(repComponent);
     }
@@ -99,7 +100,7 @@ const PatientSingleWorkoutReport: React.FC = () => {
                                 <div className="flex flex-row gap-x-4">
                                     {componentData?.rep_data.map((repData) => (
                                         <div
-                                            className={`rounded-full p-2 font-semibold text-white text-base cursor-pointer w-10 h-10 text-center ${repData == selectedRep ? "bg-primary-darkblue" : "bg-secondary-darkpink"}`}
+                                            className={`rounded-full p-2 font-semibold text-white text-base cursor-pointer w-10 h-10 text-center ${repData == selectedRep ? "bg-primary-blue" : "bg-secondary-darkpink hover:bg-secondary-lightpink"}`}
                                             onClick={() => { onClickRep(repData, componentData) }}
                                         >
                                             {(getRepScore(repData, componentData.exercise_detail) * 100).toFixed(0)}
