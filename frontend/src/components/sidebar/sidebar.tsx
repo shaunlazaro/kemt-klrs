@@ -17,7 +17,7 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <nav
       className={cn(
-        "relative hidden h-screen border-r pt-0 md:block transition-all duration-300 bg-primary-blue text-white",
+        "relative hidden h-screen border-r pt-0 md:block transition-all duration-300 bg-primary-darkblue text-white",
         isOpen ? "w-72" : "w-[72px]",
         className,
       )}
@@ -36,7 +36,9 @@ export default function Sidebar({ className }: SidebarProps) {
             />
         </div> */}
       <div className="pb-6 flex items-center px-5 pt-6">
-        <div className="w-14 h-14 border-2 border-white rounded-lg"></div>
+        <div className="w-8 h-8 border-0 border-white rounded-lg flex items-center justify-center overflow-hidden">
+          <img src="/logo-stick-dpink.png" alt="Logo" className="w-full h-full object-contain" />
+        </div>
         <span className="h-auto ml-3 font-semibold text-2xl mb-1">RePose</span>
       </div>
       <div className="space-y-2 pb-2 h-full overflow-y-auto">
@@ -47,7 +49,7 @@ export default function Sidebar({ className }: SidebarProps) {
             className={cn(
               "flex items-center gap-3 p-4 transition hover:bg-primary-lightblue hover:text-black text-white",
               pathname === item.href && "bg-secondary-darkpink",
-              pathname != item.href && "bg-primary-blue"
+              pathname != item.href && "bg-primary-darkblue"
             )}
           >
             <item.icon className="h-6 w-6" />

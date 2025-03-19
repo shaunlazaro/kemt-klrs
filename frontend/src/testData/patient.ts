@@ -12,57 +12,57 @@ const dateNYearsAgo = (n: number) => {
 
 export const MockPatients: Patient[] = [
     {
-        userId: "1",
-        firstName: "Al",
-        lastName: "Liver",
-        dateOfBirth: dateNYearsAgo(40),
+        id: "1",
+        first_name: "Al",
+        last_name: "Liver",
+        date_of_birth: dateNYearsAgo(40),
         email: "test@test.com",
         sex: "M",
         condition: "Knee",
         exercises: TestRoutineConfig,
-        weeklyProgress: 7
+        //weeklyProgress: 7
     },
     {
-        userId: "2",
-        firstName: "Bourne",
-        lastName: "Happy",
-        dateOfBirth: dateNYearsAgo(70),
+        id: "2",
+        first_name: "Bourne",
+        last_name: "Happy",
+        date_of_birth: dateNYearsAgo(70),
         email: "test@test.com",
         sex: "F",
         condition: "Ankle",
         exercises: TestRoutineConfig2,
-        weeklyProgress: 2
+        //weeklyProgress: 2
     },
     {
-        userId: "3",
-        firstName: "Craig",
-        lastName: "Gnee",
-        dateOfBirth: dateNYearsAgo(24),
+        id: "3",
+        first_name: "Craig",
+        last_name: "Gnee",
+        date_of_birth: dateNYearsAgo(24),
         email: "test@test.com",
         sex: "M",
         condition: "Knee",
         exercises: TestRoutineConfig2,
-        weeklyProgress: 7
+        //weeklyProgress: 7
     },
     {
-        userId: "4",
-        firstName: "Destry",
-        lastName: "Bone",
-        dateOfBirth: dateNYearsAgo(60),
+        id: "4",
+        first_name: "Destry",
+        last_name: "Bone",
+        date_of_birth: dateNYearsAgo(60),
         email: "test@test.com",
         sex: "F",
         condition: "Knee",
         exercises: TestRoutineConfig,
-        weeklyProgress: 7
+        //weeklyProgress: 7
     },
     {
-        userId: "5",
-        firstName: "El",
-        lastName: "Fizzio",
-        dateOfBirth: dateNYearsAgo(14),
+        id: "5",
+        first_name: "El",
+        last_name: "Fizzio",
+        date_of_birth: dateNYearsAgo(14),
         email: "test@test.com",
         sex: "F",
         condition: "Ankle",
-        weeklyProgress: 7
+        //weeklyProgress: 7
     },
 ]

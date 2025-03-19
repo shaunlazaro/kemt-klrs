@@ -1,0 +1,2627 @@
+{
+    "routine_config": {
+        "id": "1",
+        "name": "knee_routine",
+        "exercises": [
+            {
+                "exercise": {
+                    "rep_keypoints": [
+                        "right_hip",
+                        "right_knee",
+                        "right_ankle"
+                    ],
+                    "rep_tracking": {
+                        "tracking_type": "ANGLE_OF_THREE_POINTS",
+                        "keypoints": [
+                            "hip",
+                            "knee",
+                            "ankle"
+                        ],
+                        "symmetric": true,
+                        "dimensionality": "2D",
+                        "goal_flexion": 90,
+                        "goal_extension": null,
+                        "alert_message": "Go deeper!",
+                        "show_alert_if_above": null,
+                        "show_alert_if_below": null
+                    },
+                    "start_angle": 180,
+                    "min_rep_time": 1.5,
+                    "threshold_flexion": 110,
+                    "threshold_extension": 160,
+                    "display_name": "Squat",
+                    "start_in_flexion": false,
+                    "body_alignment": "side",
+                    "default_tracking_details": [
+                        {
+                            "tracking_type": "ANGLE_OF_THREE_POINTS",
+                            "keypoints": [
+                                "hip",
+                                "knee",
+                                "ankle"
+                            ],
+                            "symmetric": true,
+                            "dimensionality": "2D",
+                            "goal_flexion": 90,
+                            "goal_extension": null,
+                            "alert_message": "Go deeper!",
+                            "show_alert_if_above": null,
+                            "show_alert_if_below": null
+                        },
+                        {
+                            "tracking_type": "ANGLE_WITH_VERTICAL",
+                            "keypoints": [
+                                "hip",
+                                "shoulder"
+                            ],
+                            "symmetric": true,
+                            "dimensionality": "2D",
+                            "goal_flexion": null,
+                            "goal_extension": null,
+                            "alert_message": "Keep your back more upright!",
+                            "show_alert_if_above": 50,
+                            "show_alert_if_below": null
+                        }
+                    ],
+                    "instruction": null
+                },
+                "reps": 1,
+                "custom_tracking_details": []
+            },
+            {
+                "exercise": {
+                    "rep_keypoints": [
+                        "right_hip",
+                        "right_knee",
+                        "right_ankle"
+                    ],
+                    "rep_tracking": {
+                        "tracking_type": "ANGLE_OF_THREE_POINTS",
+                        "keypoints": [
+                            "right_hip",
+                            "right_knee",
+                            "right_ankle"
+                        ],
+                        "symmetric": false,
+                        "dimensionality": "2D",
+                        "goal_flexion": null,
+                        "goal_extension": 160,
+                        "alert_message": "Extend further!",
+                        "show_alert_if_above": null,
+                        "show_alert_if_below": null
+                    },
+                    "start_angle": 90,
+                    "min_rep_time": 1.5,
+                    "threshold_flexion": 100,
+                    "threshold_extension": 130,
+                    "display_name": "Leg Extension",
+                    "start_in_flexion": true,
+                    "body_alignment": "side",
+                    "default_tracking_details": [
+                        {
+                            "tracking_type": "ANGLE_OF_THREE_POINTS",
+                            "keypoints": [
+                                "right_hip",
+                                "right_knee",
+                                "right_ankle"
+                            ],
+                            "symmetric": false,
+                            "dimensionality": "2D",
+                            "goal_flexion": null,
+                            "goal_extension": 160,
+                            "alert_message": "Extend further!",
+                            "show_alert_if_above": null,
+                            "show_alert_if_below": null
+                        }
+                    ],
+                    "instruction": null
+                },
+                "reps": 1,
+                "custom_tracking_details": []
+            }
+        ],
+        "injury": "knee"
+    },
+    "routine_component_data": [
+        {
+            "exercise_detail": {
+                "id": "1",
+                "rep_keypoints": [
+                    "right_hip",
+                    "right_knee",
+                    "right_ankle"
+                ],
+                "rep_tracking": {
+                    "tracking_type": "ANGLE_OF_THREE_POINTS",
+                    "keypoints": [
+                        "hip",
+                        "knee",
+                        "ankle"
+                    ],
+                    "symmetric": true,
+                    "dimensionality": "2D",
+                    "goal_flexion": 90,
+                    "goal_extension": null,
+                    "alert_message": "Go deeper!",
+                    "show_alert_if_above": null,
+                    "show_alert_if_below": null
+                },
+                "start_angle": 180,
+                "min_rep_time": 1.5,
+                "threshold_flexion": 110,
+                "threshold_extension": 160,
+                "display_name": "Squat",
+                "start_in_flexion": false,
+                "body_alignment": "side",
+                "default_tracking_details": [
+                    {
+                        "tracking_type": "ANGLE_OF_THREE_POINTS",
+                        "keypoints": [
+                            "hip",
+                            "knee",
+                            "ankle"
+                        ],
+                        "symmetric": true,
+                        "dimensionality": "2D",
+                        "goal_flexion": 90,
+                        "goal_extension": null,
+                        "alert_message": "Go deeper!",
+                        "show_alert_if_above": null,
+                        "show_alert_if_below": null
+                    },
+                    {
+                        "tracking_type": "ANGLE_WITH_VERTICAL",
+                        "keypoints": [
+                            "hip",
+                            "shoulder"
+                        ],
+                        "symmetric": true,
+                        "dimensionality": "2D",
+                        "goal_flexion": null,
+                        "goal_extension": null,
+                        "alert_message": "Keep your back more upright!",
+                        "show_alert_if_above": 50,
+                        "show_alert_if_below": null
+                    }
+                ],
+                "instruction": null
+            },
+            "rep_data": [
+                {
+                    "rep_number": 1,
+                    "max_flexion": 48.454975288553065,
+                    "max_extension": 161.80323654448364,
+                    "concentric_time": 0.1295619010925293,
+                    "eccentric_time": 0.6674070358276367,
+                    "total_time": 0.796968936920166,
+                    "goal_flexion_met": true,
+                    "goal_extension_met": true,
+                    "max_score": 1,
+                    "alerts": [
+                        "Slow down your movement"
+                    ],
+                    "poses": [
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.550902783870697,
+                                    "y": 0.10814563184976578,
+                                    "z": -0.028772402554750443,
+                                    "visibility": 0.9998239874839783
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5538060665130615,
+                                    "y": 0.09546108543872833,
+                                    "z": -0.0009490882512181997,
+                                    "visibility": 0.9996795654296875
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.5559154748916626,
+                                    "y": 0.09709902852773666,
+                                    "z": -0.0009791067568585277,
+                                    "visibility": 0.999550461769104
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.557854950428009,
+                                    "y": 0.09868605434894562,
+                                    "z": -0.0010090279392898083,
+                                    "visibility": 0.999478280544281
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.5454673171043396,
+                                    "y": 0.09044599533081055,
+                                    "z": -0.027880989015102386,
+                                    "visibility": 0.9997934699058533
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5415341854095459,
+                                    "y": 0.08872729539871216,
+                                    "z": -0.02789035066962242,
+                                    "visibility": 0.9998012781143188
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.5378021597862244,
+                                    "y": 0.08668976277112961,
+                                    "z": -0.027899298816919327,
+                                    "visibility": 0.999840259552002
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5553715825080872,
+                                    "y": 0.1075620949268341,
+                                    "z": 0.13515761494636536,
+                                    "visibility": 0.9985873699188232
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5297897458076477,
+                                    "y": 0.09410391747951508,
+                                    "z": 0.011409906670451164,
+                                    "visibility": 0.9998945593833923
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5512112975120544,
+                                    "y": 0.12942804396152496,
+                                    "z": 0.024560565128922462,
+                                    "visibility": 0.9991965293884277
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.5410930514335632,
+                                    "y": 0.12328997254371643,
+                                    "z": -0.01152960117906332,
+                                    "visibility": 0.9997649192810059
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.534763753414154,
+                                    "y": 0.1951257735490799,
+                                    "z": 0.27762937545776367,
+                                    "visibility": 0.996425449848175
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.5056895613670349,
+                                    "y": 0.15366967022418976,
+                                    "z": -0.06095419079065323,
+                                    "visibility": 0.9999793767929077
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.5110047459602356,
+                                    "y": 0.290555477142334,
+                                    "z": 0.3595057427883148,
+                                    "visibility": 0.1691581755876541
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.44388702511787415,
+                                    "y": 0.20131255686283112,
+                                    "z": -0.1924646943807602,
+                                    "visibility": 0.9976948499679565
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.5311711430549622,
+                                    "y": 0.3759826421737671,
+                                    "z": 0.3152252435684204,
+                                    "visibility": 0.20766901969909668
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.4916533827781677,
+                                    "y": 0.31277766823768616,
+                                    "z": -0.2839645445346832,
+                                    "visibility": 0.9800712466239929
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.5303570628166199,
+                                    "y": 0.40727779269218445,
+                                    "z": 0.3174714148044586,
+                                    "visibility": 0.21603906154632568
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.49605903029441833,
+                                    "y": 0.3510637581348419,
+                                    "z": -0.31676948070526123,
+                                    "visibility": 0.9549862146377563
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.5353498458862305,
+                                    "y": 0.4097258746623993,
+                                    "z": 0.2850162386894226,
+                                    "visibility": 0.22001884877681732
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.5049731135368347,
+                                    "y": 0.34762465953826904,
+                                    "z": -0.29303595423698425,
+                                    "visibility": 0.9526097774505615
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.5331466794013977,
+                                    "y": 0.3943462371826172,
+                                    "z": 0.29860761761665344,
+                                    "visibility": 0.22066617012023926
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.5059787631034851,
+                                    "y": 0.33790019154548645,
+                                    "z": -0.27263739705085754,
+                                    "visibility": 0.9373907446861267
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.5231306552886963,
+                                    "y": 0.4595942795276642,
+                                    "z": 0.12265688925981522,
+                                    "visibility": 0.9955547451972961
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.502515971660614,
+                                    "y": 0.441862016916275,
+                                    "z": -0.1227644830942154,
+                                    "visibility": 0.9987688064575195
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5197480320930481,
+                                    "y": 0.6736717224121094,
+                                    "z": 0.0412629172205925,
+                                    "visibility": 0.7775782346725464
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.5318034291267395,
+                                    "y": 0.6625871062278748,
+                                    "z": -0.20275774598121643,
+                                    "visibility": 0.9892112016677856
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5059904456138611,
+                                    "y": 0.8848878741264343,
+                                    "z": 0.06991869956254959,
+                                    "visibility": 0.8212580680847168
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.4255983531475067,
+                                    "y": 0.7561850547790527,
+                                    "z": -0.14089639484882355,
+                                    "visibility": 0.9875966906547546
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.4958057701587677,
+                                    "y": 0.9207364320755005,
+                                    "z": 0.06614401936531067,
+                                    "visibility": 0.7849752306938171
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.3997916281223297,
+                                    "y": 0.7601885199546814,
+                                    "z": -0.1364741325378418,
+                                    "visibility": 0.9098288416862488
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.5612237453460693,
+                                    "y": 0.9374421238899231,
+                                    "z": -0.0014816373586654663,
+                                    "visibility": 0.8857485055923462
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.43794864416122437,
+                                    "y": 0.8876935839653015,
+                                    "z": -0.22089897096157074,
+                                    "visibility": 0.9808963537216187
+                                }
+                            ]
+                        },
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.5533660054206848,
+                                    "y": 0.11306217312812805,
+                                    "z": -0.04252432659268379,
+                                    "visibility": 0.9998490214347839
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5553814768791199,
+                                    "y": 0.09967216849327087,
+                                    "z": -0.017685847356915474,
+                                    "visibility": 0.9997190833091736
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.5572376847267151,
+                                    "y": 0.10122492164373398,
+                                    "z": -0.017738964408636093,
+                                    "visibility": 0.9996045827865601
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.5589511394500732,
+                                    "y": 0.10258472710847855,
+                                    "z": -0.017809493467211723,
+                                    "visibility": 0.9995486736297607
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.547088623046875,
+                                    "y": 0.09429799020290375,
+                                    "z": -0.04505448043346405,
+                                    "visibility": 0.9998207092285156
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5434549450874329,
+                                    "y": 0.0925929918885231,
+                                    "z": -0.04507831856608391,
+                                    "visibility": 0.99982750415802
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.5397456884384155,
+                                    "y": 0.09079059213399887,
+                                    "z": -0.045106299221515656,
+                                    "visibility": 0.9998613595962524
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5549064874649048,
+                                    "y": 0.10965526849031448,
+                                    "z": 0.10874553769826889,
+                                    "visibility": 0.9987030625343323
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5304742455482483,
+                                    "y": 0.09660851955413818,
+                                    "z": -0.018454305827617645,
+                                    "visibility": 0.9999107718467712
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5529820322990417,
+                                    "y": 0.13380637764930725,
+                                    "z": 0.006977616343647242,
+                                    "visibility": 0.9992316961288452
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.5436739325523376,
+                                    "y": 0.1273532509803772,
+                                    "z": -0.029800020158290863,
+                                    "visibility": 0.9997779726982117
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.5374956727027893,
+                                    "y": 0.1981172114610672,
+                                    "z": 0.24802561104297638,
+                                    "visibility": 0.9969465732574463
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.504966676235199,
+                                    "y": 0.15612660348415375,
+                                    "z": -0.08399830013513565,
+                                    "visibility": 0.9999812841415405
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.5194167494773865,
+                                    "y": 0.2975095212459564,
+                                    "z": 0.338040828704834,
+                                    "visibility": 0.13911780714988708
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.4452381730079651,
+                                    "y": 0.20649170875549316,
+                                    "z": -0.17365139722824097,
+                                    "visibility": 0.9977008104324341
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.5373228788375854,
+                                    "y": 0.38761791586875916,
+                                    "z": 0.30106115341186523,
+                                    "visibility": 0.1729300171136856
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.4970615804195404,
+                                    "y": 0.3129618465900421,
+                                    "z": -0.24098436534404755,
+                                    "visibility": 0.9773947596549988
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.5388737320899963,
+                                    "y": 0.4142647981643677,
+                                    "z": 0.3041432797908783,
+                                    "visibility": 0.1816074550151825
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.5017688274383545,
+                                    "y": 0.3480720818042755,
+                                    "z": -0.26752644777297974,
+                                    "visibility": 0.9495826959609985
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.542047917842865,
+                                    "y": 0.4180397391319275,
+                                    "z": 0.26823553442955017,
+                                    "visibility": 0.18509650230407715
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.5101621747016907,
+                                    "y": 0.34474703669548035,
+                                    "z": -0.2446269690990448,
+                                    "visibility": 0.9464772343635559
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.5406017303466797,
+                                    "y": 0.40243813395500183,
+                                    "z": 0.2831191420555115,
+                                    "visibility": 0.1863700896501541
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.5105901956558228,
+                                    "y": 0.3356284201145172,
+                                    "z": -0.22930017113685608,
+                                    "visibility": 0.9311257004737854
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.5253168940544128,
+                                    "y": 0.4596554934978485,
+                                    "z": 0.12757402658462524,
+                                    "visibility": 0.9963833093643188
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.5094119906425476,
+                                    "y": 0.4414135217666626,
+                                    "z": -0.12761320173740387,
+                                    "visibility": 0.9989761710166931
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5210010409355164,
+                                    "y": 0.6749210357666016,
+                                    "z": 0.07881404459476471,
+                                    "visibility": 0.7645986676216125
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.5437755584716797,
+                                    "y": 0.6478805541992188,
+                                    "z": -0.21708029508590698,
+                                    "visibility": 0.990691065788269
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5055803656578064,
+                                    "y": 0.8901799917221069,
+                                    "z": 0.12901028990745544,
+                                    "visibility": 0.8472201824188232
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.42855873703956604,
+                                    "y": 0.5940488576889038,
+                                    "z": -0.03600560501217842,
+                                    "visibility": 0.9858612418174744
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.4915791153907776,
+                                    "y": 0.9300750494003296,
+                                    "z": 0.1292201429605484,
+                                    "visibility": 0.8101657629013062
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.40496599674224854,
+                                    "y": 0.5596544146537781,
+                                    "z": -0.014562743715941906,
+                                    "visibility": 0.9163291454315186
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.5598114132881165,
+                                    "y": 0.9388020634651184,
+                                    "z": 0.06432042270898819,
+                                    "visibility": 0.9002482295036316
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.41203486919403076,
+                                    "y": 0.6819410920143127,
+                                    "z": -0.009765696711838245,
+                                    "visibility": 0.9792941212654114
+                                }
+                            ]
+                        },
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.5567681789398193,
+                                    "y": 0.11516562849283218,
+                                    "z": -0.044211819767951965,
+                                    "visibility": 0.9998681545257568
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5594093799591064,
+                                    "y": 0.10199732333421707,
+                                    "z": -0.020020274445414543,
+                                    "visibility": 0.9997446537017822
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.5611593127250671,
+                                    "y": 0.10344114154577255,
+                                    "z": -0.02004818245768547,
+                                    "visibility": 0.9996406435966492
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.5626546740531921,
+                                    "y": 0.10458877682685852,
+                                    "z": -0.020195666700601578,
+                                    "visibility": 0.9995941519737244
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.5513779520988464,
+                                    "y": 0.09665393084287643,
+                                    "z": -0.04747157543897629,
+                                    "visibility": 0.9998380541801453
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5476999878883362,
+                                    "y": 0.09470586478710175,
+                                    "z": -0.047545697540044785,
+                                    "visibility": 0.9998447299003601
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.5438677668571472,
+                                    "y": 0.09293726086616516,
+                                    "z": -0.04765107482671738,
+                                    "visibility": 0.9998734593391418
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5581472516059875,
+                                    "y": 0.11080802977085114,
+                                    "z": 0.1009133979678154,
+                                    "visibility": 0.9987444877624512
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5338404774665833,
+                                    "y": 0.09750707447528839,
+                                    "z": -0.027596499770879745,
+                                    "visibility": 0.9999217391014099
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5554889440536499,
+                                    "y": 0.1358128786087036,
+                                    "z": 0.0023790213745087385,
+                                    "visibility": 0.9992523193359375
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.5468139052391052,
+                                    "y": 0.12970362603664398,
+                                    "z": -0.030896179378032684,
+                                    "visibility": 0.9997894167900085
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.5400529503822327,
+                                    "y": 0.19896434247493744,
+                                    "z": 0.22780442237854004,
+                                    "visibility": 0.9974132180213928
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.5042286515235901,
+                                    "y": 0.16034547984600067,
+                                    "z": -0.08848976343870163,
+                                    "visibility": 0.9999827742576599
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.5268458724021912,
+                                    "y": 0.31255578994750977,
+                                    "z": 0.2934165894985199,
+                                    "visibility": 0.1168045848608017
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.44811078906059265,
+                                    "y": 0.20933303236961365,
+                                    "z": -0.20354734361171722,
+                                    "visibility": 0.9975245594978333
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.538326621055603,
+                                    "y": 0.402555376291275,
+                                    "z": 0.23792368173599243,
+                                    "visibility": 0.1520068645477295
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.49806565046310425,
+                                    "y": 0.30799809098243713,
+                                    "z": -0.30166876316070557,
+                                    "visibility": 0.9744417071342468
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.5398939847946167,
+                                    "y": 0.4266407787799835,
+                                    "z": 0.24158146977424622,
+                                    "visibility": 0.16243040561676025
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.5034316778182983,
+                                    "y": 0.3438156545162201,
+                                    "z": -0.33330070972442627,
+                                    "visibility": 0.9441735148429871
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.5430639982223511,
+                                    "y": 0.42900821566581726,
+                                    "z": 0.20332245528697968,
+                                    "visibility": 0.1656595915555954
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.5108576416969299,
+                                    "y": 0.34086811542510986,
+                                    "z": -0.3115336298942566,
+                                    "visibility": 0.9403345584869385
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.540880560874939,
+                                    "y": 0.41962873935699463,
+                                    "z": 0.22046908736228943,
+                                    "visibility": 0.16719812154769897
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.5108563303947449,
+                                    "y": 0.3319629430770874,
+                                    "z": -0.29154667258262634,
+                                    "visibility": 0.9246600270271301
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.5274616479873657,
+                                    "y": 0.4593905508518219,
+                                    "z": 0.12386373430490494,
+                                    "visibility": 0.9970532655715942
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.5102891325950623,
+                                    "y": 0.44357383251190186,
+                                    "z": -0.12389834225177765,
+                                    "visibility": 0.9991406798362732
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5196607708930969,
+                                    "y": 0.6699973344802856,
+                                    "z": 0.10073146224021912,
+                                    "visibility": 0.7557991743087769
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.5429964065551758,
+                                    "y": 0.6429752111434937,
+                                    "z": -0.20893841981887817,
+                                    "visibility": 0.9916762113571167
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5052096843719482,
+                                    "y": 0.8862066864967346,
+                                    "z": 0.14074641466140747,
+                                    "visibility": 0.8701348304748535
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.44385167956352234,
+                                    "y": 0.5597034692764282,
+                                    "z": -0.027200276032090187,
+                                    "visibility": 0.9825121760368347
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.48954376578330994,
+                                    "y": 0.9236913323402405,
+                                    "z": 0.14051130414009094,
+                                    "visibility": 0.8351345062255859
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.427555114030838,
+                                    "y": 0.5322586297988892,
+                                    "z": -0.007002429571002722,
+                                    "visibility": 0.9177338480949402
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.5578373670578003,
+                                    "y": 0.9271681904792786,
+                                    "z": 0.07097984850406647,
+                                    "visibility": 0.9136539101600647
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.4186461865901947,
+                                    "y": 0.632500410079956,
+                                    "z": -0.005969444755464792,
+                                    "visibility": 0.975283682346344
+                                }
+                            ]
+                        },
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.5610503554344177,
+                                    "y": 0.11745322495698929,
+                                    "z": -0.05159306153655052,
+                                    "visibility": 0.9998774528503418
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5641555190086365,
+                                    "y": 0.10464665293693542,
+                                    "z": -0.02675526961684227,
+                                    "visibility": 0.9997487664222717
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.5656630396842957,
+                                    "y": 0.10593565553426743,
+                                    "z": -0.026794392615556717,
+                                    "visibility": 0.9996493458747864
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.5672845840454102,
+                                    "y": 0.10711494833230972,
+                                    "z": -0.026863904669880867,
+                                    "visibility": 0.9996101260185242
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.5568293929100037,
+                                    "y": 0.09913097321987152,
+                                    "z": -0.05405966192483902,
+                                    "visibility": 0.9998429417610168
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5532350540161133,
+                                    "y": 0.09689082950353622,
+                                    "z": -0.05409182235598564,
+                                    "visibility": 0.9998511672019958
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.5495131015777588,
+                                    "y": 0.09474224597215652,
+                                    "z": -0.05412549152970314,
+                                    "visibility": 0.9998767375946045
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5634345412254333,
+                                    "y": 0.11286821216344833,
+                                    "z": 0.10094122588634491,
+                                    "visibility": 0.9986790418624878
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5396699905395508,
+                                    "y": 0.09847064316272736,
+                                    "z": -0.02647761069238186,
+                                    "visibility": 0.9999282956123352
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5595855712890625,
+                                    "y": 0.13772545754909515,
+                                    "z": -0.0016822651959955692,
+                                    "visibility": 0.9991986751556396
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.5507869124412537,
+                                    "y": 0.1309044063091278,
+                                    "z": -0.038186486810445786,
+                                    "visibility": 0.9997789859771729
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.5442428588867188,
+                                    "y": 0.2009878009557724,
+                                    "z": 0.2347123920917511,
+                                    "visibility": 0.997700572013855
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.5071428418159485,
+                                    "y": 0.16411958634853363,
+                                    "z": -0.08910031616687775,
+                                    "visibility": 0.9999828934669495
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.5292776226997375,
+                                    "y": 0.3163119852542877,
+                                    "z": 0.3128891885280609,
+                                    "visibility": 0.0976642370223999
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.450548380613327,
+                                    "y": 0.2118678241968155,
+                                    "z": -0.2085455358028412,
+                                    "visibility": 0.9974108338356018
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.5379647612571716,
+                                    "y": 0.4121270477771759,
+                                    "z": 0.2781064212322235,
+                                    "visibility": 0.13271082937717438
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.49787622690200806,
+                                    "y": 0.30630406737327576,
+                                    "z": -0.3227851986885071,
+                                    "visibility": 0.9728002548217773
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.5416564345359802,
+                                    "y": 0.43627139925956726,
+                                    "z": 0.28289684653282166,
+                                    "visibility": 0.14428655803203583
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.5046359300613403,
+                                    "y": 0.3420809507369995,
+                                    "z": -0.3580670952796936,
+                                    "visibility": 0.9419629573822021
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.5442908406257629,
+                                    "y": 0.4360703229904175,
+                                    "z": 0.24799379706382751,
+                                    "visibility": 0.14742246270179749
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.5131029486656189,
+                                    "y": 0.33998242020606995,
+                                    "z": -0.3354475796222687,
+                                    "visibility": 0.9378431439399719
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.5426328182220459,
+                                    "y": 0.4240494966506958,
+                                    "z": 0.2615576684474945,
+                                    "visibility": 0.1493886262178421
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.5129837393760681,
+                                    "y": 0.3307872414588928,
+                                    "z": -0.31319183111190796,
+                                    "visibility": 0.9216904044151306
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.5302724242210388,
+                                    "y": 0.45952001214027405,
+                                    "z": 0.12427359074354172,
+                                    "visibility": 0.9975824356079102
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.5109807848930359,
+                                    "y": 0.44495508074760437,
+                                    "z": -0.12429782003164291,
+                                    "visibility": 0.999255895614624
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5200691819190979,
+                                    "y": 0.6704328060150146,
+                                    "z": 0.1026589497923851,
+                                    "visibility": 0.7517688870429993
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.5429063439369202,
+                                    "y": 0.6493346691131592,
+                                    "z": -0.20861364901065826,
+                                    "visibility": 0.9927050471305847
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5051690936088562,
+                                    "y": 0.8846198916435242,
+                                    "z": 0.14529657363891602,
+                                    "visibility": 0.8885605335235596
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.43265315890312195,
+                                    "y": 0.6415745615959167,
+                                    "z": -0.03477717563509941,
+                                    "visibility": 0.9820762872695923
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.4894881844520569,
+                                    "y": 0.9213165044784546,
+                                    "z": 0.14451225101947784,
+                                    "visibility": 0.8543975353240967
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.4147564172744751,
+                                    "y": 0.6218490600585938,
+                                    "z": -0.016488824039697647,
+                                    "visibility": 0.9227540493011475
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.557686448097229,
+                                    "y": 0.9286203980445862,
+                                    "z": 0.09146727621555328,
+                                    "visibility": 0.9243335127830505
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.4164174497127533,
+                                    "y": 0.7031407952308655,
+                                    "z": -0.029323924332857132,
+                                    "visibility": 0.9748445749282837
+                                }
+                            ]
+                        },
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.5650991797447205,
+                                    "y": 0.11845030635595322,
+                                    "z": -0.03794417157769203,
+                                    "visibility": 0.9998922944068909
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5676466822624207,
+                                    "y": 0.10579755902290344,
+                                    "z": -0.014452912844717503,
+                                    "visibility": 0.9997746348381042
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.5690388083457947,
+                                    "y": 0.10707342624664307,
+                                    "z": -0.014563239179551601,
+                                    "visibility": 0.9996849894523621
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.570634663105011,
+                                    "y": 0.10828746110200882,
+                                    "z": -0.01469825766980648,
+                                    "visibility": 0.9996519684791565
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.5609070658683777,
+                                    "y": 0.10023312270641327,
+                                    "z": -0.03945029899477959,
+                                    "visibility": 0.9998608827590942
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5573936700820923,
+                                    "y": 0.09800122678279877,
+                                    "z": -0.03949134424328804,
+                                    "visibility": 0.9998689889907837
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.5538228154182434,
+                                    "y": 0.09576249867677689,
+                                    "z": -0.0394878014922142,
+                                    "visibility": 0.9998912811279297
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5665158629417419,
+                                    "y": 0.11399908363819122,
+                                    "z": 0.10754138976335526,
+                                    "visibility": 0.9988017082214355
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5436941385269165,
+                                    "y": 0.09959337115287781,
+                                    "z": -0.021208425983786583,
+                                    "visibility": 0.9999372363090515
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5635766983032227,
+                                    "y": 0.1384665071964264,
+                                    "z": 0.00911883357912302,
+                                    "visibility": 0.9992350339889526
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.5553126931190491,
+                                    "y": 0.131754532456398,
+                                    "z": -0.025718344375491142,
+                                    "visibility": 0.9997900128364563
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.5445275902748108,
+                                    "y": 0.20146122574806213,
+                                    "z": 0.24000218510627747,
+                                    "visibility": 0.9979035258293152
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.5119019746780396,
+                                    "y": 0.16478829085826874,
+                                    "z": -0.09461454302072525,
+                                    "visibility": 0.9999840259552002
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.5245822668075562,
+                                    "y": 0.313654363155365,
+                                    "z": 0.32120031118392944,
+                                    "visibility": 0.08199649304151535
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.4527924656867981,
+                                    "y": 0.21294787526130676,
+                                    "z": -0.2220328003168106,
+                                    "visibility": 0.9974586367607117
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.5340796113014221,
+                                    "y": 0.40899166464805603,
+                                    "z": 0.2821977734565735,
+                                    "visibility": 0.11645074188709259
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.4991616904735565,
+                                    "y": 0.30779197812080383,
+                                    "z": -0.32566124200820923,
+                                    "visibility": 0.9745702147483826
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.5394981503486633,
+                                    "y": 0.4343058466911316,
+                                    "z": 0.28457221388816833,
+                                    "visibility": 0.12893521785736084
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.5049411654472351,
+                                    "y": 0.34525468945503235,
+                                    "z": -0.36038053035736084,
+                                    "visibility": 0.9460511803627014
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.54200679063797,
+                                    "y": 0.4296768009662628,
+                                    "z": 0.25120508670806885,
+                                    "visibility": 0.13204242289066315
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.5138334035873413,
+                                    "y": 0.3431549370288849,
+                                    "z": -0.33693477511405945,
+                                    "visibility": 0.9423071146011353
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.5405579805374146,
+                                    "y": 0.4130725860595703,
+                                    "z": 0.2656424939632416,
+                                    "visibility": 0.13417170941829681
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.514378547668457,
+                                    "y": 0.33336377143859863,
+                                    "z": -0.3153500556945801,
+                                    "visibility": 0.9262396097183228
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.5350317358970642,
+                                    "y": 0.4599000811576843,
+                                    "z": 0.12385816872119904,
+                                    "visibility": 0.9979093670845032
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.5130780935287476,
+                                    "y": 0.4455885589122772,
+                                    "z": -0.12389110773801804,
+                                    "visibility": 0.9993075728416443
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5267726182937622,
+                                    "y": 0.6704990267753601,
+                                    "z": 0.07291292399168015,
+                                    "visibility": 0.7425334453582764
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.539140522480011,
+                                    "y": 0.6587074398994446,
+                                    "z": -0.21311958134174347,
+                                    "visibility": 0.9931938648223877
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5091988444328308,
+                                    "y": 0.884628176689148,
+                                    "z": 0.12358953058719635,
+                                    "visibility": 0.8918185830116272
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.430632084608078,
+                                    "y": 0.8169668912887573,
+                                    "z": -0.17062975466251373,
+                                    "visibility": 0.9834597706794739
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.4946677088737488,
+                                    "y": 0.9219058752059937,
+                                    "z": 0.12315212190151215,
+                                    "visibility": 0.8564992547035217
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.4071089029312134,
+                                    "y": 0.8268385529518127,
+                                    "z": -0.16848629713058472,
+                                    "visibility": 0.9294551610946655
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.5586118698120117,
+                                    "y": 0.9307418465614319,
+                                    "z": 0.062496379017829895,
+                                    "visibility": 0.9259018301963806
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.45064428448677063,
+                                    "y": 0.9305372834205627,
+                                    "z": -0.2574217617511749,
+                                    "visibility": 0.9769384264945984
+                                }
+                            ]
+                        },
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.5665795207023621,
+                                    "y": 0.12078461796045303,
+                                    "z": -0.02571604773402214,
+                                    "visibility": 0.9998930096626282
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5695264339447021,
+                                    "y": 0.10795442759990692,
+                                    "z": -0.0023683973122388124,
+                                    "visibility": 0.9997801184654236
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.5709061026573181,
+                                    "y": 0.10928130894899368,
+                                    "z": -0.0023881925735622644,
+                                    "visibility": 0.9996915459632874
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.5723745822906494,
+                                    "y": 0.11067797243595123,
+                                    "z": -0.0023711505346000195,
+                                    "visibility": 0.9996606707572937
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.5622720122337341,
+                                    "y": 0.10211177170276642,
+                                    "z": -0.033220548182725906,
+                                    "visibility": 0.9998658895492554
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5586972832679749,
+                                    "y": 0.09953203052282333,
+                                    "z": -0.03325672447681427,
+                                    "visibility": 0.9998740553855896
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.554885745048523,
+                                    "y": 0.09696640074253082,
+                                    "z": -0.03330973908305168,
+                                    "visibility": 0.9998965263366699
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5678769946098328,
+                                    "y": 0.11652639508247375,
+                                    "z": 0.11498748511075974,
+                                    "visibility": 0.9988144040107727
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5450088977813721,
+                                    "y": 0.10079124569892883,
+                                    "z": -0.025532234460115433,
+                                    "visibility": 0.9999355673789978
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5647374987602234,
+                                    "y": 0.1406411975622177,
+                                    "z": 0.02093484066426754,
+                                    "visibility": 0.999212920665741
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.5562957525253296,
+                                    "y": 0.13350370526313782,
+                                    "z": -0.02028130181133747,
+                                    "visibility": 0.9997830986976624
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.5450325608253479,
+                                    "y": 0.2038370817899704,
+                                    "z": 0.24205417931079865,
+                                    "visibility": 0.997437059879303
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.5139160752296448,
+                                    "y": 0.16955530643463135,
+                                    "z": -0.09565935283899307,
+                                    "visibility": 0.9999827742576599
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.5188867449760437,
+                                    "y": 0.31517818570137024,
+                                    "z": 0.3068663775920868,
+                                    "visibility": 0.07003720104694366
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.45261436700820923,
+                                    "y": 0.2132655680179596,
+                                    "z": -0.22251279652118683,
+                                    "visibility": 0.9969709515571594
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.5315572619438171,
+                                    "y": 0.4041995108127594,
+                                    "z": 0.2335059940814972,
+                                    "visibility": 0.10429146140813828
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.5002568364143372,
+                                    "y": 0.30691230297088623,
+                                    "z": -0.3293876349925995,
+                                    "visibility": 0.9744349122047424
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.5383737683296204,
+                                    "y": 0.4289800524711609,
+                                    "z": 0.23368358612060547,
+                                    "visibility": 0.11856179684400558
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.5062609314918518,
+                                    "y": 0.3459230363368988,
+                                    "z": -0.36270058155059814,
+                                    "visibility": 0.946597695350647
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.5434948801994324,
+                                    "y": 0.4176136553287506,
+                                    "z": 0.2029438018798828,
+                                    "visibility": 0.12186795473098755
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.5151612758636475,
+                                    "y": 0.34365102648735046,
+                                    "z": -0.3386410176753998,
+                                    "visibility": 0.9428647756576538
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.5418189764022827,
+                                    "y": 0.4121468961238861,
+                                    "z": 0.2169976532459259,
+                                    "visibility": 0.12364988029003143
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.5155100226402283,
+                                    "y": 0.33354678750038147,
+                                    "z": -0.31874048709869385,
+                                    "visibility": 0.9251587986946106
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.5343254208564758,
+                                    "y": 0.46127256751060486,
+                                    "z": 0.11875737458467484,
+                                    "visibility": 0.9967224597930908
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.5150229334831238,
+                                    "y": 0.45069727301597595,
+                                    "z": -0.11882266402244568,
+                                    "visibility": 0.9991502165794373
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5219255089759827,
+                                    "y": 0.6664338707923889,
+                                    "z": 0.12557215988636017,
+                                    "visibility": 0.7060062289237976
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.5165876746177673,
+                                    "y": 0.6697673797607422,
+                                    "z": -0.21839548647403717,
+                                    "visibility": 0.9917736053466797
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5066816210746765,
+                                    "y": 0.8710821866989136,
+                                    "z": 0.18767894804477692,
+                                    "visibility": 0.858163058757782
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.4754924476146698,
+                                    "y": 0.9019125699996948,
+                                    "z": -0.25649088621139526,
+                                    "visibility": 0.9838114380836487
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.4946872293949127,
+                                    "y": 0.8956214785575867,
+                                    "z": 0.1876518726348877,
+                                    "visibility": 0.8208258748054504
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.45836183428764343,
+                                    "y": 0.9386103749275208,
+                                    "z": -0.26566892862319946,
+                                    "visibility": 0.9307748079299927
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.5567398071289062,
+                                    "y": 0.928285539150238,
+                                    "z": 0.12720991671085358,
+                                    "visibility": 0.9100996851921082
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.5378862023353577,
+                                    "y": 0.9618813991546631,
+                                    "z": -0.37866634130477905,
+                                    "visibility": 0.977942943572998
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "exercise_detail": {
+                "id": "1",
+                "rep_keypoints": [
+                    "right_hip",
+                    "right_knee",
+                    "right_ankle"
+                ],
+                "rep_tracking": {
+                    "tracking_type": "ANGLE_OF_THREE_POINTS",
+                    "keypoints": [
+                        "right_hip",
+                        "right_knee",
+                        "right_ankle"
+                    ],
+                    "symmetric": false,
+                    "dimensionality": "2D",
+                    "goal_flexion": null,
+                    "goal_extension": 160,
+                    "alert_message": "Extend further!",
+                    "show_alert_if_above": null,
+                    "show_alert_if_below": null
+                },
+                "start_angle": 90,
+                "min_rep_time": 1.5,
+                "threshold_flexion": 100,
+                "threshold_extension": 130,
+                "display_name": "Leg Extension",
+                "start_in_flexion": true,
+                "body_alignment": "side",
+                "default_tracking_details": [
+                    {
+                        "tracking_type": "ANGLE_OF_THREE_POINTS",
+                        "keypoints": [
+                            "right_hip",
+                            "right_knee",
+                            "right_ankle"
+                        ],
+                        "symmetric": false,
+                        "dimensionality": "2D",
+                        "goal_flexion": null,
+                        "goal_extension": 160,
+                        "alert_message": "Extend further!",
+                        "show_alert_if_above": null,
+                        "show_alert_if_below": null
+                    }
+                ],
+                "instruction": null
+            },
+            "rep_data": [
+                {
+                    "rep_number": 1,
+                    "max_flexion": 83.70108669374848,
+                    "max_extension": 171.96574948049005,
+                    "concentric_time": 0.05591607093811035,
+                    "eccentric_time": 0.4659097194671631,
+                    "total_time": 0.5218257904052734,
+                    "goal_flexion_met": true,
+                    "goal_extension_met": true,
+                    "max_score": 1,
+                    "alerts": [
+                        "Slow down your movement"
+                    ],
+                    "poses": [
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.5669422149658203,
+                                    "y": 0.11641718447208405,
+                                    "z": -0.02545332722365856,
+                                    "visibility": 0.9999746680259705
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5694380402565002,
+                                    "y": 0.1019977480173111,
+                                    "z": -0.0013081930810585618,
+                                    "visibility": 0.9999610781669617
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.5712975859642029,
+                                    "y": 0.10360768437385559,
+                                    "z": -0.001333437510766089,
+                                    "visibility": 0.9999368786811829
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.5729841589927673,
+                                    "y": 0.10516326129436493,
+                                    "z": -0.0013266239548102021,
+                                    "visibility": 0.999931812286377
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.5612655878067017,
+                                    "y": 0.09700696170330048,
+                                    "z": -0.030547862872481346,
+                                    "visibility": 0.999979555606842
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5571790933609009,
+                                    "y": 0.09521101415157318,
+                                    "z": -0.03058472089469433,
+                                    "visibility": 0.9999791979789734
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.5527485013008118,
+                                    "y": 0.09352277219295502,
+                                    "z": -0.030659908428788185,
+                                    "visibility": 0.9999854564666748
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5673591494560242,
+                                    "y": 0.11310826241970062,
+                                    "z": 0.12159246951341629,
+                                    "visibility": 0.9997588992118835
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5405794978141785,
+                                    "y": 0.09833503514528275,
+                                    "z": -0.011628198437392712,
+                                    "visibility": 0.9999876618385315
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5656362175941467,
+                                    "y": 0.13692519068717957,
+                                    "z": 0.024063849821686745,
+                                    "visibility": 0.9998399019241333
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.5572294592857361,
+                                    "y": 0.1323269009590149,
+                                    "z": -0.014757590368390083,
+                                    "visibility": 0.9999553561210632
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.5475926995277405,
+                                    "y": 0.2031191885471344,
+                                    "z": 0.25413206219673157,
+                                    "visibility": 0.9974488615989685
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.5209742784500122,
+                                    "y": 0.16661104559898376,
+                                    "z": -0.08081620186567307,
+                                    "visibility": 0.9999921321868896
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.5211676359176636,
+                                    "y": 0.303134560585022,
+                                    "z": 0.3169253468513489,
+                                    "visibility": 0.020366830751299858
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.453610360622406,
+                                    "y": 0.2114696055650711,
+                                    "z": -0.20467916131019592,
+                                    "visibility": 0.9965247511863708
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.5312153100967407,
+                                    "y": 0.3795408606529236,
+                                    "z": 0.24803058803081512,
+                                    "visibility": 0.042505498975515366
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.5021604299545288,
+                                    "y": 0.31547367572784424,
+                                    "z": -0.32297956943511963,
+                                    "visibility": 0.9714598655700684
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.5360252261161804,
+                                    "y": 0.42042115330696106,
+                                    "z": 0.2495672106742859,
+                                    "visibility": 0.058803390711545944
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.5067889094352722,
+                                    "y": 0.3501933217048645,
+                                    "z": -0.35451215505599976,
+                                    "visibility": 0.9350550174713135
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.539322018623352,
+                                    "y": 0.4133227467536926,
+                                    "z": 0.22000211477279663,
+                                    "visibility": 0.06328384578227997
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.5153239965438843,
+                                    "y": 0.3496604859828949,
+                                    "z": -0.3364499509334564,
+                                    "visibility": 0.9271712899208069
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.5391716361045837,
+                                    "y": 0.40696707367897034,
+                                    "z": 0.2323501706123352,
+                                    "visibility": 0.0629521831870079
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.515497088432312,
+                                    "y": 0.3408149182796478,
+                                    "z": -0.31414344906806946,
+                                    "visibility": 0.8973119258880615
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.5329538583755493,
+                                    "y": 0.461250901222229,
+                                    "z": 0.11370901763439178,
+                                    "visibility": 0.995529294013977
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.5159403085708618,
+                                    "y": 0.4530496597290039,
+                                    "z": -0.11378029733896255,
+                                    "visibility": 0.9993463754653931
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5218824744224548,
+                                    "y": 0.6633769273757935,
+                                    "z": 0.1068345457315445,
+                                    "visibility": 0.4124987721443176
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.5132712125778198,
+                                    "y": 0.6708940863609314,
+                                    "z": -0.220140278339386,
+                                    "visibility": 0.9811431765556335
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5050657391548157,
+                                    "y": 0.8687535524368286,
+                                    "z": 0.15358439087867737,
+                                    "visibility": 0.6626307964324951
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.4909892678260803,
+                                    "y": 0.9036852717399597,
+                                    "z": -0.2768680453300476,
+                                    "visibility": 0.9878369569778442
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.49214547872543335,
+                                    "y": 0.9019085168838501,
+                                    "z": 0.1520513892173767,
+                                    "visibility": 0.5925631523132324
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.4787745773792267,
+                                    "y": 0.9393513202667236,
+                                    "z": -0.2880755066871643,
+                                    "visibility": 0.9608027935028076
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.56220543384552,
+                                    "y": 0.9187971949577332,
+                                    "z": 0.08812624961137772,
+                                    "visibility": 0.8550046682357788
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.5521904826164246,
+                                    "y": 0.9595196843147278,
+                                    "z": -0.40510833263397217,
+                                    "visibility": 0.9870291352272034
+                                }
+                            ]
+                        },
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.566639244556427,
+                                    "y": 0.11642910540103912,
+                                    "z": -0.028153492137789726,
+                                    "visibility": 0.999962329864502
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5688029527664185,
+                                    "y": 0.1020004004240036,
+                                    "z": -0.004661031067371368,
+                                    "visibility": 0.9999396204948425
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.5705324411392212,
+                                    "y": 0.10359761118888855,
+                                    "z": -0.004674150608479977,
+                                    "visibility": 0.9999061226844788
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.5721177458763123,
+                                    "y": 0.10511818528175354,
+                                    "z": -0.004651910625398159,
+                                    "visibility": 0.9999004602432251
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.5607926249504089,
+                                    "y": 0.09699854254722595,
+                                    "z": -0.03636622801423073,
+                                    "visibility": 0.9999674558639526
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5568946599960327,
+                                    "y": 0.0952143743634224,
+                                    "z": -0.03640791028738022,
+                                    "visibility": 0.9999675154685974
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.5526008605957031,
+                                    "y": 0.09359945356845856,
+                                    "z": -0.036479510366916656,
+                                    "visibility": 0.9999768733978271
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5658081769943237,
+                                    "y": 0.11268565058708191,
+                                    "z": 0.11422501504421234,
+                                    "visibility": 0.9996518492698669
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5406538844108582,
+                                    "y": 0.09878381341695786,
+                                    "z": -0.028992274776101112,
+                                    "visibility": 0.9999799132347107
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5649567246437073,
+                                    "y": 0.13698239624500275,
+                                    "z": 0.019680505618453026,
+                                    "visibility": 0.9997584819793701
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.5568285584449768,
+                                    "y": 0.13228118419647217,
+                                    "z": -0.0223238542675972,
+                                    "visibility": 0.9999316334724426
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.5461550354957581,
+                                    "y": 0.20386581122875214,
+                                    "z": 0.2455969601869583,
+                                    "visibility": 0.9971252083778381
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.5195843577384949,
+                                    "y": 0.16451694071292877,
+                                    "z": -0.09873564541339874,
+                                    "visibility": 0.9999902248382568
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.5167873501777649,
+                                    "y": 0.28876635432243347,
+                                    "z": 0.3136240243911743,
+                                    "visibility": 0.020722486078739166
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.4526025652885437,
+                                    "y": 0.2104402780532837,
+                                    "z": -0.22044247388839722,
+                                    "visibility": 0.9963261485099792
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.5308671593666077,
+                                    "y": 0.38031524419784546,
+                                    "z": 0.24955078959465027,
+                                    "visibility": 0.04183882102370262
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.5016884207725525,
+                                    "y": 0.31214115023612976,
+                                    "z": -0.3312252163887024,
+                                    "visibility": 0.9721122980117798
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.535444438457489,
+                                    "y": 0.41629743576049805,
+                                    "z": 0.25135859847068787,
+                                    "visibility": 0.05817362293601036
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.5068212747573853,
+                                    "y": 0.34954652190208435,
+                                    "z": -0.36359766125679016,
+                                    "visibility": 0.9376437067985535
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.5395581126213074,
+                                    "y": 0.411440908908844,
+                                    "z": 0.221252903342247,
+                                    "visibility": 0.06245110556483269
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.5153158903121948,
+                                    "y": 0.3482098877429962,
+                                    "z": -0.34148868918418884,
+                                    "visibility": 0.9303730726242065
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.5385428667068481,
+                                    "y": 0.40469086170196533,
+                                    "z": 0.23357583582401276,
+                                    "visibility": 0.06249851733446121
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.5154744386672974,
+                                    "y": 0.3391740918159485,
+                                    "z": -0.3210732340812683,
+                                    "visibility": 0.901419460773468
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.532885730266571,
+                                    "y": 0.46143147349357605,
+                                    "z": 0.11377833038568497,
+                                    "visibility": 0.9948225021362305
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.5165473222732544,
+                                    "y": 0.4531116485595703,
+                                    "z": -0.11384992301464081,
+                                    "visibility": 0.999226450920105
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5211988687515259,
+                                    "y": 0.6638166904449463,
+                                    "z": 0.11986485123634338,
+                                    "visibility": 0.42418527603149414
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.5132201910018921,
+                                    "y": 0.6703891158103943,
+                                    "z": -0.20899933576583862,
+                                    "visibility": 0.9812048077583313
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5067684650421143,
+                                    "y": 0.8701182007789612,
+                                    "z": 0.17471005022525787,
+                                    "visibility": 0.6588158011436462
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.4910270571708679,
+                                    "y": 0.9038160443305969,
+                                    "z": -0.24300307035446167,
+                                    "visibility": 0.9870410561561584
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.49343758821487427,
+                                    "y": 0.9002790451049805,
+                                    "z": 0.17407003045082092,
+                                    "visibility": 0.5894056558609009
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.47867125272750854,
+                                    "y": 0.9394723176956177,
+                                    "z": -0.25021252036094666,
+                                    "visibility": 0.9580079317092896
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.561670184135437,
+                                    "y": 0.9201280474662781,
+                                    "z": 0.11245348304510117,
+                                    "visibility": 0.8480035066604614
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.5520384907722473,
+                                    "y": 0.9581187963485718,
+                                    "z": -0.36781150102615356,
+                                    "visibility": 0.9860875010490417
+                                }
+                            ]
+                        },
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.5663852691650391,
+                                    "y": 0.11652886122465134,
+                                    "z": -0.08854023367166519,
+                                    "visibility": 0.9999328851699829
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5681464076042175,
+                                    "y": 0.10211117565631866,
+                                    "z": -0.06354258209466934,
+                                    "visibility": 0.9998847246170044
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.569776177406311,
+                                    "y": 0.10364541411399841,
+                                    "z": -0.06354586780071259,
+                                    "visibility": 0.9998289346694946
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.5712614059448242,
+                                    "y": 0.10501762479543686,
+                                    "z": -0.06354396045207977,
+                                    "visibility": 0.9998197555541992
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.5603421330451965,
+                                    "y": 0.09707504510879517,
+                                    "z": -0.09452828764915466,
+                                    "visibility": 0.9999363422393799
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5564715266227722,
+                                    "y": 0.09528327733278275,
+                                    "z": -0.09456248581409454,
+                                    "visibility": 0.9999381303787231
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.5522632598876953,
+                                    "y": 0.0937318205833435,
+                                    "z": -0.09459211677312851,
+                                    "visibility": 0.9999538064002991
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5640251040458679,
+                                    "y": 0.11212828010320663,
+                                    "z": 0.06795968860387802,
+                                    "visibility": 0.9993602633476257
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5403658151626587,
+                                    "y": 0.09906987100839615,
+                                    "z": -0.07284006476402283,
+                                    "visibility": 0.9999600648880005
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5644779801368713,
+                                    "y": 0.13712461292743683,
+                                    "z": -0.036492202430963516,
+                                    "visibility": 0.9995474219322205
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.5564515590667725,
+                                    "y": 0.1323442906141281,
+                                    "z": -0.07777386158704758,
+                                    "visibility": 0.9998756051063538
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.545212984085083,
+                                    "y": 0.20424385368824005,
+                                    "z": 0.2168692797422409,
+                                    "visibility": 0.9967576861381531
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.5170758962631226,
+                                    "y": 0.1649564504623413,
+                                    "z": -0.1342584788799286,
+                                    "visibility": 0.999986469745636
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.515086829662323,
+                                    "y": 0.2920478284358978,
+                                    "z": 0.3034343719482422,
+                                    "visibility": 0.02019861526787281
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.45188552141189575,
+                                    "y": 0.21147754788398743,
+                                    "z": -0.251915842294693,
+                                    "visibility": 0.9962034225463867
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.5308266878128052,
+                                    "y": 0.3828429877758026,
+                                    "z": 0.2500447928905487,
+                                    "visibility": 0.03990905359387398
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.50167316198349,
+                                    "y": 0.3121512234210968,
+                                    "z": -0.3458685576915741,
+                                    "visibility": 0.972143828868866
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.5351985692977905,
+                                    "y": 0.41201943159103394,
+                                    "z": 0.2506825029850006,
+                                    "visibility": 0.05546080321073532
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.5069621205329895,
+                                    "y": 0.349477618932724,
+                                    "z": -0.3805173635482788,
+                                    "visibility": 0.938692033290863
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.5395326614379883,
+                                    "y": 0.4101473093032837,
+                                    "z": 0.21751588582992554,
+                                    "visibility": 0.05946538597345352
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.5156176090240479,
+                                    "y": 0.3472270369529724,
+                                    "z": -0.3586425483226776,
+                                    "visibility": 0.9319931864738464
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.5382036566734314,
+                                    "y": 0.40209218859672546,
+                                    "z": 0.23286232352256775,
+                                    "visibility": 0.05993686988949776
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.5157212018966675,
+                                    "y": 0.3380691111087799,
+                                    "z": -0.3360843062400818,
+                                    "visibility": 0.9032627940177917
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.5342700481414795,
+                                    "y": 0.4614298641681671,
+                                    "z": 0.11859467625617981,
+                                    "visibility": 0.9940714836120605
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.5158273577690125,
+                                    "y": 0.4528929889202118,
+                                    "z": -0.11866660416126251,
+                                    "visibility": 0.9990624189376831
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5298599600791931,
+                                    "y": 0.663562536239624,
+                                    "z": 0.07786043733358383,
+                                    "visibility": 0.45144397020339966
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.5202720761299133,
+                                    "y": 0.6690474152565002,
+                                    "z": -0.21758593618869781,
+                                    "visibility": 0.9821943640708923
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5072027444839478,
+                                    "y": 0.8663424849510193,
+                                    "z": 0.14765405654907227,
+                                    "visibility": 0.6731663346290588
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.4571523070335388,
+                                    "y": 0.8597531914710999,
+                                    "z": -0.1789962500333786,
+                                    "visibility": 0.987065851688385
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.4961255192756653,
+                                    "y": 0.891284704208374,
+                                    "z": 0.14808566868305206,
+                                    "visibility": 0.6077216267585754
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.43179675936698914,
+                                    "y": 0.875796914100647,
+                                    "z": -0.1782403141260147,
+                                    "visibility": 0.9549475312232971
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.559359610080719,
+                                    "y": 0.926127016544342,
+                                    "z": 0.07506122440099716,
+                                    "visibility": 0.8484687209129333
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.4908291697502136,
+                                    "y": 0.9497631192207336,
+                                    "z": -0.2772800028324127,
+                                    "visibility": 0.9859275817871094
+                                }
+                            ]
+                        },
+                        {
+                            "landmarks": [
+                                {
+                                    "landmark_index": 0,
+                                    "x": 0.5636267066001892,
+                                    "y": 0.11539231240749359,
+                                    "z": -0.07835206389427185,
+                                    "visibility": 0.9999399185180664
+                                },
+                                {
+                                    "landmark_index": 1,
+                                    "x": 0.5658762454986572,
+                                    "y": 0.10103558003902435,
+                                    "z": -0.05190999060869217,
+                                    "visibility": 0.9998909831047058
+                                },
+                                {
+                                    "landmark_index": 2,
+                                    "x": 0.5678272247314453,
+                                    "y": 0.10247911512851715,
+                                    "z": -0.05193854868412018,
+                                    "visibility": 0.9998382925987244
+                                },
+                                {
+                                    "landmark_index": 3,
+                                    "x": 0.5696975588798523,
+                                    "y": 0.10379622131586075,
+                                    "z": -0.05197734758257866,
+                                    "visibility": 0.9998298287391663
+                                },
+                                {
+                                    "landmark_index": 4,
+                                    "x": 0.5573093295097351,
+                                    "y": 0.09628159552812576,
+                                    "z": -0.08049824088811874,
+                                    "visibility": 0.9999401569366455
+                                },
+                                {
+                                    "landmark_index": 5,
+                                    "x": 0.5533615350723267,
+                                    "y": 0.09487979114055634,
+                                    "z": -0.08053180575370789,
+                                    "visibility": 0.9999424815177917
+                                },
+                                {
+                                    "landmark_index": 6,
+                                    "x": 0.5490438342094421,
+                                    "y": 0.09351471066474915,
+                                    "z": -0.08057285845279694,
+                                    "visibility": 0.9999563694000244
+                                },
+                                {
+                                    "landmark_index": 7,
+                                    "x": 0.5632390975952148,
+                                    "y": 0.11103031039237976,
+                                    "z": 0.07004237174987793,
+                                    "visibility": 0.9993751645088196
+                                },
+                                {
+                                    "landmark_index": 8,
+                                    "x": 0.5375359654426575,
+                                    "y": 0.09907592833042145,
+                                    "z": -0.03984731063246727,
+                                    "visibility": 0.9999645948410034
+                                },
+                                {
+                                    "landmark_index": 9,
+                                    "x": 0.5623934864997864,
+                                    "y": 0.1360953152179718,
+                                    "z": -0.0249966848641634,
+                                    "visibility": 0.9995343685150146
+                                },
+                                {
+                                    "landmark_index": 10,
+                                    "x": 0.553550660610199,
+                                    "y": 0.13168944418430328,
+                                    "z": -0.06387297064065933,
+                                    "visibility": 0.9998738169670105
+                                },
+                                {
+                                    "landmark_index": 11,
+                                    "x": 0.5451303720474243,
+                                    "y": 0.20365683734416962,
+                                    "z": 0.23968686163425446,
+                                    "visibility": 0.997136116027832
+                                },
+                                {
+                                    "landmark_index": 12,
+                                    "x": 0.5148851871490479,
+                                    "y": 0.16515912115573883,
+                                    "z": -0.10404538363218307,
+                                    "visibility": 0.9999866485595703
+                                },
+                                {
+                                    "landmark_index": 13,
+                                    "x": 0.522452712059021,
+                                    "y": 0.30187371373176575,
+                                    "z": 0.3368567228317261,
+                                    "visibility": 0.018512500450015068
+                                },
+                                {
+                                    "landmark_index": 14,
+                                    "x": 0.4514116048812866,
+                                    "y": 0.21313855051994324,
+                                    "z": -0.22003546357154846,
+                                    "visibility": 0.9965161681175232
+                                },
+                                {
+                                    "landmark_index": 15,
+                                    "x": 0.5329398512840271,
+                                    "y": 0.3901404142379761,
+                                    "z": 0.30962398648262024,
+                                    "visibility": 0.03874871879816055
+                                },
+                                {
+                                    "landmark_index": 16,
+                                    "x": 0.5018494129180908,
+                                    "y": 0.3128284215927124,
+                                    "z": -0.3250299096107483,
+                                    "visibility": 0.973420262336731
+                                },
+                                {
+                                    "landmark_index": 17,
+                                    "x": 0.5352790951728821,
+                                    "y": 0.4187280535697937,
+                                    "z": 0.31579968333244324,
+                                    "visibility": 0.05372690036892891
+                                },
+                                {
+                                    "landmark_index": 18,
+                                    "x": 0.5073684453964233,
+                                    "y": 0.3507932126522064,
+                                    "z": -0.3619810938835144,
+                                    "visibility": 0.9417225122451782
+                                },
+                                {
+                                    "landmark_index": 19,
+                                    "x": 0.5398328304290771,
+                                    "y": 0.42118582129478455,
+                                    "z": 0.2808718979358673,
+                                    "visibility": 0.0574333555996418
+                                },
+                                {
+                                    "landmark_index": 20,
+                                    "x": 0.516456663608551,
+                                    "y": 0.3486252725124359,
+                                    "z": -0.3375462293624878,
+                                    "visibility": 0.9355599284172058
+                                },
+                                {
+                                    "landmark_index": 21,
+                                    "x": 0.5380452275276184,
+                                    "y": 0.41227126121520996,
+                                    "z": 0.29296907782554626,
+                                    "visibility": 0.05837448686361313
+                                },
+                                {
+                                    "landmark_index": 22,
+                                    "x": 0.5164578557014465,
+                                    "y": 0.3388374149799347,
+                                    "z": -0.31408458948135376,
+                                    "visibility": 0.9089064002037048
+                                },
+                                {
+                                    "landmark_index": 23,
+                                    "x": 0.5331417322158813,
+                                    "y": 0.4619199335575104,
+                                    "z": 0.12651993334293365,
+                                    "visibility": 0.9951103925704956
+                                },
+                                {
+                                    "landmark_index": 24,
+                                    "x": 0.5142676830291748,
+                                    "y": 0.45069965720176697,
+                                    "z": -0.12654408812522888,
+                                    "visibility": 0.9991523027420044
+                                },
+                                {
+                                    "landmark_index": 25,
+                                    "x": 0.5272064208984375,
+                                    "y": 0.6711308360099792,
+                                    "z": 0.06929518282413483,
+                                    "visibility": 0.5048685073852539
+                                },
+                                {
+                                    "landmark_index": 26,
+                                    "x": 0.5428674817085266,
+                                    "y": 0.6606831550598145,
+                                    "z": -0.19644266366958618,
+                                    "visibility": 0.9848819375038147
+                                },
+                                {
+                                    "landmark_index": 27,
+                                    "x": 0.5073456168174744,
+                                    "y": 0.8904728293418884,
+                                    "z": 0.12822891771793365,
+                                    "visibility": 0.7239047884941101
+                                },
+                                {
+                                    "landmark_index": 28,
+                                    "x": 0.42933279275894165,
+                                    "y": 0.6865836381912231,
+                                    "z": -0.047756489366292953,
+                                    "visibility": 0.9878761172294617
+                                },
+                                {
+                                    "landmark_index": 29,
+                                    "x": 0.49321186542510986,
+                                    "y": 0.9257006645202637,
+                                    "z": 0.12752264738082886,
+                                    "visibility": 0.6628050804138184
+                                },
+                                {
+                                    "landmark_index": 30,
+                                    "x": 0.40856361389160156,
+                                    "y": 0.6644411087036133,
+                                    "z": -0.030470745638012886,
+                                    "visibility": 0.9559338688850403
+                                },
+                                {
+                                    "landmark_index": 31,
+                                    "x": 0.5618579387664795,
+                                    "y": 0.935265839099884,
+                                    "z": 0.051258694380521774,
+                                    "visibility": 0.8682612776756287
+                                },
+                                {
+                                    "landmark_index": 32,
+                                    "x": 0.4239467680454254,
+                                    "y": 0.8074644804000854,
+                                    "z": -0.053721822798252106,
+                                    "visibility": 0.9863320589065552
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
