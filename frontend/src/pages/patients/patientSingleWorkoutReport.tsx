@@ -16,7 +16,7 @@ const PatientSingleWorkoutReport: React.FC = () => {
     // const routineDataReturn = useTestRoutineData(); // TODO: Fetch report with id = reportID
     // const uploadRoutineData = useAddRoutineData();
 
-    const { data: routineDataReturn } = useGetRoutineDataById(reportId ?? "");
+    const { data: routineDataReturn, isLoading: routineDataLoading } = useGetRoutineDataById(reportId ?? "");
     const { data: patientData, isLoading: patientLoading } = useGetPatientById(patientId ?? "");
 
     const [patient, setPatient] = useState<Patient>(BLANK_PATIENT);
@@ -59,7 +59,7 @@ const PatientSingleWorkoutReport: React.FC = () => {
 
     return (
         <>
-            {patientLoading && <Loader />}
+            {(patientLoading || routineDataLoading) && <Loader />}
             <div className="h-auto bg-white pb-20 px-10">
                 <div className="text-xl font-base text-black pb-2">
                     {getPatientName(patient)}
@@ -102,7 +102,7 @@ const PatientSingleWorkoutReport: React.FC = () => {
                                             className={`rounded-full p-2 font-semibold text-white text-base cursor-pointer w-10 h-10 text-center ${repData == selectedRep ? "bg-primary-darkblue" : "bg-secondary-darkpink"}`}
                                             onClick={() => { onClickRep(repData, componentData) }}
                                         >
-                                            {getRepScore(repData, componentData.exercise_detail) * 100}
+                                            {(getRepScore(repData, componentData.exercise_detail) * 100).toFixed(0)}
                                         </div>
                                     ))}
                                 </div>

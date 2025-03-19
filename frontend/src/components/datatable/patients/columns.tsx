@@ -11,7 +11,7 @@ import {
     // DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "../../dropdown/dropdown"
-import { ADDEDIT_PATIENTS_PATH, PATIENTS_PATH } from "../../../routes";
+import { ADDEDIT_PATIENTS_PATH, PATIENT_REPORT_PATH, PATIENTS_PATH } from "../../../routes";
 import { useNavigate } from "react-router-dom";
 import { RoutineConfig } from "../../../interfaces/exercisePlan.interface";
 import { getPatientAge, getPatientName } from "../../../common/utils";
@@ -25,13 +25,18 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
         header: () => (
             <div className="w-full cursor-default">Name</div>
         ),
-        cell: ({ cell }) => (
-            <div
-                className={`rounded-md py-1`}
-            >
-                {`${cell.getValue()}`}
-            </div>
-        ),
+        cell: ({ row }) => {
+            const patient = row.original
+            const navigate = useNavigate();
+            return (
+                <div
+                    className={`rounded-md py-1 text-blue-700 underline cursor-pointer`}
+                    onClick={() => { navigate(PATIENT_REPORT_PATH.replace(":id", patient.id)) }}
+                >
+                    {`${getPatientName(patient)}`}
+                </div>
+            )
+        },
     },
     {
         id: "age",

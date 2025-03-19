@@ -163,7 +163,7 @@ export const useAddRoutineData = () => {
                 routineConfig_id: routineData.routine_config.id, // Map routineConfig to its ID
                 routine_component_data: routineData.routine_component_data.map((componentData) => ({
                     // exercise_detail: componentData.exercise_detail.id, // Map ExerciseDetail to its ID
-                    exercise_detail: "1", // Map ExerciseDetail to its ID
+                    exercise_detail_id: "1", // Map ExerciseDetail to its ID
                     rep_data: componentData.rep_data.map((repData) => ({
                         ...repData,
                         poses: repData.poses
@@ -199,7 +199,7 @@ export const useGetRoutineData = () => {
 
 export const useGetRoutineDataById = (routineDataId: string) => {
     return useQuery({
-        queryKey: [QueryKeys.ROUTINE_DATA],
+        queryKey: [QueryKeys.ROUTINE_DATA, routineDataId],
         queryFn: () =>
             request.get(`/routine-data/${routineDataId}`) as Promise<RoutineData>,
         staleTime: 10000,

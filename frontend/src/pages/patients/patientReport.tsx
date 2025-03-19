@@ -20,7 +20,7 @@ const PatientReport: React.FC = () => {
 
     // const routineDataReturn = useTestRoutineData();
 
-    const { data: routineDataReturn } = useGetRoutineData();
+    const { data: routineDataReturn, isLoading: routineDataLoading } = useGetRoutineData();
     const { data: patientData, isLoading: patientLoading } = useGetPatientById(patientId ?? "");
 
     const [patient, setPatient] = useState<Patient>(BLANK_PATIENT);
@@ -52,7 +52,7 @@ const PatientReport: React.FC = () => {
 
     return (
         <>
-            {patientLoading && <Loader />}
+            {(patientLoading || routineDataLoading) && <Loader />}
             <div className="h-auto bg-white pb-20 px-8">
                 <div className="text-2xl font-semibold text-primary-darkblue pb-6">
                     {getPatientName(patient)}
@@ -148,7 +148,7 @@ const PatientReport: React.FC = () => {
                                     See All
                                 </div>
                             </div>
-                            <div className="w-full grid grid-cols-11 text-base gap-y-1 text-center">
+                            <div className="w-full grid grid-cols-11 text-base gap-y-1 text-center items-center">
                                 <div className="col-start-4 col-end-6 font-bold"># Errors</div>
                                 <div className="col-start-6 col-end-9 font-bold">% Completed</div>
                                 <div className="col-start-9 col-end-11 font-bold">Score</div>
@@ -158,8 +158,8 @@ const PatientReport: React.FC = () => {
                                     </div>
                                     <div className="col-start-4 col-end-6">{getTotalAlerts(routineData)}</div>
                                     <div className="col-start-6 col-end-9">{getPercentCompleted(routineData)}</div>
-                                    <div className="col-start-9 col-end-11">{getAverageScore(routineData).toFixed(1)}</div>
-                                    <div className="col-start-12 cursor-pointer" onClick={() => onClickReport(routineData)}> <FaChevronRight /></div>
+                                    <div className="col-start-9 col-end-11">{getAverageScore(routineData).toFixed(0)}</div>
+                                    <div className="col-start-12 cursor-pointer h-auto align-middle" onClick={() => onClickReport(routineData)}> <FaChevronRight /></div>
                                 </>))}
                             </div>
                         </div>

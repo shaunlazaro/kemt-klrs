@@ -35,6 +35,7 @@ const PoseVideo: React.FC<PoseVideoProps> = ({ posesRaw, fps = 10 }) => {
     ];
 
     useEffect(() => {
+        frameIndexRef.current = 0; // Reset frame index to prevent out-of-bounds access
         const canvas = canvasRef.current;
         if (!canvas || poses.length === 0) return;
         const ctx = canvas.getContext("2d");
