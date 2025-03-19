@@ -86,7 +86,7 @@ const PoseVideo: React.FC<PoseVideoProps> = ({ posesRaw, fps = 10 }) => {
         };
     }, [poses, fps]);
 
-    return <canvas ref={canvasRef} width={500} height={500} style={{ border: "1px solid #000" }} />;
+    return <canvas ref={canvasRef} width={1000} height={1000} className="w-3/4 aspect-square" style={{ border: "1px solid #000" }} />;
 };
 
 export default PoseVideo;
