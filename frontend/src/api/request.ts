@@ -1,8 +1,8 @@
 import axios from "axios";
 // import { useSessionStore } from "./session";
 
-// const apiBase = "http://140.238.151.117:8000/api";
-const apiBase = "http://127.0.0.1:8000/api";
+const apiBase = "http://140.238.151.117:8000/api";
+// const apiBase = "http://127.0.0.1:8000/api";
 
 const axiosInstance = axios.create({
     baseURL: apiBase,
