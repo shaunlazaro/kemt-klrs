@@ -20,7 +20,7 @@ const PatientReport: React.FC = () => {
 
     // const routineDataReturn = useTestRoutineData();
 
-    const { data: routineDataReturn } = useGetRoutineData();
+    const { data: routineDataReturn, isLoading: routineDataLoading } = useGetRoutineData();
     const { data: patientData, isLoading: patientLoading } = useGetPatientById(patientId ?? "");
 
     const [patient, setPatient] = useState<Patient>(BLANK_PATIENT);
@@ -52,7 +52,7 @@ const PatientReport: React.FC = () => {
 
     return (
         <>
-            {patientLoading && <Loader />}
+            {(patientLoading || routineDataLoading) && <Loader />}
             <div className="h-auto bg-white pb-20 px-8">
                 <div className="text-2xl font-semibold text-primary-darkblue pb-6">
                     {getPatientName(patient)}
