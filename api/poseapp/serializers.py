@@ -183,14 +183,15 @@ class RepDataSerializer(serializers.ModelSerializer):
 
 class RoutineComponentDataSerializer(serializers.ModelSerializer):
     """Serializer for RoutineComponentData with nested RepData."""
-    exercise_detail = serializers.PrimaryKeyRelatedField(
-        queryset=ExerciseDetail.objects.all()
-    )  # Reference ExerciseDetail by ID
+    exercise_detail_id = serializers.PrimaryKeyRelatedField(
+        queryset=ExerciseDetail.objects.all(), source="exercise_detail", write_only=True
+    )  # Accept ID for writes
+    exercise_detail = ExerciseDetailSerializer(read_only=True)  # Return full object on read
     rep_data = RepDataSerializer(many=True)  # Accept full RepData objects
 
     class Meta:
         model = RoutineComponentData
-        fields = '__all__'
+        fields = ['id', 'exercise_detail', 'exercise_detail_id', 'rep_data']
 
     def create(self, validated_data):
         """Custom create function for RoutineComponentData with nested RepData."""
