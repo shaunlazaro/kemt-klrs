@@ -8,10 +8,14 @@ interface PatientSingleRepPanelProps {
 }
 
 const PatientSingleRepPanel: React.FC<PatientSingleRepPanelProps> = ({ repData, componentData }: PatientSingleRepPanelProps) => {
+    const getRepFps = (repData: RepData) => {
+        // console.log(`Rep FPS: ${repData.poses.length / repData.total_time}`)
+        return Math.round(repData.poses.length / repData.total_time);
+    }
     return (<div>
         <div className="px-8 pt-2 pb-6">
             <div className="w-full flex justify-center py-8">
-                <PoseVideo posesRaw={repData.poses} />
+                <PoseVideo posesRaw={repData.poses} fps={getRepFps(repData)} />
             </div>
             <div className="font-semibold text-xl text-primary-darkblue pb-4">
                 {componentData.exercise_detail.display_name} - Rep {repData.rep_number}
