@@ -63,6 +63,11 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
     queryset = RoutineData.objects.all()
     serializer_class = RoutineDataSerializer
 
+    def get_serializer(self, *args, **kwargs):
+        """Pass request context to serializer."""
+        kwargs.setdefault('context', self.get_serializer_context())
+        return super().get_serializer(*args, **kwargs)
+
 # Kinda sloppy way to do this, since we are skipping Users + Auth for patients atm.
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
