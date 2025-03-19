@@ -119,8 +119,12 @@ class ExerciseTracker:
                 continue
             if detail.show_alert_if_above and value > detail.show_alert_if_above:
                 self.alerts.add(detail.alert_message)
-            if detail.show_alert_if_below and value < detail.show_alert_if_below:
+                self.last_rep_alerts.add(detail.alert_message)
+            elif detail.show_alert_if_below and value < detail.show_alert_if_below:
                 self.alerts.add(detail.alert_message)
+                self.last_rep_alerts.add(detail.alert_message)
+            else:
+                self.alerts.discard(detail.alert_message)
 
     def _update_progress_score(self, primary_angle, start_angle):
         """Computes a normalized rep completion score (0 to 1) based on progress from start_angle to goal."""
@@ -193,7 +197,7 @@ class ExerciseTracker:
         if self.last_concentric_time + self.last_eccentric_time < min_rep_time:
             self.alerts.add("Slow down your movement")
 
-        self.last_rep_alerts = self.alerts.copy()
+        self.last_rep_alerts.update(self.alerts)
 
         rep_entry = RepData(
             rep_number=self.rep_count,
@@ -230,3 +234,4 @@ class ExerciseTracker:
         self.last_pose_capture_time = 0
         self.max_score = 0
         self.score = 0
+        self.last_rep_alerts.clear()
