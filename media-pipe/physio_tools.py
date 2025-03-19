@@ -47,6 +47,7 @@ class ExerciseTracker:
     def __init__(self, exercise_detail):
         self.rep_count = 0
         self.state = "rest"
+        self.rep_ready = True
         self.just_completed_rep = False
         self.rep_start_time = None
         self.last_rep_duration = 0
@@ -142,8 +143,12 @@ class ExerciseTracker:
     def _update_state(self, primary_angle, current_time):
         """Handles state transitions based on detected movement."""
         if self.state == "rest":
-            if self._is_start_of_rep(primary_angle):
+            if self._is_full_rep_completed(primary_angle):
+                self.rep_ready = True 
+
+            if self.rep_ready and self._is_start_of_rep(primary_angle):
                 self._start_new_rep(current_time)
+                self.rep_ready = False
 
         elif self.state == "phase_1":
             if self._is_half_rep_completed(primary_angle):
