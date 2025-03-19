@@ -12,6 +12,7 @@ import com.google.mediapipe.tasks.components.containers.Connection
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
+import java.lang.Double.sum
 import kotlin.math.max
 import kotlin.math.min
 
@@ -51,15 +52,32 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
+        var sum_x = 0f
+        var sum_y = 0f
         results?.let { poseLandmarkerResult ->
             for(landmark in poseLandmarkerResult.landmarks()) {
-                for(normalizedLandmark in landmark.drop(23).take(6)) {
+                for(normalizedLandmark in landmark) {
 //                    canvas.drawPoint(
 //                        normalizedLandmark.x() * imageWidth * scaleFactor,
 //                        normalizedLandmark.y() * imageHeight * scaleFactor,
 //                        pointPaint
 //                    )
+
+                    sum_x += normalizedLandmark.x()
+                    sum_y += normalizedLandmark.y()
+
                 }
+                val midpoint_x = sum_x / landmark.size
+                val midpoint_y = sum_y / landmark.size
+
+                Log.d("MIDPOINT", midpoint_x.toString())
+                Log.d("MIDPOINT", midpoint_y.toString())
+
+                canvas.drawPoint(
+                        midpoint_x * imageWidth * scaleFactor,
+                        midpoint_y * imageHeight * scaleFactor,
+                        pointPaint
+                    )
 
                 val connections = setOf(Connection.create(23,25), Connection.create(24,26), Connection.create(25,27), Connection.create(26,28))
 

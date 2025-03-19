@@ -32,7 +32,7 @@ class PerfromExercises : AppCompatActivity() {
     lateinit var status: TextView
     lateinit var endWorkoutButton: Button
 
-    lateinit var routineData: RoutineDataUpload
+//    lateinit var routineData: RoutineDataUpload
 
     var isReceiverRegistered = false
 
@@ -60,7 +60,7 @@ class PerfromExercises : AppCompatActivity() {
     private var buttonPressReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "com.example.END_WORKOUT") {
-                routineData = (intent.getSerializableExtra("routineData") as RoutineDataUpload?)!!
+//                routineData = (intent.getSerializableExtra("routineData") as RoutineDataUpload?)!!
                 endWorkoutButton.performClick() // Simulate button press
             }
         }
@@ -122,7 +122,7 @@ class PerfromExercises : AppCompatActivity() {
                     intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig)
                 }
 
-                intent.putExtra("routineData", routineData)
+//                intent.putExtra("routineData", routineData)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
                 val intentClose = Intent("com.example.CLOSE_EXTERNAL_ACTIVITY")
@@ -145,13 +145,6 @@ class PerfromExercises : AppCompatActivity() {
             override fun onClick(view: View?) {
                 Log.d("NickDebug", "connect")
                 val intent = Intent("com.example.PRESS_CONNECT_BUTTON")
-                LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
-            }
-        })
-
-        startTrackingButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(view: View?) {
-                val intent = Intent("com.example.PRESS_START_BUTTON")
                 LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
             }
         })

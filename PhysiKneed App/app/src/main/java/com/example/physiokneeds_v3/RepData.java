@@ -1,8 +1,9 @@
 package com.example.physiokneeds_v3;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class RepData {
+public class RepData implements Serializable {
     private int rep_number;
     private double max_flexion;
     private double max_extension;

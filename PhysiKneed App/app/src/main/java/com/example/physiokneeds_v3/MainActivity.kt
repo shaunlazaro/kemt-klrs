@@ -8,6 +8,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -18,6 +19,7 @@ import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -35,6 +37,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.VideoView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -42,6 +45,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import coil.load
 import com.chaquo.python.Python
 import com.google.gson.Gson
 import com.google.mediapipe.framework.image.BitmapImageBuilder
@@ -59,14 +63,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.ObjectOutputStream
 import java.util.UUID
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.round
 import kotlin.properties.Delegates
 
@@ -125,6 +123,8 @@ class MainActivity : AppCompatActivity() {
 //    lateinit var handlerBT: Handler
     var arduinoBTModule: BluetoothDevice? = null
     var arduinoUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+    private var bluetoothSocket: BluetoothSocket? = null // Shared socket reference
+    var btButtonCount = 0
 
     lateinit var search_button: Button
     lateinit var bt_button: Button
@@ -140,6 +140,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var alertBox: TextView
     lateinit var repTimer: TextView
     lateinit var tipText: TextView
+    lateinit var loadingBar: ProgressBar
 
     lateinit var connectedThreadWrite: ConnectedThread
 
@@ -147,16 +148,12 @@ class MainActivity : AppCompatActivity() {
 
     var isConnected = false
 
-    var startTracking = false
-
     val COUNT_MAX = 10
     var counts = 0
 
-    var currentPos = "90,45"
+    var currentPos = "[90,45]"
 
     var isReceiverRegistered = false
-
-    var doneExercise = false
 
     // frame height and width
     var frameWidth by Delegates.notNull<Int>()
@@ -164,15 +161,12 @@ class MainActivity : AppCompatActivity() {
 
 
     // For exercise flow
-    var state = 0
+    var state = 100
     var trackUserCount = 0
     var currentExerciseIndex = 0
 
     // set which camera the app opens first (FOR DEBUGGING)
     var current_camera = 0
-
-    // For data tracking (end)
-    lateinit var routineData: RoutineData
 
     // broadcast receiver for controlling the external display
     private var buttonPressReceiver = object : BroadcastReceiver() {
@@ -185,27 +179,16 @@ class MainActivity : AppCompatActivity() {
             }
             if (intent?.action == "com.example.PRESS_CONNECT_BUTTON") {
                 bt_button.performClick() // Simulate button press
-                state = 1 // TODO remove when using mount
-            }
-            if (intent?.action == "com.example.PRESS_START_BUTTON") {
-                Log.d(TAG, "Start Tracking Called")
-                startTracking = true
-                if (isConnected) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Tracking Will Now Start",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        applicationContext,
-                        "Bluetooth Mount Not Connected Please Try Again",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+//                state = 1 // TODO remove when using mount
             }
             if (intent?.action == "com.example.CLOSE_EXTERNAL_ACTIVITY") {
-                finish()
+                state = -1
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (::connectedThreadWrite.isInitialized) {
+                        connectedThreadWrite?.write("[90,45]")
+                    }
+                    finish()
+                }, 1000)
             }
         }
     }
@@ -267,10 +250,6 @@ class MainActivity : AppCompatActivity() {
             repDataLists.add(mutableListOf<RepData>())
         }
 
-        // Routine Data
-        var routineComponentDataList = emptyList<RoutineComponentData>()
-        routineData = RoutineData(routineConfig, routineComponentDataList)
-
         // connect to bluetooth
         val bluetoothManager = getSystemService(BluetoothManager::class.java)
         val bluetoothAdapter = bluetoothManager.adapter
@@ -295,6 +274,7 @@ class MainActivity : AppCompatActivity() {
 
             // Check if Socket connected
             if (connectThread.mmSocket.isConnected) {
+                bluetoothSocket = connectThread.mmSocket
                 // The pass the Open socket as arguments to call the constructor of ConnectedThread
                 connectedThreadWrite = ConnectedThread(connectThread.mmSocket)
                 connectedThreadWrite.run()
@@ -309,13 +289,11 @@ class MainActivity : AppCompatActivity() {
         // broadcast receivers for external display control
         val searchFilter = IntentFilter("com.example.PRESS_SEARCH_BUTTON")
         val connectFilter = IntentFilter("com.example.PRESS_CONNECT_BUTTON")
-        val startFilter = IntentFilter("com.example.PRESS_START_BUTTON")
         val closeFilter = IntentFilter("com.example.CLOSE_EXTERNAL_ACTIVITY")
 
 
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, searchFilter)
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, connectFilter)
-        LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, startFilter)
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, closeFilter)
 
         isReceiverRegistered = true
@@ -323,25 +301,30 @@ class MainActivity : AppCompatActivity() {
         // connect to ESP32
         bt_button.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {
-                if (arduinoBTModule != null) {
+                if (arduinoBTModule != null && btButtonCount < 1) {
                     Log.d(TAG, "Arduino Device Found")
+                    isConnected = true
+                    btButtonCount++
+
+//                    // connecting delay
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        loadingBar.visibility = View.GONE
+                        state = 0 // start next state
+                    }, 5000)
+
+                    // For Debug without mount
+//                    Handler(Looper.getMainLooper()).postDelayed({
+//                        state = 1 // start next state
+//                    }, 10000)
+
                     // We subscribe to the observable until the onComplete() is called
                     // We also define control the thread management with
                     // subscribeOn:  the thread in which you want to execute the action
                     // observeOn: the thread in which you want to get the response
                     connectToBTObservable.observeOn(AndroidSchedulers.mainThread()).
                     subscribeOn(Schedulers.io()).
-                    subscribe({ valueRead ->
-                        // valueRead returned by the onNext() from the Observable
-                        connection_text.setText(valueRead)
-                        isConnected = true
-                        Toast.makeText(
-                            applicationContext,
-                            "BT Mount Connected",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    })
-                } else {
+                    subscribe({ valueRead -> })
+                } else if (arduinoBTModule == null) {
                     Toast.makeText(
                         applicationContext,
                         "BT Mount Could Not Connect",
@@ -408,14 +391,12 @@ class MainActivity : AppCompatActivity() {
         })
 
         send_coords.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(view: View?) {
-//                val random1 = (40..60).shuffled().last().toString()
-//                val random2 = (40..60).shuffled().last().toString()
-//                connectedThreadWrite.write(random1 + "," + random2)
-                connectedThreadWrite.write("90,45")
-                currentPos = "90,45"
-
+            override fun onClick(p0: View?) {
+                if (::connectedThreadWrite.isInitialized) {
+                    connectedThreadWrite.write("0,0")
+                }
             }
+
         })
 
         // get camera permissions from the user
@@ -447,6 +428,16 @@ class MainActivity : AppCompatActivity() {
         alertBox = findViewById(R.id.alert_box)
         repTimer = findViewById(R.id.rep_timer)
         tipText = findViewById(R.id.tips_text)
+        leftImage = findViewById(R.id.left_image)
+        loadingBar = findViewById(R.id.progressBarMain)
+
+        val videoFeed = findViewById<VideoView>(R.id.video)
+        val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.get_position_01)
+        videoFeed.setVideoURI(videoUri)
+        videoFeed.start()
+        videoFeed.setOnCompletionListener {
+            videoFeed.start()
+        }
 
         // set the camera resolution to half the width
         val screenHeight = resources.displayMetrics.heightPixels
@@ -540,16 +531,21 @@ class MainActivity : AppCompatActivity() {
 
                 // EXERCISE START
 
-                if (state == 0) {
+                if (state == 100) {
+                    titleText.text = "Connecting To Mount..."
+//                    leftText.text = "Connecting..."
+                    Log.d("EXTERNAL_UI", "Title: " + titleText.text)
+                    Log.d("EXTERNAL_UI", "Descr: " + leftText.text)
+                }
+                else if (state == 0) {
+//                    leftImage.setImageResource(R.drawable.positioned)
+                    videoFeed.visibility = View.VISIBLE
                     // update text
                     titleText.text = "Get Positioned"
-                    leftText.text = "Stand 2 m away from camera \n\n Your entire body should be visible on the screen"
+                    leftText.visibility = View.VISIBLE
+//                    leftText.text = "Stand 2 m away from camera \n\n Your entire body should be visible on the screen \n\n Your first exercise will start automatically once tracking is completed"
                     // TODO more polish for UI
-                    // switch image to bottom
-//                    val lastView = instructionsLayout.getChildAt(instructionsLayout.childCount - 1)
-//                    instructionsLayout.removeView(lastView)
-//                    instructionsLayout.addView(lastView, 0)
-                    // TODO update image
+                    // TODO update image with GIF
 
                     if (result != null && result.landmarks().size > 0 && counts > COUNT_MAX) {
                         val landmarks = result.landmarks()[0]
@@ -560,9 +556,15 @@ class MainActivity : AppCompatActivity() {
                             (visibility[kp] ?: 0f) > CONFIDENCE_THRESHOLD
                         }
 
+                        val trackingKeypoints = listOf("left_hip", "right_hip", "left_shoulder", "right_shoulder")
+
+                        val keypointVisibleForTracking = trackingKeypoints.all { kp ->
+                            (visibility[kp] ?: 0f) > CONFIDENCE_THRESHOLD
+                        }
+
                         if (keypointVisible) {
                             track_user(result, mpImage.height, mpImage.width, true)
-                        } else {
+                        } else if (keypointVisibleForTracking) {
                             track_user(result, mpImage.height, mpImage.width, false)
                             // TODO add pop up that keypoints aren't visible (light, in frame, stay still etc.)
                         }
@@ -572,14 +574,29 @@ class MainActivity : AppCompatActivity() {
                     counts += 1
                 }
                 else if (state == 1) {
-                    // switch image to top
-//                    val lastView = instructionsLayout.getChildAt(instructionsLayout.childCount - 1)
-//                    instructionsLayout.removeView(lastView)
-//                    instructionsLayout.addView(lastView, 0)
-
-                    tipText.visibility = View.VISIBLE
+//                    tipText.visibility = View.VISIBLE
+//                    tipText.text = "TIPS"
                     titleText.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
-                    leftText.text = "1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
+                    leftText.text = "TIPS \n\n1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
+                    if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Seated Leg Extension (Left)") {
+                        val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.seated_leg_extension)
+                        videoFeed.setVideoURI(videoUri)
+                        videoFeed.start()
+                        videoFeed.setOnCompletionListener {
+                            videoFeed.start()
+                        }
+                    } else if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Squat") {
+                        val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.squat_01)
+                        videoFeed.setVideoURI(videoUri)
+                        videoFeed.start()
+                        videoFeed.setOnCompletionListener {
+                            videoFeed.start()
+                        }
+                    } else {
+                        leftImage.visibility = View.VISIBLE
+                        videoFeed.visibility = View.GONE
+                        leftImage.setImageResource(R.drawable.baseline_fitness_center_24)
+                    }
                     reps_text.visibility = View.VISIBLE
                     repTimer.visibility = View.VISIBLE
 
@@ -710,8 +727,10 @@ class MainActivity : AppCompatActivity() {
                     exerciseTitle.text = "Workout Complete"
                     exerciseNumberText.text = "Nice Work!"
 
-//                    connectedThreadWrite.write("90,45")
-//                    currentPos = "90,45"
+                    if (::connectedThreadWrite.isInitialized) {
+                        connectedThreadWrite.write("[90,45]")
+                        currentPos = "[90,45]"
+                    }
 
                     state = -1
                     val loadingDuration = 10000
@@ -752,18 +771,6 @@ class MainActivity : AppCompatActivity() {
                     }, loadingDuration.toLong())  // finish after 10 seconds
                 }
             }
-
-//                // check if any keypoints are detected before processing
-//                if (result != null && result.landmarks().size > 0 && result.landmarks().get(0).get(0).visibility().orElse(0.0f) > 0.6f) {
-//                    // process and show results for the specified exercise
-//                    seated_knee_extension(result)
-//                    if (counts > COUNT_MAX && !doneExercise) {
-//                        track_user(result, mpImage.height, mpImage.width)
-//                        counts = 0
-//                    }
-//                }
-
-//                textView_reps.text = counts.toString()
         }
     }
 
@@ -791,8 +798,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun disconnectBluetooth() {
+        Log.d("NICK_BT", "disconnectBluetooth Called")
+
+        try {
+            bluetoothSocket?.let { socket ->
+                if (socket.isConnected) {
+                    socket.close()
+                    Log.d("NICK_BT", "Bluetooth socket closed successfully")
+                } else {
+                    Log.d("NICK_BT", "Socket already disconnected")
+                }
+            } ?: Log.d("NICK_BT", "No active Bluetooth socket to close")
+        } catch (e: IOException) {
+            Log.e("NICK_BT", "Error closing socket: ${e.message}")
+        } finally {
+            isConnected = false
+        }
+    }
+
+
     override fun onDestroy() {
-        super.onDestroy()
+        Log.d("TAG1234", "onDestroyCalled")
+
         // Unregister the receiver to avoid memory leaks
         if (isReceiverRegistered) {
             try {
@@ -803,8 +831,14 @@ class MainActivity : AppCompatActivity() {
             isReceiverRegistered = false
         }
 
+        disconnectBluetooth()
+
         val intent = Intent("com.example.CLOSE_EXTERNAL_ACTIVITY")
         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+
+        super.onDestroy()
+        Log.d("TAG1234", "onDestroyCalledAfter")
+
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -892,9 +926,12 @@ class MainActivity : AppCompatActivity() {
             if (motorCoords != "DNM") {
                 currentPos = motorCoords
                 Log.d("CUSTOMTAG", currentPos)
-                connectedThreadWrite.write(motorCoords)
+                if (::connectedThreadWrite.isInitialized) {
+                    connectedThreadWrite.write(motorCoords)
+                    Log.d("COORDS_TAG", "Coords Sent: " + motorCoords)
+                }
                 trackUserCount = 0
-            } else if (trackUserCount >= 10 && changeState) {
+            } else if (trackUserCount >= 3 && changeState) {
                 // if the camera hasn't moved for 10 iterations, stop moving camera
                 state = 1
                 trackUserCount = 0
@@ -904,155 +941,10 @@ class MainActivity : AppCompatActivity() {
                 trackUserCount += 1
             }
         } catch (e: Exception) {
-            Log.e(TAG, "An error occurred:", e)
-        }
-
-
-//        try {
-//            // initialize python (Chaquopy)
-//            val py = Python.getInstance()
-//            val motorCoords = py.getModule("processing")
-//                .callAttr("get_coords", allPoints.toTypedArray(), height, width, currentPos)
-//
-//            if (motorCoords.toString() != "DNM") {
-////                textView_knee.text = motorCoords.toString()
-//                currentPos = motorCoords.toString()
-//                Log.d(TAG, currentPos)
-//                connectedThreadWrite.write(motorCoords.toString())
-//            }
-//
-//        } catch (e: Exception) {
-//            // Log the stack trace to Logcat
-//            Log.e("PythonError", "An error occurred:", e)
-//        }
-    }
-
-    fun seated_knee_extension(result: PoseLandmarkerResult) {
-        val CONFIDENCE_THRESHOLD = 0.6f  // Adjust based on desired accuracy
-
-        // if all points are visible with above the threshold
-        if (result.landmarks().get(0).get(PoseLandmark.RIGHT_HIP).visibility()
-                .orElse(0.0f) > CONFIDENCE_THRESHOLD &&
-            result.landmarks().get(0).get(PoseLandmark.RIGHT_KNEE).visibility()
-                .orElse(0.0f) > CONFIDENCE_THRESHOLD &&
-            result.landmarks().get(0).get(PoseLandmark.RIGHT_ANKLE).visibility()
-                .orElse(0.0f) > CONFIDENCE_THRESHOLD) {
-
-            // get 3d keypoints of the three landmarks
-            val rightHip = listOf(result.landmarks().get(0).get(PoseLandmark.RIGHT_HIP).x(),
-                result.landmarks().get(0).get(PoseLandmark.RIGHT_HIP).y(),
-                result.landmarks().get(0).get(PoseLandmark.RIGHT_HIP).z()).toTypedArray()
-
-            val rightKnee = listOf(result.landmarks().get(0).get(PoseLandmark.RIGHT_KNEE).x(),
-                result.landmarks().get(0).get(PoseLandmark.RIGHT_KNEE).y(),
-                result.landmarks().get(0).get(PoseLandmark.RIGHT_KNEE).z()).toTypedArray()
-
-            val rightAnkle = listOf(result.landmarks().get(0).get(PoseLandmark.RIGHT_ANKLE).x(),
-                result.landmarks().get(0).get(PoseLandmark.RIGHT_ANKLE).y(),
-                result.landmarks().get(0).get(PoseLandmark.RIGHT_ANKLE).z()).toTypedArray()
-
-            // calculate the angle and count reps
-            try {
-                // initialize python (Chaquopy)
-                val py = Python.getInstance()
-                val kneeAngle = py.getModule("processing")
-                    .callAttr("calculate_angle", rightHip, rightKnee, rightAnkle)
-
-//                val reps = py.getModule("processing")
-//                    .callAttr("detect_reps", kneeAngle)
-
-//                val repsList = exerciseTrackerKneeExt.detectReps(kneeAngle.toDouble())
-
-                Log.d("ExerciseTracker", kneeAngle.toDouble().toString())
-
-//                textView_knee.text = "Right Knee Angle: " + kneeAngle.toString()
-//                reps_text.text = "Rep " + repsList[0].toString() + "/ 10"
-
-            } catch (e: Exception) {
-                // Log the stack trace to Logcat
-                Log.e("PythonErrorKnee", "An error occurred:", e)
-            }
+            Log.e("PythonErrorTrackUser", "An error occurred:", e)
         }
     }
 
-
-    fun getMotorCoordsOffset(midpoint: Int, frameSize: Int): Double {
-        val MOTOR_RATIO = 23.0 / (frameSize / 2.0) // Distance from center to edge in motor coords (angle)
-        return (midpoint - frameSize / 2.0) * MOTOR_RATIO
-    }
-
-    fun getCoords(allPoints: List<Array<Float>>, h: Int, w: Int, current: String): String {
-        val FRAME_WIDTH = w
-        val FRAME_HEIGHT = h
-
-        val TOLERANCE_X = 80 * 23.0 / (FRAME_WIDTH / 2.0)
-        val TOLERANCE_Y = 80 * 23.0 / (FRAME_HEIGHT / 2.0)
-
-        val MAX_MOVE_DISTANCE: Int = 25
-
-        // Parse current motor positions
-        val currentSplit =
-            current.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val currentX = currentSplit[0].toInt()
-        val currentY = currentSplit[1].toInt()
-
-        var motorX = currentX // Horizontal motor
-        var motorY = currentY // Vertical motor
-
-        // Calculate the midpoint of all landmarks
-        var sumX = 0
-        var sumY = 0
-        for (point in allPoints) {
-            sumX += point[0].toInt()
-            sumY += point[1].toInt()
-        }
-        val midpointX = sumX.toDouble() / allPoints.size
-        val midpointY = sumY.toDouble() / allPoints.size
-
-        // Convert midpoint to pixel coordinates
-        val pixelMidpointX = (midpointX * w).toInt()
-        val pixelMidpointY = (midpointY * h).toInt()
-
-        // Calculate offsets from frame center
-        val offsetX = getMotorCoordsOffset(pixelMidpointX, FRAME_WIDTH)
-        val offsetY = getMotorCoordsOffset(pixelMidpointY, FRAME_HEIGHT)
-
-        // Check if offsets exceed tolerance
-        if (abs(offsetX) > TOLERANCE_X || abs(offsetY) > TOLERANCE_Y) {
-            // Update motor positions
-            if (offsetX > TOLERANCE_X && motorX > 0) {
-                motorX += min(
-                    Math.round(offsetX).toInt().toDouble(),
-                    MAX_MOVE_DISTANCE.toDouble()
-                ).toInt()
-            } else if (offsetX < -TOLERANCE_X && motorX < 180) {
-                motorX += max(
-                    Math.round(offsetX * 23).toInt().toDouble(),
-                    -MAX_MOVE_DISTANCE.toDouble()
-                ).toInt()
-            }
-
-            if (offsetY > TOLERANCE_Y && motorY > 0) {
-                motorY -= min(
-                    Math.round(offsetY).toInt().toDouble(),
-                    MAX_MOVE_DISTANCE.toDouble()
-                ).toInt()
-            } else if (offsetY < -TOLERANCE_Y && motorY < 180) {
-                motorY -= max(
-                    Math.round(offsetY).toInt().toDouble(),
-                    -MAX_MOVE_DISTANCE.toDouble()
-                ).toInt()
-            }
-
-            // Keep motor values within bounds
-            motorX = max(0.0, min(180.0, motorX.toDouble())).toInt()
-            motorY = max(0.0, min(180.0, motorY.toDouble())).toInt()
-
-            return "$motorX,$motorY" // Return updated motor coordinates
-        } else {
-            return "DNM" // Do Not Move
-        }
-    }
 
     fun extractKeypointsDynamic(
         landmarks: List<NormalizedLandmark>,

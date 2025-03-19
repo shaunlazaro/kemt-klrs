@@ -26,6 +26,8 @@ public class ExerciseTracker {
     private List<Pose> posesBuffer;
     private double lastPoseCaptureTime;
     private double score;
+    private double max_score;
+
 
     public ExerciseTracker(ExerciseDetail exerciseDetail) {
         this.repCount = 0;
@@ -48,7 +50,8 @@ public class ExerciseTracker {
         this.lastEccentricTime = 0;
         this.posesBuffer = new ArrayList<>();
         this.lastPoseCaptureTime = 0;
-        this.score = 0f;
+        this.score = 0.0;
+        this.max_score = 0.0;
     }
 
     public RepData detectReps(List<TrackingResult> trackingResults, ExerciseDetail exerciseDetail, Pose poseData) {
@@ -125,7 +128,12 @@ public class ExerciseTracker {
             progress = (primaryAngle - startAngle) / (goalFlexion - startAngle);
         }
 
-        score = Math.max(0, Math.min(1, progress));
+        Log.d("ROUTINE_DEBUG_", "Progress: " + String.valueOf(progress));
+        score = Math.max(0.0, Math.min(1.0, progress));
+        max_score = Math.max(score, max_score);
+
+        Log.d("ROUTINE_DEBUG_", "Score: " + String.valueOf(score));
+        Log.d("ROUTINE_DEBUG_", "Max Score: " + String.valueOf(max_score));
     }
 
     private void updateState(double primaryAngle, double currentTime) {
@@ -187,7 +195,7 @@ public class ExerciseTracker {
         lastRepAlerts = new HashSet<>(alerts);
 
         Log.d("ROUTINE_DEBUG", "poseBufferSize: " + posesBuffer.size());
-        RepData repEntry = new RepData(repCount, currentMaxFlexion, currentMaxExtension, lastConcentricTime, lastEccentricTime, lastRepDuration, flexionGoalMet, extensionGoalMet, score, new ArrayList<>(lastRepAlerts), posesBuffer);
+        RepData repEntry = new RepData(repCount, currentMaxFlexion, currentMaxExtension, lastConcentricTime, lastEccentricTime, lastRepDuration, flexionGoalMet, extensionGoalMet, max_score, new ArrayList<>(lastRepAlerts), posesBuffer);
         Log.d("ROUTINE_DEBUG", "Pose Size: " + repEntry.getPoses().size());
 
         printRepFeedback();

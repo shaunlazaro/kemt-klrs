@@ -1,6 +1,8 @@
 package com.example.physiokneeds_v3;
 
-public class Landmark {
+import java.io.Serializable;
+
+public class Landmark implements Serializable {
     private int landmark_index;
     private float x;
     private float y;

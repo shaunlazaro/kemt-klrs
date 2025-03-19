@@ -76,7 +76,13 @@ public class MyExercises extends AppCompatActivity {
             imageParams.setMargins(dpToPx(40), 0, 0, 0); // layout_marginStart="40dp"
             imageView.setLayoutParams(imageParams);
             imageView.setBackgroundResource(R.drawable.outline_button); // Set background drawable
-            imageView.setImageResource(R.drawable.baseline_fitness_center_24); // Set image
+            if (routineConfig.getExercises().get(i).getExercise().getDisplayName().equals("Seated Leg Extension (Left)")) {
+                imageView.setImageResource(R.drawable.seated_leg);
+            } else if (routineConfig.getExercises().get(i).getExercise().getDisplayName().equals("Squat")) {
+                imageView.setImageResource(R.drawable.squat);
+            } else {
+                imageView.setImageResource(R.drawable.baseline_fitness_center_24);
+            }
             imageView.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10));
             imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
