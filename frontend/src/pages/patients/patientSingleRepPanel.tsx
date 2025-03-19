@@ -24,7 +24,7 @@ const PatientSingleRepPanel: React.FC<PatientSingleRepPanelProps> = ({ repData, 
                     </div>
                     <div className="flex gap-x-6">
                         <div className="font-bold">Score</div>
-                        <div>{getRepScore(repData, componentData.exercise_detail) * 100}</div>
+                        <div>{(getRepScore(repData, componentData.exercise_detail) * 100).toFixed(2)}</div>
                     </div>
                 </div>
                 <div className="font-bold pb-1">Errors</div>
