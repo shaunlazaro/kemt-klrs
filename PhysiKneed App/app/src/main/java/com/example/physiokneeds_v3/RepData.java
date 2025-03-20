@@ -46,5 +46,7 @@ public class RepData implements Serializable {
     public double getScore() { return max_score; }
     public List<String> getAlerts() { return alerts; }
     public List<Pose> getPoses() { return poses; }
+
+
 }
 

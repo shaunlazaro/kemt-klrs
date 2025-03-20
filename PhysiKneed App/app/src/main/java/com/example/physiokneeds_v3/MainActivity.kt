@@ -19,6 +19,8 @@ import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
+import android.media.AudioAttributes
+import android.media.SoundPool
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -102,7 +104,7 @@ class MainActivity : AppCompatActivity() {
     val CONFIDENCE_THRESHOLD = 0.6f
 
     // set which pose estimation model being used (lite/full/heavy)
-    val baseOptionsBuilder = BaseOptions.builder().setModelAssetPath("pose_landmarker_heavy.task")
+    val baseOptionsBuilder = BaseOptions.builder().setModelAssetPath("pose_landmarker_full.task")
 
     // set pose estimator options
     val optionsBuilder =
@@ -142,13 +144,16 @@ class MainActivity : AppCompatActivity() {
     lateinit var tipText: TextView
     lateinit var loadingBar: ProgressBar
 
+    private lateinit var soundPool: SoundPool
+    var playSound = false
+
     lateinit var connectedThreadWrite: ConnectedThread
 
     var startTime = 0.0.toLong()
 
     var isConnected = false
 
-    val COUNT_MAX = 10
+    val COUNT_MAX = 20
     var counts = 0
 
     var currentPos = "[90,45]"
@@ -179,7 +184,6 @@ class MainActivity : AppCompatActivity() {
             }
             if (intent?.action == "com.example.PRESS_CONNECT_BUTTON") {
                 bt_button.performClick() // Simulate button press
-//                state = 1 // TODO remove when using mount
             }
             if (intent?.action == "com.example.CLOSE_EXTERNAL_ACTIVITY") {
                 state = -1
@@ -312,7 +316,7 @@ class MainActivity : AppCompatActivity() {
                         state = 0 // start next state
                     }, 5000)
 
-                    // For Debug without mount
+//                     For Debug without mount
 //                    Handler(Looper.getMainLooper()).postDelayed({
 //                        state = 1 // start next state
 //                    }, 10000)
@@ -438,6 +442,23 @@ class MainActivity : AppCompatActivity() {
         videoFeed.setOnCompletionListener {
             videoFeed.start()
         }
+
+        // for sound effects
+        soundPool = SoundPool.Builder()
+            .setMaxStreams(5) // Max number of simultaneous sounds
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
+            .build()
+
+        val beginRepSound = soundPool.load(applicationContext, R.raw.begin_rep, 1)
+        val errorSound = soundPool.load(applicationContext, R.raw.error, 1)
+        val singleRepSound = soundPool.load(applicationContext, R.raw.single_rep, 1)
+        val repsCompleteSound = soundPool.load(applicationContext, R.raw.reps_complete, 1)
+
 
         // set the camera resolution to half the width
         val screenHeight = resources.displayMetrics.heightPixels
@@ -577,7 +598,9 @@ class MainActivity : AppCompatActivity() {
 //                    tipText.visibility = View.VISIBLE
 //                    tipText.text = "TIPS"
                     titleText.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
-                    leftText.text = "TIPS \n\n1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
+
+                    Log.d("INSTRUCTIONS_DEBUG", routineConfig.exercises[currentExerciseIndex].exercise.instruction)
+                    leftText.text = "TIPS \n\n" + routineConfig.exercises[currentExerciseIndex].exercise.instruction.replace("\\n", "\n") // 1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
                     if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Seated Leg Extension (Left)") {
                         val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.seated_leg_extension)
                         videoFeed.setVideoURI(videoUri)
@@ -587,6 +610,13 @@ class MainActivity : AppCompatActivity() {
                         }
                     } else if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Squat") {
                         val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.squat_01)
+                        videoFeed.setVideoURI(videoUri)
+                        videoFeed.start()
+                        videoFeed.setOnCompletionListener {
+                            videoFeed.start()
+                        }
+                    } else if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Hamstring Curl (Left)") {
+                        val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.hamstring_curl)
                         videoFeed.setVideoURI(videoUri)
                         videoFeed.start()
                         videoFeed.setOnCompletionListener {
@@ -614,9 +644,17 @@ class MainActivity : AppCompatActivity() {
                         popupMenu.visibility = View.GONE // hide pop up
                     }, loadingDuration.toLong())  // update progress
 
+                    playSound = true
+
                     startTime = (System.currentTimeMillis() / 1000) + 3
                 }
                 else if (state == 2) {
+
+                    if (playSound) {
+                        soundPool.play(beginRepSound, 1f, 1f, 0, 0, 1f)
+                    }
+
+                    playSound = false
 
                     // update rep timer
                     updateRepTimer()
@@ -645,7 +683,11 @@ class MainActivity : AppCompatActivity() {
 
                             // update rep data
                             if (repData != null) {
-                                Log.d("NICK_AHHHH", repData.poses.size.toString())
+                                soundPool.play(singleRepSound, 1f, 1f, 0, 0, 1f)
+
+//                                Log.d("NICK_AHHHH", repData.poses.size.toString())
+                                Log.d("POSE_FRAME_DEBUG", "Total Time: " + repData.totalTime.toString())
+
                                 repDataLists[currentExerciseIndex].add(repData)
                                 Log.d("NICK_AHHHH", repDataLists[currentExerciseIndex][repDataLists[currentExerciseIndex].size - 1].poses.size.toString())
 
@@ -653,26 +695,6 @@ class MainActivity : AppCompatActivity() {
                                 Log.d("ALERT_LOG", "Rep Number: " + repData.repNumber)
                                 Log.d("ALERT_LOG", "Max Angle: " + repData.maxExtension)
                                 Log.d("ALERT_LOG", "Alert Size: " + repData.alerts.size.toString())
-
-                                if (repData.alerts.size > 0) {
-                                    var alertText = ""
-                                    var alertCount = 1
-                                    for (alert in repData.alerts) {
-                                        if (alertCount == repData.alerts.size) {
-                                            alertText = alertText + alert
-                                        } else {
-                                            alertText = alertText + alert + " & "
-                                        }
-                                        Log.d("ALERT_LOG", "Alert:" + alert)
-                                        alertCount++
-                                    }
-                                    alertBox.text = alertText
-                                    alertBox.visibility = View.VISIBLE
-
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        alertBox.visibility = View.GONE
-                                    }, 1500)  // update progress
-                                }
                             }
 
                             // TODO add smooth angle
@@ -694,6 +716,28 @@ class MainActivity : AppCompatActivity() {
                         exerciseTrackers[currentExerciseIndex].repCount.toString() +
                                 " / " + routineConfig.exercises[currentExerciseIndex].reps + " reps     "
 
+                    // real time alerts
+                    if (exerciseTrackers[currentExerciseIndex].alertTriggers.size > 0) {
+                        soundPool.play(errorSound, 1f, 1f, 0, 0, 1f)
+                        var alertText = ""
+                        var alertCount = 1
+                        for (alert in exerciseTrackers[currentExerciseIndex].alertTriggers) {
+                            if (alertCount == exerciseTrackers[currentExerciseIndex].alertTriggers.size) {
+                                alertText = alertText + alert
+                            } else {
+                                alertText = alertText + alert + " & "
+                            }
+                            Log.d("ALERT_LOG", "Alert:" + alert)
+                            alertCount++
+                        }
+                        alertBox.text = alertText
+                        alertBox.visibility = View.VISIBLE
+
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            alertBox.visibility = View.GONE
+                        }, 3000)  // update progress
+                    }
+
                     // check if exercise is done
                     if (exerciseTrackers[currentExerciseIndex].repCount == routineConfig.exercises[currentExerciseIndex].reps) {
                         // done exercise
@@ -706,6 +750,9 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 else if (state == 3) {
+
+                    soundPool.play(repsCompleteSound, 1f, 1f, 1, 0, 1f)
+
                     reps_text.text =
                         "0 / " + routineConfig.exercises[currentExerciseIndex].reps + " reps     "
                     popupMenu.visibility = View.VISIBLE
@@ -762,10 +809,13 @@ class MainActivity : AppCompatActivity() {
                     val routineData = RoutineDataUpload(routineConfig.id, routineDataList)
                     sendData(routineData)
 
+                    // send routine data to next screen
+                    val intentRoutine = Intent("com.example.ROUTINE_DATA_SEND")
+                    intentRoutine.putExtra("RoutineData", routineData)
+                    LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentRoutine)
+
                     Handler(Looper.getMainLooper()).postDelayed({
                         val intent = Intent("com.example.END_WORKOUT")
-                        // send rep data
-                        intent.putExtra("routineData", routineData)
                         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
                         finish()
                     }, loadingDuration.toLong())  // finish after 10 seconds
@@ -958,6 +1008,7 @@ class MainActivity : AppCompatActivity() {
         val extractedPoints = mutableListOf<List<Float>>()
 
         for (kp in keypoints) {
+            Log.d("HAMSTRING", "kp: " + kp)
             val landmark = landmarks[helperMap.get(kp)!!]
 
             if (mode == "3D") {

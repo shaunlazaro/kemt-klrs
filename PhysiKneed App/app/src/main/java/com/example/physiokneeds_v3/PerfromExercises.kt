@@ -32,7 +32,7 @@ class PerfromExercises : AppCompatActivity() {
     lateinit var status: TextView
     lateinit var endWorkoutButton: Button
 
-//    lateinit var routineData: RoutineDataUpload
+    lateinit var routineData: RoutineDataUpload
 
     var isReceiverRegistered = false
 
@@ -60,8 +60,10 @@ class PerfromExercises : AppCompatActivity() {
     private var buttonPressReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "com.example.END_WORKOUT") {
-//                routineData = (intent.getSerializableExtra("routineData") as RoutineDataUpload?)!!
                 endWorkoutButton.performClick() // Simulate button press
+            } else if (intent?.action == "com.example.ROUTINE_DATA_SEND") {
+                Log.d("SEND_DATA", "got message for routine data")
+                routineData = (intent.getSerializableExtra("RoutineData") as RoutineDataUpload?)!!
             }
         }
     }
@@ -91,8 +93,11 @@ class PerfromExercises : AppCompatActivity() {
 
         // broadcast receivers for external display control
         val endFilter = IntentFilter("com.example.END_WORKOUT")
+        val routineDataFilter = IntentFilter("com.example.ROUTINE_DATA_SEND")
+
 
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, endFilter)
+        LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, routineDataFilter)
 
         isReceiverRegistered = true
 
@@ -117,19 +122,45 @@ class PerfromExercises : AppCompatActivity() {
 
         endWorkoutButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {
+                Log.d("FINAL_CRASH", "0")
+
                 val intent = Intent(applicationContext, WorkoutComplete::class.java)
+                Log.d("FINAL_CRASH", "1")
+
                 if (routineConfig != null) {
+                    Log.d("FINAL_CRASH", "2")
+
                     intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig)
                 }
 
-//                intent.putExtra("routineData", routineData)
+                Log.d("FINAL_CRASH", "3")
+
+                if (::routineData.isInitialized) {
+                    Log.d("FINAL_CRASH", "4")
+
+                    intent.putExtra("RoutineData", routineData)
+                }
+                Log.d("FINAL_CRASH", "5")
+
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                Log.d("FINAL_CRASH", "6")
+
 
                 val intentClose = Intent("com.example.CLOSE_EXTERNAL_ACTIVITY")
+                Log.d("FINAL_CRASH", "7")
+
                 LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentClose)
 
+                Log.d("FINAL_CRASH", "8")
+
+
                 displayManager.unregisterDisplayListener(displayListener)
+                Log.d("FINAL_CRASH", "9")
+
                 applicationContext.startActivity(intent)
+
+                Log.d("FINAL_CRASH", "10")
+
             }
         })
 
