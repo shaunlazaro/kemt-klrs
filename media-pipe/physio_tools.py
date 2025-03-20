@@ -62,6 +62,7 @@ class ExerciseTracker:
         self.goal_extension = exercise_detail.rep_tracking.goal_extension
 
         self.alerts = set()
+        self.alert_trigger = set()
         self.last_rep_alerts = set()
 
         self.phase_1_start_time = None
@@ -112,6 +113,9 @@ class ExerciseTracker:
 
     def _process_alerts(self, tracking_results, main_tracking_detail):
         """Checks for alert conditions based on tracking data."""
+        
+        self.alert_trigger.clear()
+        
         for entry in tracking_results:
             detail, value = entry["detail"], entry["angle"]
             
@@ -119,9 +123,13 @@ class ExerciseTracker:
             if detail == main_tracking_detail:
                 continue
             if detail.show_alert_if_above and value > detail.show_alert_if_above:
+                if detail.alert_message not in self.alerts:
+                    self.alert_trigger.add(detail.alert_message)
                 self.alerts.add(detail.alert_message)
                 self.last_rep_alerts.add(detail.alert_message)
             elif detail.show_alert_if_below and value < detail.show_alert_if_below:
+                if detail.alert_message not in self.alerts:
+                    self.alert_trigger.add(detail.alert_message)
                 self.alerts.add(detail.alert_message)
                 self.last_rep_alerts.add(detail.alert_message)
             else:
@@ -138,7 +146,6 @@ class ExerciseTracker:
 
         self.score = max(0, min(1, progress))
         self.max_score = max(self.max_score, self.score)
-        # print(f"Progress: {self.score:.2%}")
 
     def _update_state(self, primary_angle, current_time):
         """Handles state transitions based on detected movement."""
@@ -195,9 +202,11 @@ class ExerciseTracker:
         extension_goal_met = self.goal_extension is None or self.current_max_extension >= self.goal_extension
 
         if not flexion_goal_met or not extension_goal_met:
+            self.alert_trigger.add(main_tracking_detail.alert_message)
             self.alerts.add(main_tracking_detail.alert_message)
             
         if self.last_concentric_time + self.last_eccentric_time < min_rep_time:
+            self.alert_trigger.add("Slow down your movement")
             self.alerts.add("Slow down your movement")
 
         self.last_rep_alerts.update(self.alerts)
@@ -232,9 +241,9 @@ class ExerciseTracker:
         self.current_max_flexion = float('inf')
         self.current_max_extension = float('-inf')
         self.phase_1_start_time = current_time
-        self.alerts.clear()
         self.poses_buffer = []
         self.last_pose_capture_time = 0
         self.max_score = 0
         self.score = 0
+        self.alerts.clear()
         self.last_rep_alerts.clear()
