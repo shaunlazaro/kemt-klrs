@@ -5,69 +5,19 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <TextureView
-        android:layout_width="1440px"
-        android:layout_height="1080px"
-        android:id="@+id/camera_feed" />
-
-    <com.example.physiokneeds_v3.OverlayView
-        android:layout_width="1440px"
-        android:layout_height="1080px"
-        android:id="@+id/overlayView" />
-
-    <TextView
-        android:id="@+id/kneeAngle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/camera_feed"
-        android:layout_margin="20dp"
-        android:textSize="20dp"
-        android:text="Right Knee Angle: " />
-
-    <TextView
-        android:id="@+id/repsCount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/kneeAngle"
-        android:layout_margin="20dp"
-        android:textSize="20dp"
-        android:text="Reps: " />
-
-    <Button
-        android:id="@+id/start_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/repsCount"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginTop="20dp"
-        android:text="START"/>
-
-    <Button
-        android:id="@+id/camera_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/start_button"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginTop="20dp"
-        android:text="Switch Camera"/>
+    android:background="@color/white"
+    tools:context=".MainActivity"
+    android:visibility="gone">
 
     <Button
         android:id="@+id/search_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/repsCount"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="SEARCH DEVICES"/>
+        android:text="SEARCH DEVICES"
+        android:visibility="visible"/>
 
     <Button
         android:id="@+id/bt_button"
@@ -77,7 +27,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="CONNECT TO MOUNT"/>
+        android:text="CONNECT TO MOUNT"
+        android:visibility="visible"/>
 
     <Button
         android:id="@+id/send_coords"
@@ -87,15 +38,257 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="SEND COORDS"/>
+        android:text="SEND COORDS"
+        android:visibility="visible"/>
 
-    <TextView
-        android:id="@+id/status_text"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/repsCount"
-        android:layout_margin="20dp"
-        android:textSize="20dp"
-        android:text="Reps: " />
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
-</RelativeLayout>
+        <TextureView
+            android:layout_width="1440px"
+            android:layout_height="1080px"
+            android:id="@+id/camera_feed" />
+
+        <com.example.physiokneeds_v3.OverlayView
+            android:layout_width="1440px"
+            android:layout_height="1080px"
+            android:id="@+id/overlayView" />
+
+        <TextView
+            android:id="@+id/kneeAngle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/camera_feed"
+            android:layout_margin="20dp"
+            android:textSize="20dp"
+            android:text="Right Knee Angle: "
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/repsCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/kneeAngle"
+            android:layout_margin="20dp"
+            android:textSize="20dp"
+            android:text="Reps: "
+            android:visibility="invisible"/>
+
+        <Button
+            android:id="@+id/start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/repsCount"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginTop="20dp"
+            android:text="START"
+            android:visibility="invisible"/>
+
+        <Button
+            android:id="@+id/camera_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/start_button"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginTop="20dp"
+            android:text="Switch Camera"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/repsCount"
+            android:layout_margin="20dp"
+            android:textSize="20dp"
+            android:text="Reps: "
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/rep_count_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Reps: 0"
+            android:fontFamily="@font/source_sans"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:layout_gravity="right"
+            android:layout_marginEnd="30dp" />
+
+        <TextView
+            android:id="@+id/left_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Reps: 0"
+            android:fontFamily="@font/source_sans"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:layout_gravity="right"
+            android:layout_marginEnd="30dp" />
+
+        <TextView
+            android:id="@+id/title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Seated Left Knee Extension"
+            android:fontFamily="@font/source_sans"
+            android:textSize="48sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:layout_marginStart="10dp" />
+
+        <ImageView
+            android:id="@+id/left_image"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:background="@drawable/outline_button"
+            android:src="@drawable/baseline_fitness_center_24"
+            android:padding="10dp" />
+
+        <LinearLayout
+            android:id="@+id/instructions_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/popup_panel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:elevation="2dp">
+
+            <View
+                android:id="@+id/dark_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#99000000"
+                android:elevation="1dp"
+                android:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/exercise_number_text"
+                android:text="Exercise #1"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:textColor="@android:color/black"
+                android:background="@drawable/pink_rounded_textbox"
+                android:layout_gravity="center_horizontal"
+                android:elevation="6dp"
+                android:layout_marginTop="130dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/exercise_title"
+                android:text="Seated Leg Extension"
+                android:textSize="40sp"
+                android:padding="10dp"
+                android:layout_marginTop="140dp"
+                android:layout_marginBottom="140dp"
+                android:layout_marginRight="150dp"
+                android:layout_marginLeft="150dp"
+                android:textColor="@android:color/black"
+                android:background="@drawable/today_exercises_textbox"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:elevation="3dp" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="240dp"
+                android:layout_marginBottom="150dp"
+                android:layout_marginRight="250dp"
+                android:layout_marginLeft="250dp"
+                android:elevation="4dp"
+                android:progressDrawable="@drawable/countdown_exercise"
+                android:max="3000"/>
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/rep_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="   0:00   "
+            android:fontFamily="@font/source_sans"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:background="@drawable/pink_textbox"
+            android:padding="10dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="30dp"
+            android:elevation="10dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/alert_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="340dp"
+            android:layout_marginEnd="40dp"
+            android:padding="30dp"
+            android:text="Alert"
+            android:textSize="24sp"
+            android:textColor="@android:color/black"
+            android:fontFamily="@font/source_sans"
+            android:textStyle="bold"
+            android:background="@drawable/today_exercises_textbox"
+            android:drawablePadding="70dp"
+            app:drawableStartCompat="@drawable/baseline_error_outline_24" />
+
+        <TextView
+            android:id="@+id/tips_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="TIPS"
+            android:fontFamily="@font/source_sans"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:padding="10dp"
+            android:visibility="gone"
+            android:layout_marginTop="30dp" />
+
+        <ProgressBar
+            android:id="@+id/progressBarMain"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="100dp"
+            android:backgroundTint="@color/blue"
+            android:layout_gravity="center"/>
+
+        <VideoView
+            android:id="@+id/video"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_marginTop="100dp"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    </RelativeLayout>
+
+
+

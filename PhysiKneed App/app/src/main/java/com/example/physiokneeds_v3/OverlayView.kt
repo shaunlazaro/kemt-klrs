@@ -5,11 +5,14 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import com.google.mediapipe.tasks.components.containers.Connection
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
+import java.lang.Double.sum
 import kotlin.math.max
 import kotlin.math.min
 
@@ -49,23 +52,47 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
+        var sum_x = 0f
+        var sum_y = 0f
         results?.let { poseLandmarkerResult ->
             for(landmark in poseLandmarkerResult.landmarks()) {
                 for(normalizedLandmark in landmark) {
-                    canvas.drawPoint(
-                        normalizedLandmark.x() * imageWidth * scaleFactor,
-                        normalizedLandmark.y() * imageHeight * scaleFactor,
-                        pointPaint
-                    )
-                }
+//                    canvas.drawPoint(
+//                        normalizedLandmark.x() * imageWidth * scaleFactor,
+//                        normalizedLandmark.y() * imageHeight * scaleFactor,
+//                        pointPaint
+//                    )
 
-                PoseLandmarker.POSE_LANDMARKS.forEach {
-                    canvas.drawLine(
-                        poseLandmarkerResult.landmarks().get(0).get(it!!.start()).x() * imageWidth * scaleFactor,
-                        poseLandmarkerResult.landmarks().get(0).get(it.start()).y() * imageHeight * scaleFactor,
-                        poseLandmarkerResult.landmarks().get(0).get(it.end()).x() * imageWidth * scaleFactor,
-                        poseLandmarkerResult.landmarks().get(0).get(it.end()).y() * imageHeight * scaleFactor,
-                        linePaint)
+                    sum_x += normalizedLandmark.x()
+                    sum_y += normalizedLandmark.y()
+
+                }
+                val midpoint_x = sum_x / landmark.size
+                val midpoint_y = sum_y / landmark.size
+
+                Log.d("MIDPOINT", midpoint_x.toString())
+                Log.d("MIDPOINT", midpoint_y.toString())
+
+//                canvas.drawPoint(
+//                        midpoint_x * imageWidth * scaleFactor,
+//                        midpoint_y * imageHeight * scaleFactor,
+//                        pointPaint
+//                    )
+
+                val connections = setOf(Connection.create(23,25), Connection.create(24,26), Connection.create(25,27), Connection.create(26,28))
+
+//                PoseLandmarker.POSE_LANDMARKS.forEach {
+                connections.forEach {
+                    // only draw the lines if the visibility is over 60%
+                    if (poseLandmarkerResult.landmarks().get(0).get(it!!.start()).visibility().orElse(0.0f) > 0.6f
+                        && poseLandmarkerResult.landmarks().get(0).get(it!!.end()).visibility().orElse(0.0f) > 0.6f) {
+                        canvas.drawLine(
+                            poseLandmarkerResult.landmarks().get(0).get(it!!.start()).x() * imageWidth * scaleFactor,
+                            poseLandmarkerResult.landmarks().get(0).get(it.start()).y() * imageHeight * scaleFactor,
+                            poseLandmarkerResult.landmarks().get(0).get(it.end()).x() * imageWidth * scaleFactor,
+                            poseLandmarkerResult.landmarks().get(0).get(it.end()).y() * imageHeight * scaleFactor,
+                            linePaint)
+                    }
                 }
             }
         }

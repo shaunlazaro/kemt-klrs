@@ -1,0 +1,20 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape>
+            <solid android:color="@color/light_blue"/>
+            <corners android:radius="16dp"/>
+        </shape>
+    </item>
+
+    <item
+        android:gravity="start"
+        android:width="80dp">
+        <shape>
+            <solid android:color="@color/pink"/>
+            <corners android:topLeftRadius="16dp"
+                android:bottomLeftRadius="16dp"/>
+        </shape>
+    </item>
+
+</layer-list>

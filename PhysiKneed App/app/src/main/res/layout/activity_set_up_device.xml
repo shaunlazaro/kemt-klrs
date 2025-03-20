@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".SetUpDevice">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/linear_layout_exercises"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/back_button"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@color/white"
+                    android:src="@drawable/baseline_arrow_back_24"
+                    android:contentDescription="Back"
+                    android:layout_marginStart="24dp" />
+
+                <TextView
+                    android:id="@+id/title_top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Setup your device"
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="24sp"
+                    android:textColor="@color/nav_blue"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:layout_marginStart="10dp"/>
+
+            </LinearLayout>
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:layout_weight="1"/>
+
+            <com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator
+                android:id="@+id/dotsIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:dotsColor="@color/pink"
+                app:selectedDotColor="@color/pink"
+                app:dotsSize="8dp"
+                android:layout_marginTop="16dp"/>
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/next_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:text="Next"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/source_sans"
+                android:textStyle="bold"
+                android:background="@drawable/blue_button"
+                android:padding="10dp" />
+
+            <TextView
+                android:id="@+id/skip_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:text="Skip Setup"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textColor="@color/blue"
+                android:fontFamily="@font/source_sans"
+                android:textStyle="bold"
+                android:background="@color/white" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

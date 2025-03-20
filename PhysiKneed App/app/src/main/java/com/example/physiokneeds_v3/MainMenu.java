@@ -46,17 +46,17 @@ public class MainMenu extends AppCompatActivity {
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (emailInput.getText().toString().equals("user")
-                        && passwordInput.getText().toString().equals("password")) {
+//                if (emailInput.getText().toString().equals("user")
+//                        && passwordInput.getText().toString().equals("password")) {
                     Intent homeIntent = new Intent(MainMenu.this, HomeScreen.class);
                     homeIntent.putExtra(USERNAME_TAG, emailInput.getText().toString());
 
                     MainMenu.this.startActivity(homeIntent);
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Incorrect Email or Password, Please Try Again",
-                            Toast.LENGTH_SHORT).show();
-                }
+//                } else {
+//                    Toast.makeText(getApplicationContext(),
+//                            "Incorrect Email or Password, Please Try Again",
+//                            Toast.LENGTH_SHORT).show();
+//                }
             }
         });
 
