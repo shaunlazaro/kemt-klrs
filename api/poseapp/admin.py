@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Pose, Routine
+from .models import Pose, Routine, TrackingDetail, ExerciseDetail, RoutineConfig, RoutineExercise, RepData, RoutineComponentData, RoutineData, Patient
 
 # Customizing Pose admin view
 @admin.register(Pose)
@@ -25,3 +25,25 @@ class RoutineAdmin(admin.ModelAdmin):
         # This counts the number of poses related to a routine
         return obj.poses.count()
     pose_count.short_description = 'Number of Poses'
+
+admin.site.register(TrackingDetail)
+admin.site.register(ExerciseDetail)
+admin.site.register(RoutineConfig)
+admin.site.register(RoutineExercise)
+
+@admin.register(RepData)
+class RepDataAdmin(admin.ModelAdmin):
+    list_display = ('id', 'rep_number', 'max_score', 'goal_flexion_met', 'goal_extension_met')
+    search_fields = ('rep_number',)
+
+@admin.register(RoutineComponentData)
+class RoutineComponentDataAdmin(admin.ModelAdmin):
+    list_display = ('id', 'exercise_detail',)
+    filter_horizontal = ('rep_data',)
+
+@admin.register(RoutineData)
+class RoutineDataAdmin(admin.ModelAdmin):
+    list_display = ('id', 'routine_config', 'created_at')
+    filter_horizontal = ('routine_component_data',)
+
+admin.site.register(Patient)

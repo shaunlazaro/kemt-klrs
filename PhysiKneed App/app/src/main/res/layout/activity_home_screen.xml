@@ -25,11 +25,12 @@
                 android:layout_gravity="center_horizontal"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"
+                android:textColor="@color/blue"
                 android:fontFamily="@font/source_sans"
                 android:layout_marginTop="20dp"
-                android:paddingLeft="40dp"
-                android:paddingRight="40dp"
+                android:paddingStart="90dp"
+                android:drawablePadding="-90dp"
+                android:drawableStart="@drawable/scaled_logo_20dp"
                 android:text="RePose" />
 
             <TextView

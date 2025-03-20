@@ -73,11 +73,11 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                 Log.d("MIDPOINT", midpoint_x.toString())
                 Log.d("MIDPOINT", midpoint_y.toString())
 
-                canvas.drawPoint(
-                        midpoint_x * imageWidth * scaleFactor,
-                        midpoint_y * imageHeight * scaleFactor,
-                        pointPaint
-                    )
+//                canvas.drawPoint(
+//                        midpoint_x * imageWidth * scaleFactor,
+//                        midpoint_y * imageHeight * scaleFactor,
+//                        pointPaint
+//                    )
 
                 val connections = setOf(Connection.create(23,25), Connection.create(24,26), Connection.create(25,27), Connection.create(26,28))
 

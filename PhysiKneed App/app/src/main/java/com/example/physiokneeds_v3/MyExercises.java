@@ -80,6 +80,8 @@ public class MyExercises extends AppCompatActivity {
                 imageView.setImageResource(R.drawable.seated_leg);
             } else if (routineConfig.getExercises().get(i).getExercise().getDisplayName().equals("Squat")) {
                 imageView.setImageResource(R.drawable.squat);
+            } else if (routineConfig.getExercises().get(i).getExercise().getDisplayName().equals("Hamstring Curl (Left)")) {
+                imageView.setImageResource(R.drawable.hamstring_curl);
             } else {
                 imageView.setImageResource(R.drawable.baseline_fitness_center_24);
             }

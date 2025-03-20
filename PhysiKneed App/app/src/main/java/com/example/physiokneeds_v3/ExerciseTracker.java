@@ -7,6 +7,7 @@ import java.util.*;
 public class ExerciseTracker {
     private int repCount;
     private String state;
+    private boolean repReady;
     private boolean justCompletedRep;
     private long repStartTime;
     private double lastRepDuration;
@@ -18,6 +19,7 @@ public class ExerciseTracker {
     private Double goalFlexion;
     private Double goalExtension;
     private Set<String> alerts;
+    private Set<String> alertTrigger;
     private Set<String> lastRepAlerts;
     private double phase1StartTime;
     private double phase2StartTime;
@@ -32,6 +34,7 @@ public class ExerciseTracker {
     public ExerciseTracker(ExerciseDetail exerciseDetail) {
         this.repCount = 0;
         this.state = "rest";
+        this.repReady = true;
         this.justCompletedRep = false;
         this.repStartTime = 0;
         this.lastRepDuration = 0;
@@ -43,6 +46,7 @@ public class ExerciseTracker {
         this.goalFlexion = exerciseDetail.getRepTracking().getGoalFlexion();
         this.goalExtension = exerciseDetail.getRepTracking().getGoalExtension();
         this.alerts = new HashSet<>();
+        this.alertTrigger = new HashSet<>();
         this.lastRepAlerts = new HashSet<>();
         this.phase1StartTime = 0;
         this.phase2StartTime = 0;
@@ -52,6 +56,14 @@ public class ExerciseTracker {
         this.lastPoseCaptureTime = 0;
         this.score = 0.0;
         this.max_score = 0.0;
+    }
+
+    public Set<String> getAlerts() {
+        return alerts;
+    }
+
+    public Set<String> getAlertTriggers() {
+        return alertTrigger;
     }
 
     public RepData detectReps(List<TrackingResult> trackingResults, ExerciseDetail exerciseDetail, Pose poseData) {
@@ -70,9 +82,9 @@ public class ExerciseTracker {
         updateProgressScore(primaryAngle, exerciseDetail.getStartAngle());
 
         if (currentTime*1000 - lastPoseCaptureTime >= 100) {
-            Log.d("ROUTINE_DEBUG", "Pose Captured");
-            Log.d("ROUTINE_DEBUG", "Pose Example X:" + poseData.getLandmarks().get(0).getX());
-            Log.d("ROUTINE_DEBUG", "Poses Size:" + poseData.getLandmarks().size());
+            Log.d("POSE_FRAME_DEBUG", "Pose Captured at: " + System.currentTimeMillis());
+//            Log.d("ROUTINE_DEBUG", "Pose Example X:" + poseData.getLandmarks().get(0).getX());
+//            Log.d("ROUTINE_DEBUG", "Poses Size:" + poseData.getLandmarks().size());
             posesBuffer.add(poseData);
             lastPoseCaptureTime = currentTime;
         }
@@ -106,16 +118,30 @@ public class ExerciseTracker {
     }
 
     private void processAlerts(List<TrackingResult> trackingResults, TrackingDetail mainTrackingDetail) {
+
+        alertTrigger.clear();
+
         for (TrackingResult entry : trackingResults) {
             TrackingDetail detail = entry.getDetail();
             double value = entry.getAngle();
 
             if (entry.getDetail().getTrackingType().equals(mainTrackingDetail.getTrackingType())) continue;
             if (detail.getShowAlertIfAbove() != null && value > detail.getShowAlertIfAbove()) {
+                if (!alerts.contains(detail.getAlertMessage())) {
+                    alertTrigger.add(detail.getAlertMessage());
+                }
                 alerts.add(detail.getAlertMessage());
+                lastRepAlerts.add(detail.getAlertMessage());
             }
-            if (detail.getShowAlertIfBelow() != null && value < detail.getShowAlertIfBelow()) {
+            else if (detail.getShowAlertIfBelow() != null && value < detail.getShowAlertIfBelow()) {
+                if (!alerts.contains(detail.getAlertMessage())) {
+                    alertTrigger.add(detail.getAlertMessage());
+                }
                 alerts.add(detail.getAlertMessage());
+                lastRepAlerts.add(detail.getAlertMessage());
+            } else {
+                // self.alerts.discard(detail.alert_message)
+                alerts.remove(detail.getAlertMessage());
             }
         }
     }
@@ -139,13 +165,24 @@ public class ExerciseTracker {
     private void updateState(double primaryAngle, double currentTime) {
         switch (state) {
             case "rest":
-                if (isStartOfRep(primaryAngle)) startNewRep(currentTime);
+                if (isFullRepCompleted(primaryAngle)) {
+                    repReady = true;
+                    startNewRep(currentTime);
+                }
+
                 break;
             case "phase_1":
-                if (isHalfRepCompleted(primaryAngle)) startPhase2(currentTime);
+                if (repReady) {
+                    if (isHalfRepCompleted(primaryAngle)) startPhase2(currentTime);
+                }
                 break;
             case "phase_2":
-                if (isFullRepCompleted(primaryAngle)) completeRep(currentTime);
+                if (repReady) {
+                    if (isFullRepCompleted(primaryAngle)) {
+                        completeRep(currentTime);
+                        repReady = false;
+                    }
+                }
                 break;
         }
     }
@@ -189,12 +226,18 @@ public class ExerciseTracker {
         boolean flexionGoalMet = goalFlexion == null || currentMaxFlexion <= goalFlexion;
         boolean extensionGoalMet = goalExtension == null || currentMaxExtension >= goalExtension;
 
-        if (!flexionGoalMet || !extensionGoalMet) alerts.add(mainTrackingDetail.getAlertMessage());
-        if (lastConcentricTime + lastEccentricTime < minRepTime) alerts.add("Slow down your movement");
+        if (!flexionGoalMet || !extensionGoalMet){
+            alertTrigger.add(mainTrackingDetail.getAlertMessage());
+            alerts.add(mainTrackingDetail.getAlertMessage());
+        }
+        if (lastConcentricTime + lastEccentricTime < minRepTime){
+            alertTrigger.add("Slow down your movement");
+            alerts.add("Slow down your movement");
+        }
 
-        lastRepAlerts = new HashSet<>(alerts);
+        lastRepAlerts.addAll(alerts);
 
-        Log.d("ROUTINE_DEBUG", "poseBufferSize: " + posesBuffer.size());
+        Log.d("POSE_FRAME_DEBUG", "poseBufferSize: " + posesBuffer.size());
         RepData repEntry = new RepData(repCount, currentMaxFlexion, currentMaxExtension, lastConcentricTime, lastEccentricTime, lastRepDuration, flexionGoalMet, extensionGoalMet, max_score, new ArrayList<>(lastRepAlerts), posesBuffer);
         Log.d("ROUTINE_DEBUG", "Pose Size: " + repEntry.getPoses().size());
 
@@ -224,6 +267,9 @@ public class ExerciseTracker {
         alerts.clear();
         posesBuffer = new ArrayList<>();
         lastPoseCaptureTime = 0;
+        score = 0;
+        max_score = 0;
+        lastRepAlerts.clear();
     }
 
     public int getRepCount() {

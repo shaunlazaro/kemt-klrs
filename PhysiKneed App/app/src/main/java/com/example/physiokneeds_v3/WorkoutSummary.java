@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -21,6 +23,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.widget.TextViewCompat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class WorkoutSummary extends AppCompatActivity {
@@ -43,11 +47,68 @@ public class WorkoutSummary extends AppCompatActivity {
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         LinearLayout linearLayoutScore = findViewById(R.id.linear_layout_score);
 
+        ProgressBar scoreBar = findViewById(R.id.progress_circular);
+        TextView scoreText = findViewById(R.id.score_text);
+
         Button finishButton = findViewById(R.id.finish_button);
 
         // get routine from previous screen
         RoutineConfig routineConfig = (RoutineConfig) getIntent().getSerializableExtra(HomeScreen.ROUTINE_TAG);
-//        RoutineDataUpload routineData = (RoutineDataUpload) getIntent().getSerializableExtra("routineData");
+        RoutineDataUpload routineData = (RoutineDataUpload) getIntent().getSerializableExtra("RoutineData");
+
+        List<Double> exerciseScores = new ArrayList<>();
+        double repScore;
+        double exerciseScore;
+
+        double totalTime = 0;
+
+        for(int i = 0; i < routineData.getRoutineComponentData().size(); i++) {
+            exerciseScore = 0;
+            for (int j = 0; j < routineData.getRoutineComponentData().get(i).getRepData().size(); j++) {
+                RepData repData = routineData.getRoutineComponentData().get(i).getRepData().get(j);
+                boolean romPenalty = !repData.isGoalExtensionMet() || !repData.isGoalFlexionMet();
+                repScore = repData.getScore();
+                Log.d("SCORE_DEBUG", "Rep Max Score: " + String.valueOf(repScore));
+                Log.d("SCORE_DEBUG", "Alert Size: " + String.valueOf(repData.getAlerts().size()));
+
+                if (romPenalty) {
+                    Log.d("SCORE_DEBUG", "ROM penalty called");
+                    repScore += 0.2;
+                }
+                repScore -= repData.getAlerts().size()*0.2;
+                Log.d("SCORE_DEBUG", "repScore: " + String.valueOf(repScore));
+
+                exerciseScore += repScore;
+                Log.d("SCORE_DEBUG", "exerciseScore: " + String.valueOf(exerciseScore));
+                // total time
+                totalTime += repData.getTotalTime();
+            }
+            // Convert from total rep scores to average rep score.
+            exerciseScore /= routineData.getRoutineComponentData().get(i).getRepData().size();
+            Log.d("SCORE_DEBUG", "Average rep scores: " + String.valueOf(exerciseScore));
+
+            exerciseScores.add(exerciseScore);
+        }
+
+        // calculate overall score
+        double overallSum = 0;
+        for (double score : exerciseScores) {
+            overallSum += score;
+        }
+        double overallScore = overallSum / exerciseScores.size();
+
+        scoreText.setText(String.valueOf((int) Math.round(overallScore*100)));
+        scoreBar.setProgress((int) Math.round(overallScore*100));
+
+        // timer
+        String timeDisplay = "";
+        if (totalTime < 60) {
+            timeDisplay = ((int) totalTime) + "s";
+        } else {
+            timeDisplay = Math.floor(totalTime / 60) + "m " + ((int)totalTime%60) + "s";
+        }
+
+        timeSpent.setText(timeDisplay);
 
         for (int i = 0; i < Objects.requireNonNull(routineConfig).getExercises().size(); i++) {
             // Create a new Frame layout for score
@@ -65,7 +126,7 @@ public class WorkoutSummary extends AppCompatActivity {
             textParams.gravity = Gravity.START;
             textView.setLayoutParams(textParams);
             String text =
-//                    routineData.getRoutineComponentData().get(i).getRepData().size() +
+                    routineData.getRoutineComponentData().get(i).getRepData().size() +
                     "/" + routineConfig.getExercises().get(i).getReps() + " " +
                     routineConfig.getExercises().get(i).getExercise().getDisplayName();
             textView.setText(text);
@@ -91,7 +152,7 @@ public class WorkoutSummary extends AppCompatActivity {
                     dpToPx(22));
             textParamsEnd.gravity = Gravity.END;
             textView3.setLayoutParams(textParamsEnd);
-            textView3.setText("85"); // TODO put in real score
+            textView3.setText(String.valueOf((int) Math.round(exerciseScores.get(i)*100)));
             textView3.setTextSize(12);
             textView3.setTypeface(ResourcesCompat.getFont(this, R.font.source_sans), Typeface.BOLD);
             textView3.setTextColor(ContextCompat.getColor(this, R.color.white));
