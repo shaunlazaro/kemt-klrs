@@ -601,7 +601,7 @@ class MainActivity : AppCompatActivity() {
 
                     Log.d("INSTRUCTIONS_DEBUG", routineConfig.exercises[currentExerciseIndex].exercise.instruction)
                     leftText.text = "TIPS \n\n" + routineConfig.exercises[currentExerciseIndex].exercise.instruction.replace("\\n", "\n") // 1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
-                    if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Seated Leg Extension (Left)") {
+                    if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Seated Leg Extension (Right)") {
                         val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.seated_leg_extension)
                         videoFeed.setVideoURI(videoUri)
                         videoFeed.start()
@@ -615,7 +615,7 @@ class MainActivity : AppCompatActivity() {
                         videoFeed.setOnCompletionListener {
                             videoFeed.start()
                         }
-                    } else if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Hamstring Curl (Left)") {
+                    } else if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Hamstring Curl (Right)") {
                         val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.hamstring_curl)
                         videoFeed.setVideoURI(videoUri)
                         videoFeed.start()

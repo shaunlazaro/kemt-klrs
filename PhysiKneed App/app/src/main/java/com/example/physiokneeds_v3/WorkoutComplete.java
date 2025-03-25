@@ -63,13 +63,13 @@ public class WorkoutComplete extends AppCompatActivity {
 
         exerciseText.setText(exerciseList.get(exerciseIndex).getExercise().getDisplayName());
         switch (exerciseList.get(exerciseIndex).getExercise().getDisplayName()) {
-            case "Seated Leg Extension (Left)":
+            case "Seated Leg Extension (Right)":
                 exerciseImage.setImageResource(R.drawable.seated_leg);
                 break;
             case "Squat":
                 exerciseImage.setImageResource(R.drawable.squat);
                 break;
-            case "Hamstring Curl (Left)":
+            case "Hamstring Curl (Right)":
                 exerciseImage.setImageResource(R.drawable.hamstring_curl);
                 break;
             default:
@@ -105,13 +105,13 @@ public class WorkoutComplete extends AppCompatActivity {
                     editText.setVisibility(View.VISIBLE);
                 } else if (exerciseIndex < exerciseList.size()){
                     switch (exerciseList.get(exerciseIndex).getExercise().getDisplayName()) {
-                        case "Seated Leg Extension (Left)":
+                        case "Seated Leg Extension (Right)":
                             exerciseImage.setImageResource(R.drawable.seated_leg);
                             break;
                         case "Squat":
                             exerciseImage.setImageResource(R.drawable.squat);
                             break;
-                        case "Hamstring Curl (Left)":
+                        case "Hamstring Curl (Right)":
                             exerciseImage.setImageResource(R.drawable.hamstring_curl);
                             break;
                         default:
@@ -151,13 +151,13 @@ public class WorkoutComplete extends AppCompatActivity {
             questionText.setText("How easy did that feel?");
             exerciseImage.setVisibility(View.VISIBLE);
             switch (exerciseList.get(exerciseIndex).getExercise().getDisplayName()) {
-                case "Seated Leg Extension (Left)":
+                case "Seated Leg Extension (Right)":
                     exerciseImage.setImageResource(R.drawable.seated_leg);
                     break;
                 case "Squat":
                     exerciseImage.setImageResource(R.drawable.squat);
                     break;
-                case "Hamstring Curl (Left)":
+                case "Hamstring Curl (Right)":
                     exerciseImage.setImageResource(R.drawable.hamstring_curl);
                     break;
                 default:
