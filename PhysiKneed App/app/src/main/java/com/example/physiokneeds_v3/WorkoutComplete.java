@@ -38,7 +38,13 @@ public class WorkoutComplete extends AppCompatActivity {
 
         // get routine data
         RoutineDataUpload routineData = (RoutineDataUpload) getIntent().getSerializableExtra("RoutineData");
-        Log.d("SEND_DATA", String.valueOf(routineData.getRoutineComponentData().get(0).getRepData().get(0).getScore()));
+        if (routineData == null) {
+            // if workout was not completed, go back to home screen
+            Intent intent = new Intent(WorkoutComplete.this, HomeScreen.class);
+            WorkoutComplete.this.startActivity(intent);
+        } else {
+            Log.d("SEND_DATA", String.valueOf(routineData.getRoutineComponentData().get(0).getRepData().get(0).getScore()));
+        }
 
         TextView questionText = findViewById(R.id.question_text);
         ImageView exerciseImage = findViewById(R.id.exercise_image);

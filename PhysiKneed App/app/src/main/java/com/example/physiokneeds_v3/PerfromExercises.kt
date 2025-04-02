@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -30,6 +31,10 @@ class PerfromExercises : AppCompatActivity() {
     lateinit var startTrackingButton: Button
     lateinit var progressBar: ProgressBar
     lateinit var status: TextView
+    lateinit var viewExerciseButton: Button
+    lateinit var viewListButton: Button
+    lateinit var setupInstrButton: Button
+    lateinit var skipButton: Button
     lateinit var endWorkoutButton: Button
 
     lateinit var routineData: RoutineDataUpload
@@ -60,7 +65,10 @@ class PerfromExercises : AppCompatActivity() {
     private var buttonPressReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "com.example.END_WORKOUT") {
-                endWorkoutButton.performClick() // Simulate button press
+                // change which buttons appear
+                status.text = "Workout Complete"
+                viewExerciseButton.visibility = View.GONE
+                skipButton.visibility = View.GONE
             } else if (intent?.action == "com.example.ROUTINE_DATA_SEND") {
                 Log.d("SEND_DATA", "got message for routine data")
                 routineData = (intent.getSerializableExtra("RoutineData") as RoutineDataUpload?)!!
@@ -73,6 +81,7 @@ class PerfromExercises : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_perfrom_exercises)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -83,6 +92,11 @@ class PerfromExercises : AppCompatActivity() {
         searchButton = findViewById(R.id.search_devices_button)
         connectButton = findViewById(R.id.connect_button)
         startTrackingButton = findViewById(R.id.start_tracking_button)
+
+        viewExerciseButton = findViewById(R.id.view_instructions)
+        viewListButton = findViewById(R.id.view_list)
+        setupInstrButton = findViewById(R.id.setup_instructions)
+        skipButton = findViewById(R.id.skip_workout)
         endWorkoutButton = findViewById(R.id.end_workout)
 
         progressBar = findViewById(R.id.progressBar)
@@ -113,12 +127,38 @@ class PerfromExercises : AppCompatActivity() {
                 connectButton.performClick()
                 status.text = "Complete the workout on your external monitor or TV."
                 progressBar.visibility = ProgressBar.GONE
-//            connectButton.visibility = Button.VISIBLE
-//            connectButton.text = "Reconnect"
+                viewExerciseButton.visibility = View.VISIBLE
+                viewListButton.visibility = View.VISIBLE
+                setupInstrButton.visibility = View.VISIBLE
+                skipButton.visibility = View.VISIBLE
+                endWorkoutButton.visibility = View.VISIBLE
             }
-        }, 5000)  // Clicks after 10 seconds
+        }, 5000)
 
         // set clickListeners
+        viewListButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                val intent = Intent(applicationContext, MyExercises::class.java)
+
+                if (routineConfig != null) {
+                    intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig)
+                }
+
+                intent.putExtra("FROM_EXERCISES", true)
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                applicationContext.startActivity(intent)
+            }
+        })
+
+        setupInstrButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                val intent = Intent(applicationContext, SetUpDevice::class.java)
+                intent.putExtra("FROM_EXERCISES", true)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                applicationContext.startActivity(intent)
+            }
+        })
 
         endWorkoutButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {

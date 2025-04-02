@@ -168,7 +168,8 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:elevation="2dp"
-            android:visibility="gone">
+            android:visibility="gone"
+            >
 
             <View
                 android:id="@+id/dark_overlay"
@@ -188,7 +189,7 @@
                 android:background="@drawable/pink_rounded_textbox"
                 android:layout_gravity="center_horizontal"
                 android:elevation="6dp"
-                android:layout_marginTop="130dp"
+                android:layout_marginTop="150dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
@@ -197,8 +198,8 @@
                 android:text="Seated Leg Extension"
                 android:textSize="40sp"
                 android:padding="10dp"
-                android:layout_marginTop="140dp"
-                android:layout_marginBottom="140dp"
+                android:layout_marginTop="180dp"
+                android:layout_marginBottom="200dp"
                 android:layout_marginRight="150dp"
                 android:layout_marginLeft="150dp"
                 android:textColor="@android:color/black"
@@ -214,13 +215,29 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="240dp"
+                android:layout_marginTop="470dp"
                 android:layout_marginBottom="150dp"
                 android:layout_marginRight="350dp"
                 android:layout_marginLeft="350dp"
                 android:elevation="4dp"
                 android:progressDrawable="@drawable/countdown_exercise"
                 android:max="3000"/>
+
+            <TextView
+                android:id="@+id/exercise_subtext"
+                android:text="Tap 'End Workout' on your phone to exit"
+                android:textSize="24sp"
+                android:padding="10dp"
+                android:layout_marginTop="440dp"
+                android:layout_marginBottom="150dp"
+                android:layout_marginRight="350dp"
+                android:layout_marginLeft="350dp"
+                android:textColor="@android:color/black"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
+                android:visibility="gone"/>
 
         </FrameLayout>
 
@@ -231,7 +248,7 @@
             android:layout_marginStart="700dp"
             android:layout_marginEnd="50dp"
             android:layout_marginTop="650dp"
-            android:padding="30dp"
+            android:padding="20dp"
             android:text="Extend Further!"
             android:textSize="24sp"
             android:textColor="@android:color/black"
@@ -240,6 +257,7 @@
             android:background="@drawable/alert_box"
             android:drawablePadding="70dp"
             android:enabled="false"
+            android:gravity="center_vertical"
             android:visibility="gone"
             app:drawableStartCompat="@drawable/baseline_error_outline_24" />
 

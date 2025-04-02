@@ -1,14 +1,18 @@
 package com.example.physiokneeds_v3;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -44,6 +48,11 @@ public class MainMenu extends AppCompatActivity {
         EditText emailInput = findViewById(R.id.email_input);
         EditText passwordInput = findViewById(R.id.password_input);
 
+        // ask for permission on start up
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            get_permissions();
+        }
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 //                if (emailInput.getText().toString().equals("user")
@@ -59,14 +68,43 @@ public class MainMenu extends AppCompatActivity {
 //                }
             }
         });
+    }
 
-//        todayButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                Intent todayIntent = new Intent(MainMenu.this, MainActivity.class);
-//
-//                MainMenu.this.startActivity(todayIntent);
-//            }
-//        });
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    void get_permissions() {
 
+        String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.BLUETOOTH_CONNECT};
+
+        boolean cameraTrue = false;
+        boolean btTrue = false;
+
+        // camera permissions
+        if (checkSelfPermission(android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            cameraTrue = true;
+        }
+
+        // bluetooth permissions
+        if (checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            btTrue = true;
+        }
+
+        if (cameraTrue && btTrue) {
+            requestPermissions(permissions, 101);
+        } else if (cameraTrue) {
+            requestPermissions(new String[]{(Manifest.permission.CAMERA)}, 101);
+        } else if (btTrue) {
+            requestPermissions(new String[]{(Manifest.permission.BLUETOOTH_CONNECT)}, 101);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                get_permissions(); // Call the method to request permissions again
+            }
+        }
     }
 }

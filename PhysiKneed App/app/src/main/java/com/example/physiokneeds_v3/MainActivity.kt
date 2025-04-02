@@ -17,8 +17,10 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCaptureSession
+import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
+import android.hardware.camera2.CaptureRequest
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.net.Uri
@@ -28,6 +30,8 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.util.Log
+import android.util.Range
+import android.view.Gravity
 import android.view.Surface
 import android.view.TextureView
 import android.view.View
@@ -44,10 +48,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.text.HtmlCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import coil.load
 import com.chaquo.python.Python
 import com.google.gson.Gson
 import com.google.mediapipe.framework.image.BitmapImageBuilder
@@ -66,6 +70,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.util.Locale
 import java.util.UUID
 import kotlin.math.round
 import kotlin.properties.Delegates
@@ -122,7 +127,7 @@ class MainActivity : AppCompatActivity() {
     // bluetooth connectivity
     val TAG: String = "BTErrorLog"
     val REQUEST_ENABLE_BT: Int = 1
-//    lateinit var handlerBT: Handler
+    val connectingDelay = 5000
     var arduinoBTModule: BluetoothDevice? = null
     var arduinoUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
     private var bluetoothSocket: BluetoothSocket? = null // Shared socket reference
@@ -143,6 +148,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var repTimer: TextView
     lateinit var tipText: TextView
     lateinit var loadingBar: ProgressBar
+    lateinit var completeText: TextView
 
     private lateinit var soundPool: SoundPool
     var playSound = false
@@ -172,6 +178,12 @@ class MainActivity : AppCompatActivity() {
 
     // set which camera the app opens first (FOR DEBUGGING)
     var current_camera = 0
+
+    // FPS verification test
+    var fpsData = mutableListOf<Int>()
+    var firstFPS = true
+    var countFPS = 0
+    var startTimeFPS = System.currentTimeMillis()
 
     // broadcast receiver for controlling the external display
     private var buttonPressReceiver = object : BroadcastReceiver() {
@@ -314,12 +326,12 @@ class MainActivity : AppCompatActivity() {
                     Handler(Looper.getMainLooper()).postDelayed({
                         loadingBar.visibility = View.GONE
                         state = 0 // start next state
-                    }, 5000)
+                    }, connectingDelay.toLong())
 
 //                     For Debug without mount
-//                    Handler(Looper.getMainLooper()).postDelayed({
-//                        state = 1 // start next state
-//                    }, 10000)
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        state = 1 // start next state
+                    }, 10000)
 
                     // We subscribe to the observable until the onComplete() is called
                     // We also define control the thread management with
@@ -403,11 +415,9 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        // get camera permissions from the user
-        get_permissions()
-
         // define global variables
         textureView = findViewById(R.id.camera_feed)
+        textureView.isOpaque = false
 //        textureView.scaleX = -1f // mirror since front camera
 //        textureView.rotation = 90f // Rotate 90 degrees clockwise
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -434,6 +444,7 @@ class MainActivity : AppCompatActivity() {
         tipText = findViewById(R.id.tips_text)
         leftImage = findViewById(R.id.left_image)
         loadingBar = findViewById(R.id.progressBarMain)
+        completeText = findViewById(R.id.exercise_subtext)
 
         val videoFeed = findViewById<VideoView>(R.id.video)
         val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.get_position_01)
@@ -554,16 +565,29 @@ class MainActivity : AppCompatActivity() {
 
                 if (state == 100) {
                     titleText.text = "Connecting To Mount..."
-//                    leftText.text = "Connecting..."
-                    Log.d("EXTERNAL_UI", "Title: " + titleText.text)
-                    Log.d("EXTERNAL_UI", "Descr: " + leftText.text)
+
+                    popupMenu.visibility = View.VISIBLE
+                    exerciseTitle.text = "Connecting To Mount..."
+                    exerciseNumberText.text = "Please Wait..."
+
+                    state = -1
+                    val loadingDuration = connectingDelay + 5000
+
+                    moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
                 }
                 else if (state == 0) {
-//                    leftImage.setImageResource(R.drawable.positioned)
+                    popupMenu.visibility = View.GONE // hide pop up
                     videoFeed.visibility = View.VISIBLE
                     // update text
                     titleText.text = "Get Positioned in Frame"
                     leftText.visibility = View.VISIBLE
+                    leftText.gravity = Gravity.CENTER
+                    val htmlText = "<p>Stand <b>2 m</b> away from camera.</p>" +
+                            "<p>Exercises start automatically once your entire body is visible on screen.</p>"
+
+                    val styledText = HtmlCompat.fromHtml(htmlText, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                    leftText.text = styledText
+
 //                    leftText.text = "Stand 2 m away from the camera. \n\n Exercises start automatically once your entire body is visible on screen."
                     // TODO more polish for UI
                     // TODO update image with GIF
@@ -595,12 +619,15 @@ class MainActivity : AppCompatActivity() {
                     counts += 1
                 }
                 else if (state == 1) {
-//                    tipText.visibility = View.VISIBLE
-//                    tipText.text = "TIPS"
                     titleText.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
 
-                    Log.d("INSTRUCTIONS_DEBUG", routineConfig.exercises[currentExerciseIndex].exercise.instruction)
-                    leftText.text = "TIPS \n\n" + routineConfig.exercises[currentExerciseIndex].exercise.instruction.replace("\\n", "\n") // 1. Sit facing sideways to the camera.\n\n2. Raise and lower your leg slowly"
+                    val htmlText = "<b>TIPS</b><br>" + "<br>" +
+                            routineConfig.exercises[currentExerciseIndex].exercise.instruction.replace("\\n", "<br>")
+
+                    val styledText = HtmlCompat.fromHtml(htmlText, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                    leftText.gravity = Gravity.NO_GRAVITY
+
+                    leftText.text = styledText
                     if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Seated Leg Extension (Right)") {
                         val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.seated_leg_extension)
                         videoFeed.setVideoURI(videoUri)
@@ -635,7 +662,7 @@ class MainActivity : AppCompatActivity() {
                     exerciseNumberText.text = "Exercise #" + (currentExerciseIndex+1)
 
                     state = -1
-                    val loadingDuration = 3000
+                    val loadingDuration = 10000
 
                     moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
 
@@ -646,9 +673,21 @@ class MainActivity : AppCompatActivity() {
 
                     playSound = true
 
-                    startTime = (System.currentTimeMillis() / 1000) + 3
+                    startTime = (System.currentTimeMillis() / 1000) + 10
                 }
                 else if (state == 2) {
+
+                    // FPS verification test during exercise state
+                    if (firstFPS) {
+                        startTimeFPS = System.nanoTime()
+                        firstFPS = false
+                    } else if ((System.nanoTime() - startTimeFPS) >= 1000000000) {
+                        fpsData.add(countFPS)
+                        startTimeFPS = System.nanoTime()
+                        countFPS = 0
+                    } else {
+                        countFPS++
+                    }
 
                     if (playSound) {
                         soundPool.play(beginRepSound, 1f, 1f, 0, 0, 1f)
@@ -659,7 +698,6 @@ class MainActivity : AppCompatActivity() {
                     // update rep timer
                     updateRepTimer()
 
-                    // TODO update to the instructions in the exercise class
                     // perform exercise
                     if (result != null && result.landmarks().size > 0) {
 //                        Log.d("PORT_DEBUG", result.landmarks().toString())
@@ -687,6 +725,8 @@ class MainActivity : AppCompatActivity() {
 
 //                                Log.d("NICK_AHHHH", repData.poses.size.toString())
                                 Log.d("POSE_FRAME_DEBUG", "Total Time: " + repData.totalTime.toString())
+
+                                Log.d("SYMMETRIC_DEBUG", "Rep Number: " + repData.repNumber)
 
                                 repDataLists[currentExerciseIndex].add(repData)
                                 Log.d("NICK_AHHHH", repDataLists[currentExerciseIndex][repDataLists[currentExerciseIndex].size - 1].poses.size.toString())
@@ -723,7 +763,11 @@ class MainActivity : AppCompatActivity() {
                         var alertCount = 1
                         for (alert in exerciseTrackers[currentExerciseIndex].alertTriggers) {
                             if (alertCount == exerciseTrackers[currentExerciseIndex].alertTriggers.size) {
-                                alertText = alertText + alert
+                                if (exerciseTrackers[currentExerciseIndex].alertTriggers.size == 1){
+                                    alertText = alertText + alert
+                                } else {
+                                    alertText = alertText + alert.lowercase(Locale.ROOT)
+                                }
                             } else {
                                 alertText = alertText + alert + " & "
                             }
@@ -741,6 +785,9 @@ class MainActivity : AppCompatActivity() {
                     // check if exercise is done
                     if (exerciseTrackers[currentExerciseIndex].repCount == routineConfig.exercises[currentExerciseIndex].reps) {
                         // done exercise
+
+                        Log.d("FPS_VERIFICATION", fpsData.toString())
+
                         if (currentExerciseIndex < routineConfig.exercises.size - 1) {
                             currentExerciseIndex++ // update index
                             state = 3 // next exercise
@@ -770,18 +817,20 @@ class MainActivity : AppCompatActivity() {
                     }, loadingDuration.toLong())  // update progress
                 }
                 else if (state == 4) {
+                    // exit state machine
+                    state = -1
+
                     popupMenu.visibility = View.VISIBLE
                     exerciseTitle.text = "Workout Complete"
                     exerciseNumberText.text = "Nice Work!"
+
+                    progressBarPopup.visibility = View.GONE
+                    completeText.visibility = View.VISIBLE
 
                     if (::connectedThreadWrite.isInitialized) {
                         connectedThreadWrite.write("[90,45]")
                         currentPos = "[90,45]"
                     }
-
-                    state = -1
-                    val loadingDuration = 10000
-                    moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
 
                     // send data format
                     var routineDataList = mutableListOf<RoutineComponentDataUpload>()
@@ -795,30 +844,28 @@ class MainActivity : AppCompatActivity() {
                         val routineComponentData = RoutineComponentDataUpload(routineConfig.exercises[index].exercise.id, repDataList)
                         routineDataList.add(routineComponentData)
                         index++
-                        val gson = Gson()
-                        val jsonData = gson.toJson(repDataList) // Serialize the data
+//                        val gson = Gson()
+//                        val jsonData = gson.toJson(repDataList) // Serialize the data
 
-                        for (repData in repDataList) {
-                            Log.d("NICK_AHHHH", "Poses data: " + Gson().toJson(repData.poses))
-                        }
-
-                        Log.d("JSON_REPDATA", "repData Pose size: " + repDataList[0].poses.size)
-                        Log.d("JSON_REPDATA", "json " + jsonData)
+//                        for (repData in repDataList) {
+//                            Log.d("NICK_AHHHH", "Poses data: " + Gson().toJson(repData.poses))
+//                        }
+//
+//                        Log.d("JSON_REPDATA", "repData Pose size: " + repDataList[0].poses.size)
+//                        Log.d("JSON_REPDATA", "json " + jsonData)
                     }
 
                     val routineData = RoutineDataUpload(routineConfig.id, routineDataList)
-                    sendData(routineData)
+//                    sendData(routineData)
 
                     // send routine data to next screen
                     val intentRoutine = Intent("com.example.ROUTINE_DATA_SEND")
                     intentRoutine.putExtra("RoutineData", routineData)
                     LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentRoutine)
 
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        val intent = Intent("com.example.END_WORKOUT")
-                        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
-                        finish()
-                    }, loadingDuration.toLong())  // finish after 10 seconds
+                    // switch in progress buttons
+                    val intent = Intent("com.example.END_WORKOUT")
+                    LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
                 }
             }
         }
@@ -891,37 +938,27 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
-    fun get_permissions() {
-        // camera permissions
-        if (checkSelfPermission(android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(kotlin.arrayOf(android.Manifest.permission.CAMERA), 101)
-        }
-
-        // bluetooth permissions
-        if (checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(kotlin.arrayOf(android.Manifest.permission.BLUETOOTH_CONNECT), 1)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    override fun onRequestPermissionsResult(
-        requestCode: kotlin.Int,
-        permissions: kotlin.Array<out kotlin.String>,
-        grantResults: kotlin.IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults[0] != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            get_permissions()
-        }
-    }
-
     @SuppressLint("MissingPermission")
     fun open_camera(camera_index: Int) {
         cameraManager.openCamera(cameraManager.cameraIdList[camera_index], object:CameraDevice.StateCallback() {
             override fun onOpened(p0: CameraDevice) {
+
+                val fpsRanges: Array<out Range<Int>>? =
+                    cameraManager.getCameraCharacteristics(cameraManager.cameraIdList[camera_index]).get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)
+                if (fpsRanges != null) {
+                    for (range in fpsRanges) {
+                        Log.d(
+                            "FPS_RANGE",
+                            ("Min: " + range.getLower()).toString() + " Max: " + range.getUpper()
+                        )
+                    }
+                }
+
                 cameraDevice = p0
                 val captureRequest = p0.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                captureRequest.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,
+                    fpsRanges?.get(fpsRanges.size -1) ?: Range(30, 30)
+                )
 
                 val surface = Surface(textureView.surfaceTexture)
 
@@ -1048,12 +1085,16 @@ class MainActivity : AppCompatActivity() {
         for (trackingDetail in exerciseDetail.defaultTrackingDetails) {
             val keypoints = if (trackingDetail.symmetric) {
                 val side = detectLeadingSide(landmarks)
+                Log.d("SYMMETRIC_DEBUG", "Leading Side: " + side)
+
                 trackingDetail.keypoints.map { "${side}_$it" }.also {
                     if (trackingDetail == exerciseDetail.repTracking) {
                         exerciseDetail.repKeypoints = it
                     }
                 }
             } else trackingDetail.keypoints
+
+            Log.d("SYMMETRIC_DEBUG", keypoints.toString())
 
             val extractedLandmarks = extractKeypointsDynamic(
                 landmarks, keypoints, trackingDetail.dimensionality
