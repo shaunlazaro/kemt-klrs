@@ -14,6 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +34,11 @@ public class HomeScreen extends AppCompatActivity {
     public static final String TAG_API = "ApiError";
     public static final String ROUTINE_TAG = "ROUTINE";
 
-    RoutineConfig routineConfig;
+    public static RoutineConfig routineConfig = new RoutineConfig();
+
+    public static String loginUsername = "";
+
+    BottomNavigationView bottomNavigationView;
 
     ImageButton exerciseButton;
     Button exerciseTextButton;
@@ -53,8 +62,23 @@ public class HomeScreen extends AppCompatActivity {
         exerciseTextButton = findViewById(R.id.exercise_text_button);
         usernameText = findViewById(R.id.username);
 
+        // bottom navigation functionality
+        bottomNavigationView = findViewById(R.id.bottom_nav);
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.nav_home) {
+                replaceFragment(new HomeFragment());
+            } else if (item.getItemId() == R.id.nav_progress) {
+                replaceFragment(new ProgressFragment());
+            } else if (item.getItemId() == R.id.nav_account) {
+                replaceFragment(new AccountFragment());
+            }
+
+            return true;
+        });
+
         // for now just display the username that was entered in the login screen
-        String loginUsername = getIntent().getStringExtra(MainMenu.USERNAME_TAG);
+        loginUsername = getIntent().getStringExtra(MainMenu.USERNAME_TAG);
         if (loginUsername != null) {
             usernameText.setText(loginUsername);
         }
@@ -140,5 +164,12 @@ public class HomeScreen extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_frame_layout, fragment);
+        fragmentTransaction.commit();
     }
 }

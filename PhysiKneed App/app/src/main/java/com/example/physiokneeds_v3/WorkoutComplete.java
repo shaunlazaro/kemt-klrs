@@ -52,7 +52,10 @@ public class WorkoutComplete extends AppCompatActivity {
 
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         SeekBar scoreBar = findViewById(R.id.seekBar);
-        Button nextButton = findViewById(R.id.next_button);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        TextView nextButton = findViewById(R.id.next_text);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        Button nextButtonFinal = findViewById(R.id.next_button);
         TextView skipText = findViewById(R.id.skip_button);
 
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
@@ -109,6 +112,8 @@ public class WorkoutComplete extends AppCompatActivity {
                     backText.setVisibility(View.VISIBLE);
                     faces.setVisibility(View.GONE);
                     editText.setVisibility(View.VISIBLE);
+                    nextButton.setVisibility(View.GONE);
+                    nextButtonFinal.setVisibility(View.VISIBLE);
                 } else if (exerciseIndex < exerciseList.size()){
                     switch (exerciseList.get(exerciseIndex).getExercise().getDisplayName()) {
                         case "Seated Leg Extension (Right)":
@@ -136,6 +141,16 @@ public class WorkoutComplete extends AppCompatActivity {
                     WorkoutComplete.this.startActivity(intent);
                 }
 
+            }
+        });
+
+        nextButtonFinal.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(WorkoutComplete.this, WorkoutSummary.class);
+                intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig);
+                intent.putExtra("RoutineData", routineData);
+
+                WorkoutComplete.this.startActivity(intent);
             }
         });
 
@@ -174,6 +189,7 @@ public class WorkoutComplete extends AppCompatActivity {
             scoreBar.setVisibility(View.VISIBLE);
             nextButton.setVisibility(View.GONE);
             editText.setVisibility(View.GONE);
+            nextButtonFinal.setVisibility(View.GONE);
             faces.setVisibility(View.VISIBLE);
             exerciseText.setText(exerciseList.get(exerciseIndex).getExercise().getDisplayName());
             nextButton.setVisibility(View.GONE);

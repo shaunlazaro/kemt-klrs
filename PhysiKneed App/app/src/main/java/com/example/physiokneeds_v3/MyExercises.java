@@ -93,6 +93,17 @@ public class MyExercises extends AppCompatActivity {
             imageView.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10));
             imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
+            int finalI = i;
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MyExercises.this, WorkoutInstructions.class);
+                    intent.putExtra("EXERCISE_NAME", finalI);
+                    intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig);
+                    MyExercises.this.startActivity(intent);
+                }
+            });
+
             // Create TextView
             TextView textView = new TextView(this);
             LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(

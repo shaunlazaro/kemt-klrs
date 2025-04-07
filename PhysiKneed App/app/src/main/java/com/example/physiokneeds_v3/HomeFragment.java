@@ -1,63 +1,96 @@
 package com.example.physiokneeds_v3;
 
+import static com.example.physiokneeds_v3.HomeScreen.ROUTINE_TAG;
+import static com.example.physiokneeds_v3.HomeScreen.TAG_API;
+
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- *
- */
+import java.util.List;
+import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+
 public class HomeFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    RoutineConfig routineConfig = HomeScreen.routineConfig;
+    ImageButton exerciseButton;
+    Button exerciseTextButton;
+    TextView usernameText;
 
     public HomeFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        exerciseButton = view.findViewById(R.id.exercise_button);
+        exerciseTextButton = view.findViewById(R.id.exercise_text_button);
+        usernameText = view.findViewById(R.id.username);
+
+        // for now just display the username that was entered in the login screen
+        String loginUsername = HomeScreen.loginUsername;
+        if (loginUsername != null) {
+            usernameText.setText(loginUsername);
+        }
+
+        // implement button to get to today's exercises
+        exerciseButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent exerciseIntent = new Intent(getActivity(), MyExercises.class);
+                if (routineConfig != null) {
+                    exerciseIntent.putExtra(ROUTINE_TAG, routineConfig);
+                }
+
+                startActivity(exerciseIntent);
+            }
+        });
+
+        exerciseTextButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent exerciseIntent = new Intent(getActivity(), MyExercises.class);
+                if (routineConfig != null) {
+                    exerciseIntent.putExtra(ROUTINE_TAG, routineConfig);
+                }
+
+                startActivity(exerciseIntent);
+            }
+        });
+
+        loadData();
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return view;
+    }
+
+    private void loadData() {
+        String exerciseList = "\n";
+        for (int i = 0; i < routineConfig.getExercises().size(); i++) {
+            // formatting example
+            // android:text="\n\nSeated Leg Extension x 8\nSquat x 6\nStanding Quad Stretch x 10\nCalf Raise x 10"
+            // \n\nSeated Leg Extension x 8\nSquat x 6\nStanding Quad Stretch x 10\nCalf Raise x 10
+            exerciseList += "\n"
+                    + routineConfig.getExercises().get(i).getExercise().getDisplayName()
+                    + " x "
+                    + routineConfig.getExercises().get(i).getReps();
+        }
+
+        exerciseTextButton.setText(exerciseList);
     }
 }

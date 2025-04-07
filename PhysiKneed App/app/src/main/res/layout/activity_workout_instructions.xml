@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WorkoutInstructions">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/linear_layout_exercises"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/back_button"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@color/white"
+                    android:src="@drawable/baseline_arrow_back_24"
+                    android:contentDescription="Next"
+                    android:layout_marginStart="24dp" />
+
+                <TextView
+                    android:id="@+id/exercise_instr_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Exercise"
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="24sp"
+                    android:textColor="@color/nav_blue"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:layout_marginStart="10dp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/reps_text_instr"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="reps"
+                android:fontFamily="@font/source_sans"
+                android:textSize="14sp"
+                android:layout_gravity="start"
+                android:layout_marginStart="95dp"
+                android:textColor="@color/black" />
+
+            <ImageView
+                android:id="@+id/exercise_img"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/seated_leg"
+                android:layout_marginTop="40dp"
+                android:padding="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Steps"
+                android:fontFamily="@font/source_sans"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_gravity="start"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="40dp"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/instr_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="1. Sit on a chair with both feet on the floor\n\n2. Slowly bend your right knee, bringing your\n     lower leg up\n\n3. Lift your leg until you feel discomfort or\n    your leg is straight\n\n4. Slowly lower your leg back to the ground"
+                android:fontFamily="@font/source_sans"
+                android:textSize="15sp"
+                android:layout_gravity="start"
+                android:layout_marginStart="45dp"
+                android:layout_marginEnd="35dp"
+                android:layout_marginTop="15dp"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Common Errors"
+                android:fontFamily="@font/source_sans"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_gravity="start"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/comm_errs"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Only lift your right leg. Keep your left foot on the ground\n\nRaise and lower your leg slowly"
+                android:fontFamily="@font/source_sans"
+                android:textSize="15sp"
+                android:layout_gravity="start"
+                android:layout_marginStart="45dp"
+                android:layout_marginEnd="45dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="30dp"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

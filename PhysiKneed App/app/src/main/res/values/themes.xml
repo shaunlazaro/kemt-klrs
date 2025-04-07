@@ -1,8 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.PhysioKneeds_v3" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/blue</item> <!-- Change to your desired color -->
+        <item name="colorPrimaryDark">@color/nav_blue</item> <!-- Darker shade of primary color -->
+        <item name="colorAccent">@color/pink</item>
     </style>
 
     <style name="Theme.PhysioKneeds_v3" parent="Base.Theme.PhysioKneeds_v3" />

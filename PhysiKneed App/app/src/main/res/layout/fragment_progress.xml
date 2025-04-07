@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ProgressFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="268dp"
+                android:layout_height="match_parent"
+                android:textAlignment="center"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/blue"
+                android:fontFamily="@font/source_sans"
+                android:layout_marginTop="20dp"
+                android:paddingStart="90dp"
+                android:drawablePadding="-90dp"
+                android:drawableStart="@drawable/scaled_logo_20dp"
+                android:text="RePose" />
+
+            <TextView
+                android:layout_width="268dp"
+                android:layout_height="match_parent"
+                android:textAlignment="center"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:fontFamily="@font/source_sans"
+                android:layout_marginTop="40dp"
+                android:text="This Week" />
+
+            <TextView
+                android:layout_width="268dp"
+                android:layout_height="match_parent"
+                android:textAlignment="center"
+                android:layout_gravity="center_horizontal"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/source_sans"
+                android:text="Score" />
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/barChart"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+
+            <TextView
+                android:layout_width="268dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:fontFamily="@font/source_sans"
+                android:layout_marginTop="40dp"
+                android:text="Past Workouts" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>
