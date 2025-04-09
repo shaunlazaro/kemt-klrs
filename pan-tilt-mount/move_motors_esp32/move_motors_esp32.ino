@@ -120,8 +120,8 @@ void loop() {
     if (hpostarget <= 30) {
       hpostarget=30;
     }
-    if (vpostarget >= 120) {
-      vpostarget = 120;
+    if (vpostarget >= 75) {
+      vpostarget = 75;
     }
     if (vpostarget <= 20) {
       vpostarget=20;
