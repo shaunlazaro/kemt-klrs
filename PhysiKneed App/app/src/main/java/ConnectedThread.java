@@ -74,6 +74,7 @@ public class ConnectedThread extends Thread {
 
     //Write to the BT Stream
     public void write(String input) {
+        input = input + "\n";
         byte[] bytes = input.getBytes(); //converts entered String into bytes
         try {
             Log.d(TAG, input);
@@ -90,5 +91,9 @@ public class ConnectedThread extends Thread {
         } catch (IOException e) {
             Log.e(TAG, "Could not close the connect socket", e);
         }
+    }
+
+    public void flush() throws IOException {
+        mmOutStream.flush();
     }
 }

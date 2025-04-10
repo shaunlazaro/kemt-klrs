@@ -5,6 +5,7 @@ import java.util.List;
 public class RoutineComponentData {
     private ExerciseDetail exerciseDetail ;
     private List<RepData> repData;
+    private int rating;
 
     // Constructor
     public RoutineComponentData(ExerciseDetail exerciseDetail, List<RepData> repData) {

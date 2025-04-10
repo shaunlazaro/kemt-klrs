@@ -111,6 +111,10 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     private void loadData() {
+        // http://140.238.151.117:8000/api/routine-data/ for routine data
+        // iterate "created_at" field for last week (maybe library that will get day of week)
+        // populate progress screen
+
         // create retrofit instance
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://140.238.151.117:8000/api/routine-configs/")

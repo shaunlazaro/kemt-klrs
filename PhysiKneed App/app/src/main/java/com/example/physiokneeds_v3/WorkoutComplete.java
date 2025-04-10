@@ -155,7 +155,6 @@ public class WorkoutComplete extends AppCompatActivity {
         });
 
         skipText.setOnClickListener(v -> {
-            // TODO send user to workout summary
             Intent intent = new Intent(WorkoutComplete.this, WorkoutSummary.class);
             intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig);
             intent.putExtra("RoutineData", routineData);

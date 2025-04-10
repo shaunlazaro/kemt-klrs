@@ -148,6 +148,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var repTimer: TextView
     lateinit var tipText: TextView
     lateinit var loadingBar: ProgressBar
+    lateinit var getPosText: TextView
     lateinit var completeText: TextView
 
     private lateinit var soundPool: SoundPool
@@ -159,10 +160,10 @@ class MainActivity : AppCompatActivity() {
 
     var isConnected = false
 
-    val COUNT_MAX = 20
-    var counts = 0
+    val COUNT_MAX = 2
+    val TRACK_COUNT_MAX = 3 *(10/COUNT_MAX)
 
-    var currentPos = "[90,45]"
+    var counts = 0
 
     var isReceiverRegistered = false
 
@@ -170,6 +171,9 @@ class MainActivity : AppCompatActivity() {
     var frameWidth by Delegates.notNull<Int>()
     var frameHeight by Delegates.notNull<Int>()
 
+    // handle symmetric exercises
+    var symmetricCount = 0
+    val SYMMETRIC_COUNT_MAX = 30
 
     // For exercise flow
     var state = 100
@@ -201,7 +205,7 @@ class MainActivity : AppCompatActivity() {
                 state = -1
                 Handler(Looper.getMainLooper()).postDelayed({
                     if (::connectedThreadWrite.isInitialized) {
-                        connectedThreadWrite?.write("[90,45]")
+                        connectedThreadWrite?.write("RESET")
                     }
                     finish()
                 }, 1000)
@@ -323,15 +327,7 @@ class MainActivity : AppCompatActivity() {
                     btButtonCount++
 
 //                    // connecting delay
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        loadingBar.visibility = View.GONE
-                        state = 0 // start next state
-                    }, connectingDelay.toLong())
-
-//                     For Debug without mount
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        state = 1 // start next state
-                    }, 10000)
+                    state = 1 // start next state
 
                     // We subscribe to the observable until the onComplete() is called
                     // We also define control the thread management with
@@ -346,6 +342,12 @@ class MainActivity : AppCompatActivity() {
                         "BT Mount Could Not Connect",
                         Toast.LENGTH_SHORT
                     ).show()
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        bt_button.performClick()
+                        titleText.text = "Reconnecting To Mount..."
+                    }, connectingDelay.toLong())
+
                 }
             }
         })
@@ -384,12 +386,6 @@ class MainActivity : AppCompatActivity() {
                                 arduinoBTModule = device
                                 bt_button.isEnabled = true
                                 deviceFound = true
-
-                                Toast.makeText(
-                                    applicationContext,
-                                    "BT Mount Found",
-                                    Toast.LENGTH_SHORT
-                                ).show()
                             }
                         }
                     }
@@ -444,6 +440,7 @@ class MainActivity : AppCompatActivity() {
         tipText = findViewById(R.id.tips_text)
         leftImage = findViewById(R.id.left_image)
         loadingBar = findViewById(R.id.progressBarMain)
+        getPosText = findViewById(R.id.getPositionedBox)
         completeText = findViewById(R.id.exercise_subtext)
 
         val videoFeed = findViewById<VideoView>(R.id.video)
@@ -576,21 +573,8 @@ class MainActivity : AppCompatActivity() {
                     moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
                 }
                 else if (state == 0) {
-                    popupMenu.visibility = View.GONE // hide pop up
-                    videoFeed.visibility = View.VISIBLE
-                    // update text
-                    titleText.text = "Get Positioned in Frame"
-                    leftText.visibility = View.VISIBLE
-                    leftText.gravity = Gravity.CENTER
-                    val htmlText = "<p>Stand <b>2 m</b> away from camera.</p>" +
-                            "<p>Exercises start automatically once your entire body is visible on screen.</p>"
-
-                    val styledText = HtmlCompat.fromHtml(htmlText, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                    leftText.text = styledText
-
-//                    leftText.text = "Stand 2 m away from the camera. \n\n Exercises start automatically once your entire body is visible on screen."
-                    // TODO more polish for UI
-                    // TODO update image with GIF
+                    loadingBar.visibility = View.VISIBLE
+                    getPosText.visibility = View.VISIBLE
 
                     if (result != null && result.landmarks().size > 0 && counts > COUNT_MAX) {
                         val landmarks = result.landmarks()[0]
@@ -611,7 +595,6 @@ class MainActivity : AppCompatActivity() {
                             track_user(result, mpImage.height, mpImage.width, true)
                         } else if (keypointVisibleForTracking) {
                             track_user(result, mpImage.height, mpImage.width, false)
-                            // TODO add pop up that keypoints aren't visible (light, in frame, stay still etc.)
                         }
                         counts = 0
                     }
@@ -619,6 +602,9 @@ class MainActivity : AppCompatActivity() {
                     counts += 1
                 }
                 else if (state == 1) {
+                    reps_text.visibility = View.GONE
+                    repTimer.visibility = View.GONE
+
                     titleText.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
 
                     val htmlText = "<b>TIPS</b><br>" + "<br>" +
@@ -626,6 +612,10 @@ class MainActivity : AppCompatActivity() {
 
                     val styledText = HtmlCompat.fromHtml(htmlText, HtmlCompat.FROM_HTML_MODE_LEGACY)
                     leftText.gravity = Gravity.NO_GRAVITY
+
+                    videoFeed.visibility = View.VISIBLE
+                    // update text
+                    leftText.visibility = View.VISIBLE
 
                     leftText.text = styledText
                     if (routineConfig.exercises[currentExerciseIndex].exercise.displayName == "Seated Leg Extension (Right)") {
@@ -654,28 +644,33 @@ class MainActivity : AppCompatActivity() {
                         videoFeed.visibility = View.GONE
                         leftImage.setImageResource(R.drawable.baseline_fitness_center_24)
                     }
-                    reps_text.visibility = View.VISIBLE
-                    repTimer.visibility = View.VISIBLE
 
                     popupMenu.visibility = View.VISIBLE
                     exerciseTitle.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
                     exerciseNumberText.text = "Exercise #" + (currentExerciseIndex+1)
 
                     state = -1
-                    val loadingDuration = 10000
+                    val loadingDuration = 5000
 
                     moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
 
                     Handler(Looper.getMainLooper()).postDelayed({
-                        state = 2 // start next state
+//                        state = 0 // start next state
+                        //                     For Debug without mount
+                        state = 2
                         popupMenu.visibility = View.GONE // hide pop up
                     }, loadingDuration.toLong())  // update progress
 
                     playSound = true
 
-                    startTime = (System.currentTimeMillis() / 1000) + 10
                 }
                 else if (state == 2) {
+
+                    loadingBar.visibility = View.GONE
+                    getPosText.visibility = View.GONE
+
+                    reps_text.visibility = View.VISIBLE
+                    repTimer.visibility = View.VISIBLE
 
                     // FPS verification test during exercise state
                     if (firstFPS) {
@@ -737,7 +732,6 @@ class MainActivity : AppCompatActivity() {
                                 Log.d("ALERT_LOG", "Alert Size: " + repData.alerts.size.toString())
                             }
 
-                            // TODO add smooth angle
                             // REVISIT the equals check condition
 //                            val repTrackingAngle = trackingResults
 //                                .firstOrNull { it.detail.trackingType == exerciseDetail.repTracking.trackingType }?.angle
@@ -817,6 +811,9 @@ class MainActivity : AppCompatActivity() {
                     }, loadingDuration.toLong())  // update progress
                 }
                 else if (state == 4) {
+
+                    soundPool.play(repsCompleteSound, 1f, 1f, 1, 0, 1f)
+
                     // exit state machine
                     state = -1
 
@@ -828,8 +825,7 @@ class MainActivity : AppCompatActivity() {
                     completeText.visibility = View.VISIBLE
 
                     if (::connectedThreadWrite.isInitialized) {
-                        connectedThreadWrite.write("[90,45]")
-                        currentPos = "[90,45]"
+                        connectedThreadWrite.write("RESET")
                     }
 
                     // send data format
@@ -1005,27 +1001,32 @@ class MainActivity : AppCompatActivity() {
         }
         // Get coords to send
         try {
-//            val motorCoords = getCoords(allPoints, height, width, currentPos)
             val py = Python.getInstance()
             val motorCoords = py.getModule("processing")
-                .callAttr("get_coords", allPoints.toTypedArray(), height, width, currentPos).toString()
+                .callAttr("get_coords", allPoints.toTypedArray(), height, width).toString()
 
             if (motorCoords != "DNM") {
-                currentPos = motorCoords
-                Log.d("CUSTOMTAG", currentPos)
                 if (::connectedThreadWrite.isInitialized) {
                     connectedThreadWrite.write(motorCoords)
-                    Log.d("COORDS_TAG", "Coords Sent: " + motorCoords)
+                    connectedThreadWrite.flush()
+                    Log.d("COORDS_TAG_NEW", "Coords Sent: " + motorCoords)
                 }
+                trackUserCount -= 1
+                loadingBar.progress = trackUserCount
+                getPosText.text = "Get Positioned in Frame to Begin\n"
+            } else if (trackUserCount >= TRACK_COUNT_MAX && changeState) {
+                // if the camera hasn't moved for 3 iterations, stop moving camera
+                state = 2
+                startTime = (System.currentTimeMillis() / 1000)
                 trackUserCount = 0
-            } else if (trackUserCount >= 3 && changeState) {
-                // if the camera hasn't moved for 10 iterations, stop moving camera
-                state = 1
-                trackUserCount = 0
-            } else {
+            } else if (changeState) {
                 // increase trackUserCount if not moved and less than 10
-                Log.d("CUSTOMTAG", currentPos)
+                loadingBar.max = TRACK_COUNT_MAX
+                loadingBar.progress = trackUserCount
                 trackUserCount += 1
+                if (trackUserCount >= TRACK_COUNT_MAX/3) {
+                    getPosText.text = "Hold Still\n"
+                }
             }
         } catch (e: Exception) {
             Log.e("PythonErrorTrackUser", "An error occurred:", e)
@@ -1092,6 +1093,15 @@ class MainActivity : AppCompatActivity() {
                         exerciseDetail.repKeypoints = it
                     }
                 }
+
+//                if (symmetricCount > SYMMETRIC_COUNT_MAX) {
+//                    routineConfig.exercises[currentExerciseIndex].exercise.defaultTrackingDetails.keypoints.map { "${side}_$it" }.also {
+//                        if (trackingDetail == exerciseDetail.repTracking) {
+//                            exerciseDetail.repKeypoints = it
+//                        }
+//                    }
+//                }
+
             } else trackingDetail.keypoints
 
             Log.d("SYMMETRIC_DEBUG", keypoints.toString())
@@ -1105,7 +1115,6 @@ class MainActivity : AppCompatActivity() {
                 val py = Python.getInstance()
 
                 val exerciseAngle = when (trackingDetail.trackingType) {
-                    // TODO trackingType is a string rn
                     "Angle of three points" ->
                         py.getModule("processing")
                             .callAttr(

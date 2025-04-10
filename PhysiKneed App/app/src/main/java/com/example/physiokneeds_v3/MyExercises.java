@@ -72,7 +72,6 @@ public class MyExercises extends AppCompatActivity {
 //            linearLayoutText.setPadding(0, dpToPx(25), 0, 0);
 
             // Create ImageView
-            // TODO make imageViews buttons for more exercise instructions and custom images
             ImageView imageView = new ImageView(this);
             LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
                     dpToPx(58),

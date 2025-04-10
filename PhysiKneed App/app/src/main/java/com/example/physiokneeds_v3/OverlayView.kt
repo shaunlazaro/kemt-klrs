@@ -42,11 +42,11 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
     private fun initPaints() {
         linePaint.color =
             ContextCompat.getColor(context!!, R.color.white)
-        linePaint.strokeWidth = LANDMARK_STROKE_WIDTH
+        linePaint.strokeWidth = LANDMARK_STROKE_WIDTH*0.6f
         linePaint.style = Paint.Style.STROKE
 
-        pointPaint.color = Color.YELLOW
-        pointPaint.strokeWidth = LANDMARK_STROKE_WIDTH
+        pointPaint.color = Color.WHITE
+        pointPaint.strokeWidth = LANDMARK_STROKE_WIDTH*1.6f
         pointPaint.style = Paint.Style.FILL
     }
 
@@ -92,6 +92,18 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                             poseLandmarkerResult.landmarks().get(0).get(it.end()).x() * imageWidth * scaleFactor,
                             poseLandmarkerResult.landmarks().get(0).get(it.end()).y() * imageHeight * scaleFactor,
                             linePaint)
+                        canvas.drawCircle(
+                            poseLandmarkerResult.landmarks().get(0).get(it!!.start()).x() * imageWidth * scaleFactor,
+                            poseLandmarkerResult.landmarks().get(0).get(it.start()).y() * imageHeight * scaleFactor,
+                            LANDMARK_STROKE_WIDTH,
+                            pointPaint
+                        )
+                        canvas.drawCircle(
+                            poseLandmarkerResult.landmarks().get(0).get(it!!.end()).x() * imageWidth * scaleFactor,
+                            poseLandmarkerResult.landmarks().get(0).get(it.end()).y() * imageHeight * scaleFactor,
+                            LANDMARK_STROKE_WIDTH,
+                            pointPaint
+                        )
                     }
                 }
             }

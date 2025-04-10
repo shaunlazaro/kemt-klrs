@@ -6,6 +6,7 @@ import java.util.List;
 public class RoutineComponentDataUpload implements Serializable {
     private String exercise_detail_id;
     private List<RepData> rep_data;
+    private int rating;
 
     // Constructor
     public RoutineComponentDataUpload(String exerciseDetail, List<RepData> repData) {
