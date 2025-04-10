@@ -320,6 +320,19 @@
             android:gravity="center"
             />
 
+        <ProgressBar
+            android:id="@+id/angle_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:rotation="270"
+            android:layout_width="500px"
+            android:layout_height="30px"
+            android:layout_marginStart="1050dp"
+            android:layout_marginEnd="100dp"
+            android:layout_marginTop="450dp"
+            android:elevation="4dp"
+            android:progressDrawable="@drawable/rep_angle_bar"
+            android:max="3000"/>
+
     </RelativeLayout>
 
     </RelativeLayout>

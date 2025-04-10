@@ -17,4 +17,7 @@ public class RoutineComponentDataUpload implements Serializable {
     // Getters
     public String getRoutineComponent() { return exercise_detail_id; }
     public List<RepData> getRepData() { return rep_data; }
+
+    public Integer getRating() { return rating; }
+    public void setRating(int rating) { this.rating = rating; }
 }

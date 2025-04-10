@@ -17,4 +17,8 @@ public class RoutineDataUpload implements Serializable {
     // Getters
     public String getRoutineConfig() { return routineConfig_id; }
     public List<RoutineComponentDataUpload> getRoutineComponentData() { return routine_component_data; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
 }

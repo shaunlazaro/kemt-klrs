@@ -48,6 +48,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -150,6 +151,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var loadingBar: ProgressBar
     lateinit var getPosText: TextView
     lateinit var completeText: TextView
+    lateinit var angleBar: ProgressBar
 
     private lateinit var soundPool: SoundPool
     var playSound = false
@@ -442,6 +444,7 @@ class MainActivity : AppCompatActivity() {
         loadingBar = findViewById(R.id.progressBarMain)
         getPosText = findViewById(R.id.getPositionedBox)
         completeText = findViewById(R.id.exercise_subtext)
+        angleBar = findViewById(R.id.angle_bar)
 
         val videoFeed = findViewById<VideoView>(R.id.video)
         val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.get_position_01)
@@ -605,6 +608,8 @@ class MainActivity : AppCompatActivity() {
                     reps_text.visibility = View.GONE
                     repTimer.visibility = View.GONE
 
+                    angleBar.visibility = View.GONE
+
                     titleText.text = routineConfig.exercises[currentExerciseIndex].exercise.displayName
 
                     val htmlText = "<b>TIPS</b><br>" + "<br>" +
@@ -672,6 +677,10 @@ class MainActivity : AppCompatActivity() {
                     reps_text.visibility = View.VISIBLE
                     repTimer.visibility = View.VISIBLE
 
+                    angleBar.visibility = View.VISIBLE
+                    val angleBarMin = exerciseTrackers[currentExerciseIndex].minForBar?.toInt()!!
+                    angleBar.max = exerciseTrackers[currentExerciseIndex].maxForBar?.toInt()!! - angleBarMin
+
                     // FPS verification test during exercise state
                     if (firstFPS) {
                         startTimeFPS = System.nanoTime()
@@ -710,6 +719,23 @@ class MainActivity : AppCompatActivity() {
                             val trackingResults = processExerciseMetrics(
                                 landmarks, exerciseDetail
                             )
+
+                            // angle bar
+                            var angleForBar = exerciseTrackers[currentExerciseIndex]
+                                .getAngleBarVal(trackingResults, exerciseDetail)
+                                ?.toInt()!!
+                            angleBar.progress = angleForBar - angleBarMin
+
+                            if (angleForBar >= exerciseTrackers[currentExerciseIndex].maxForBar) {
+                                angleBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.rep_angle_bar_full)
+                            }
+                            else if (angleForBar >= exerciseTrackers[currentExerciseIndex].angleValGreen) {
+                                angleBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.rep_angle_bar_gr)
+                            } else if (angleForBar >= exerciseTrackers[currentExerciseIndex].maxForBar / 4) {
+                                angleBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.rep_angle_bar_y)
+                            } else {
+                                angleBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.rep_angle_bar)
+                            }
 
                             val repData = exerciseTrackers[currentExerciseIndex]
                                 .detectReps(trackingResults, exerciseDetail, resultToPose(result))

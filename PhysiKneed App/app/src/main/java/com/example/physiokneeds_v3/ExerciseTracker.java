@@ -29,6 +29,7 @@ public class ExerciseTracker {
     private double lastPoseCaptureTime;
     private double score;
     private double max_score;
+    private double startAngle;
 
 
     public ExerciseTracker(ExerciseDetail exerciseDetail) {
@@ -56,6 +57,7 @@ public class ExerciseTracker {
         this.lastPoseCaptureTime = 0;
         this.score = 0.0;
         this.max_score = 0.0;
+        this.startAngle = exerciseDetail.getStartAngle();
     }
 
     public Set<String> getAlerts() {
@@ -278,5 +280,44 @@ public class ExerciseTracker {
 
     public Set<String> getLastRepAlerts() {
         return lastRepAlerts;
+    }
+
+    public Double getMaxForBar() {
+        if (startInFlexion) {
+            return goalExtension;
+        } else {
+            return (startAngle - goalFlexion);
+        }
+    }
+
+    public Double getMinForBar() {
+        if (startInFlexion) {
+            return startAngle;
+        } else {
+            return 0.0;
+        }
+    }
+
+    public Double getAngleBarVal(List<TrackingResult> trackingResults, ExerciseDetail exerciseDetail) {
+        TrackingDetail mainTrackingDetail = exerciseDetail.getRepTracking();
+
+        Double primaryAngle = getPrimaryAngle(trackingResults, mainTrackingDetail);
+
+        if (primaryAngle == null) {
+            return 0.0;
+        }
+
+        if (startInFlexion) {
+            return primaryAngle;
+        } else {
+            return (180 - primaryAngle);
+        }
+    }
+    public Double getAngleValGreen() {
+        if (startInFlexion) {
+            return extensionThreshold;
+        } else {
+            return (startAngle - flexionThreshold);
+        }
     }
 }
