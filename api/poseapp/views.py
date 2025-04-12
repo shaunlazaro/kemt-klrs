@@ -1,11 +1,15 @@
+import requests
+from django.conf import settings
 from django.shortcuts import render
+from django.contrib.auth.models import User
 from django.db.models import Prefetch
 from django.core.cache import cache
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
+from rest_framework.authtoken.models import Token
 from .models import (
     Pose, 
     Routine, 
@@ -111,3 +115,52 @@ class PatientViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(patient)
         return Response(serializer.data)
+
+# --------------
+# AUTH: We'll use only Google OAuth for this prototype.
+# --------------
+GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
+
+@api_view(['GET'])
+def google_callback(request):
+    code = request.query_params.get('code')
+
+    if not code:
+        return Response({'error': 'No code provided'}, status=400)
+
+    # Exchange code for tokens
+    token_res = requests.post(GOOGLE_TOKEN_URL, data={
+        'code': code,
+        'client_id': settings.GOOGLE_CLIENT_ID,
+        'client_secret': settings.GOOGLE_CLIENT_SECRET,
+        'redirect_uri': settings.GOOGLE_REDIRECT_URI,
+        'grant_type': 'authorization_code',
+    })
+
+    if token_res.status_code != 200:
+        return Response({'error': 'Failed to get tokens'}, status=400)
+
+    token_data = token_res.json()
+    access_token = token_data.get('access_token')
+
+    # Use access token to get user info
+    userinfo_res = requests.get(GOOGLE_USERINFO_URL, headers={
+        'Authorization': f'Bearer {access_token}'
+    })
+
+    if userinfo_res.status_code != 200:
+        return Response({'error': 'Failed to fetch user info'}, status=400)
+
+    userinfo = userinfo_res.json()
+    email = userinfo.get('email')
+    name = userinfo.get('name')
+
+    # Create or get user
+    user, _ = User.objects.get_or_create(username=email, defaults={'first_name': name, 'email': email})
+
+    # Generate DRF token
+    token, _ = Token.objects.get_or_create(user=user)
+
+    # Return token to frontend
+    return Response({'token': token.key})
