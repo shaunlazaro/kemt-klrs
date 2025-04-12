@@ -173,10 +173,6 @@ class MainActivity : AppCompatActivity() {
     var frameWidth by Delegates.notNull<Int>()
     var frameHeight by Delegates.notNull<Int>()
 
-    // handle symmetric exercises
-    var symmetricCount = 0
-    val SYMMETRIC_COUNT_MAX = 30
-
     // For exercise flow
     var state = 100
     var trackUserCount = 0
@@ -190,6 +186,8 @@ class MainActivity : AppCompatActivity() {
     var firstFPS = true
     var countFPS = 0
     var startTimeFPS = System.currentTimeMillis()
+
+    var exerciseSkipped = false
 
     // broadcast receiver for controlling the external display
     private var buttonPressReceiver = object : BroadcastReceiver() {
@@ -211,6 +209,18 @@ class MainActivity : AppCompatActivity() {
                     }
                     finish()
                 }, 1000)
+            }
+            if (intent?.action == "com.example.SKIP_EXERCISE") {
+                exerciseSkipped = true
+                if (currentExerciseIndex < routineConfig.exercises.size - 1) {
+                    currentExerciseIndex++ // update index
+                    val intentIndex = Intent("com.example.VIEW_INSTRUCTIONS") // send broadcast that it is the next exercise
+                    intentIndex.putExtra("EXERCISE_INDEX", currentExerciseIndex)
+                    LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentIndex)
+                    state = 3 // next exercise
+                } else {
+                    state = 4 // done workout
+                }
             }
         }
     }
@@ -312,11 +322,13 @@ class MainActivity : AppCompatActivity() {
         val searchFilter = IntentFilter("com.example.PRESS_SEARCH_BUTTON")
         val connectFilter = IntentFilter("com.example.PRESS_CONNECT_BUTTON")
         val closeFilter = IntentFilter("com.example.CLOSE_EXTERNAL_ACTIVITY")
+        val skipWorkoutFilter = IntentFilter("com.example.SKIP_EXERCISE")
 
 
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, searchFilter)
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, connectFilter)
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, closeFilter)
+        LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, skipWorkoutFilter)
 
         isReceiverRegistered = true
 
@@ -757,17 +769,6 @@ class MainActivity : AppCompatActivity() {
                                 Log.d("ALERT_LOG", "Max Angle: " + repData.maxExtension)
                                 Log.d("ALERT_LOG", "Alert Size: " + repData.alerts.size.toString())
                             }
-
-                            // REVISIT the equals check condition
-//                            val repTrackingAngle = trackingResults
-//                                .firstOrNull { it.detail.trackingType == exerciseDetail.repTracking.trackingType }?.angle
-//
-////                            val repTrackingAngle = trackingResults[0].angle
-//
-//                            Log.d(
-//                                "ROUTINE_DEBUG",
-//                                "repTrackingAngle " + repTrackingAngle.toString()
-//                            )
                         }
                     }
 
@@ -810,6 +811,9 @@ class MainActivity : AppCompatActivity() {
 
                         if (currentExerciseIndex < routineConfig.exercises.size - 1) {
                             currentExerciseIndex++ // update index
+                            val intentIndex = Intent("com.example.VIEW_INSTRUCTIONS") // send broadcast that it is the next exercise
+                            intentIndex.putExtra("EXERCISE_INDEX", currentExerciseIndex)
+                            LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentIndex)
                             state = 3 // next exercise
                         } else {
                             state = 4 // done workout
@@ -818,13 +822,19 @@ class MainActivity : AppCompatActivity() {
                 }
                 else if (state == 3) {
 
-                    soundPool.play(repsCompleteSound, 1f, 1f, 1, 0, 1f)
 
                     reps_text.text =
                         "0 / " + routineConfig.exercises[currentExerciseIndex].reps + " reps     "
                     popupMenu.visibility = View.VISIBLE
                     exerciseNumberText.visibility = View.GONE
-                    exerciseTitle.text = "Exercise Completed"
+
+                    if (!exerciseSkipped) {
+                        soundPool.play(repsCompleteSound, 1f, 1f, 1, 0, 1f)
+                        exerciseTitle.text = "Exercise Completed"
+                    } else {
+                        exerciseTitle.text = "Exercise Skipped"
+                        exerciseSkipped = false
+                    }
 
                     state = -1
                     val loadingDuration = 3000
@@ -1119,14 +1129,6 @@ class MainActivity : AppCompatActivity() {
                         exerciseDetail.repKeypoints = it
                     }
                 }
-
-//                if (symmetricCount > SYMMETRIC_COUNT_MAX) {
-//                    routineConfig.exercises[currentExerciseIndex].exercise.defaultTrackingDetails.keypoints.map { "${side}_$it" }.also {
-//                        if (trackingDetail == exerciseDetail.repTracking) {
-//                            exerciseDetail.repKeypoints = it
-//                        }
-//                    }
-//                }
 
             } else trackingDetail.keypoints
 

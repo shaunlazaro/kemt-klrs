@@ -38,7 +38,7 @@ public class WorkoutComplete extends AppCompatActivity {
 
         // get routine data
         RoutineDataUpload routineData = (RoutineDataUpload) getIntent().getSerializableExtra("RoutineData");
-        if (routineData == null) {
+        if (routineData == null || routineData.getRoutineComponentData().isEmpty() || routineData.getRoutineComponentData().get(0).getRepData().isEmpty()) {
             // if workout was not completed, go back to home screen
             Intent intent = new Intent(WorkoutComplete.this, HomeScreen.class);
             WorkoutComplete.this.startActivity(intent);

@@ -39,6 +39,8 @@ class PerfromExercises : AppCompatActivity() {
 
     lateinit var routineData: RoutineDataUpload
 
+    var exerciseIndex = 0
+
     var isReceiverRegistered = false
 
     var displayCount = 0
@@ -72,6 +74,8 @@ class PerfromExercises : AppCompatActivity() {
             } else if (intent?.action == "com.example.ROUTINE_DATA_SEND") {
                 Log.d("SEND_DATA", "got message for routine data")
                 routineData = (intent.getSerializableExtra("RoutineData") as RoutineDataUpload?)!!
+            } else if (intent?.action == "com.example.VIEW_INSTRUCTIONS") {
+                exerciseIndex = intent.getIntExtra("EXERCISE_INDEX", 0)
             }
         }
     }
@@ -108,10 +112,11 @@ class PerfromExercises : AppCompatActivity() {
         // broadcast receivers for external display control
         val endFilter = IntentFilter("com.example.END_WORKOUT")
         val routineDataFilter = IntentFilter("com.example.ROUTINE_DATA_SEND")
-
+        val exerciseInstructionFilter = IntentFilter("com.example.VIEW_INSTRUCTIONS")
 
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, endFilter)
         LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, routineDataFilter)
+        LocalBroadcastManager.getInstance(this).registerReceiver(buttonPressReceiver, exerciseInstructionFilter)
 
         isReceiverRegistered = true
 
@@ -136,6 +141,20 @@ class PerfromExercises : AppCompatActivity() {
         }, 5000)
 
         // set clickListeners
+        viewExerciseButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                val intent = Intent(applicationContext, WorkoutInstructions::class.java)
+                intent.putExtra("EXERCISE_NAME", exerciseIndex)
+
+                if (routineConfig != null) {
+                    intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig)
+                }
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            }
+        })
+
         viewListButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {
                 val intent = Intent(applicationContext, MyExercises::class.java)
@@ -157,6 +176,13 @@ class PerfromExercises : AppCompatActivity() {
                 intent.putExtra("FROM_EXERCISES", true)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 applicationContext.startActivity(intent)
+            }
+        })
+
+        skipButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                val intent = Intent("com.example.SKIP_EXERCISE")
+                LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
             }
         })
 
