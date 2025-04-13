@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.safestring import mark_safe
-
 # ----
 # Workout Result Data  (DEPRECATED)
 # ----

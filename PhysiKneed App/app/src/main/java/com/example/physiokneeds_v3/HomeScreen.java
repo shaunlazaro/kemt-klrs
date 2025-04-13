@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -14,6 +15,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.List;
+import java.util.Objects;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,14 +26,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeScreen extends AppCompatActivity {
 
-    String TAG_API = "ApiError";
+    public static final String TAG_API = "ApiError";
     public static final String ROUTINE_TAG = "ROUTINE";
 
-    Pose pose;
+    RoutineConfig routineConfig;
 
     ImageButton exerciseButton;
-    TextView exerciseText;
+    Button exerciseTextButton;
     TextView usernameText;
+
+    String ROUTNIE_ID = "3";
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -44,7 +50,7 @@ public class HomeScreen extends AppCompatActivity {
         });
 
         exerciseButton = findViewById(R.id.exercise_button);
-        exerciseText = findViewById(R.id.exercise_text);
+        exerciseTextButton = findViewById(R.id.exercise_text_button);
         usernameText = findViewById(R.id.username);
 
         // for now just display the username that was entered in the login screen
@@ -57,8 +63,19 @@ public class HomeScreen extends AppCompatActivity {
         exerciseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent exerciseIntent = new Intent(HomeScreen.this, MyExercises.class);
-                if (pose != null) {
-                    exerciseIntent.putExtra(ROUTINE_TAG, pose);
+                if (routineConfig != null) {
+                    exerciseIntent.putExtra(ROUTINE_TAG, routineConfig);
+                }
+
+                HomeScreen.this.startActivity(exerciseIntent);
+            }
+        });
+
+        exerciseTextButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent exerciseIntent = new Intent(HomeScreen.this, MyExercises.class);
+                if (routineConfig != null) {
+                    exerciseIntent.putExtra(ROUTINE_TAG, routineConfig);
                 }
 
                 HomeScreen.this.startActivity(exerciseIntent);
@@ -72,37 +89,53 @@ public class HomeScreen extends AppCompatActivity {
     private void loadData() {
         // create retrofit instance
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://140.238.151.117:8000/api/poses/")
+                .baseUrl("http://140.238.151.117:8000/api/routine-configs/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         ApiService apiService = retrofit.create(ApiService.class);
 
         // get routine
-        Call<Pose> call = apiService.getRoutine(1);
+        Call<List<RoutineConfig>> call = apiService.getRoutine();
 
         if (call != null) {
-            call.enqueue(new Callback<Pose>() {
+            call.enqueue(new Callback<List<RoutineConfig>>() {
                 @Override
-                public void onResponse(Call<Pose> call, Response<Pose> response) {
+                public void onResponse(Call<List<RoutineConfig>> call, Response<List<RoutineConfig>> response) {
                     if (!response.isSuccessful()) {
                         // Handle the error scenario here
                         Log.e(TAG_API, "Response Code: " + response.code());
+                        Log.d(TAG_API, call.request().url().toString());
                         return;
                     }
 
-                    pose = response.body();
+                    assert response.body() != null;
+                    routineConfig = response.body().stream()
+                            .filter(x -> Objects.equals(x.getId(), ROUTNIE_ID))
+                            .findFirst().orElse(null); // hardcode id
+                    Log.d("TESTNICK", routineConfig.getId());
 
                     // TODO When pulling a routine, set username to api username
 
-                    // TODO set the exercise text to match pulled routine
+                    String exerciseList = "\n";
+                    for (int i = 0; i < routineConfig.getExercises().size(); i++) {
+                        // formatting example
+                        // android:text="\n\nSeated Leg Extension x 8\nSquat x 6\nStanding Quad Stretch x 10\nCalf Raise x 10"
+                        // \n\nSeated Leg Extension x 8\nSquat x 6\nStanding Quad Stretch x 10\nCalf Raise x 10
+                        exerciseList += "\n"
+                                + routineConfig.getExercises().get(i).getExercise().getDisplayName()
+                                + " x "
+                                + routineConfig.getExercises().get(i).getReps();
+                    }
 
-                    Log.d(TAG_API, pose.getId().toString());
-                    Log.d(TAG_API, pose.getLandmarks().get(0).toString());
+                    exerciseTextButton.setText(exerciseList);
+
+                    // test, output name
+                    Log.d(TAG_API, routineConfig.getName());
                 }
 
                 @Override
-                public void onFailure(Call<Pose> call, Throwable t) {
+                public void onFailure(Call<List<RoutineConfig>> call, Throwable t) {
                     Log.e(TAG_API, t.toString());
                 }
             });

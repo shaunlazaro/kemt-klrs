@@ -15,3 +15,17 @@ export const PageTemplate = ({ children }: { children: React.ReactNode }) => {
     </>
   );
 };
+
+export const LoginPageTemplate = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <>
+      {/* <Header /> */}
+      <div className="flex h-screen border-collapse overflow-hidden">
+        {/* <Sidebar /> */}
+        {/* <main className="bg-secondary/10"> */}
+        {children}
+        {/* </main> */}
+      </div>
+    </>
+  );
+};

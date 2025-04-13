@@ -5,19 +5,245 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_blue"
     tools:context=".MainActivity">
 
-    <TextureView
-        android:layout_width="1080px"
-        android:layout_height="1440px"
-        android:layout_alignParentRight="true"
-        android:id="@+id/camera_feed" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <com.example.physiokneeds_v3.OverlayView
-        android:layout_width="1080px"
-        android:layout_height="1440px"
-        android:layout_alignParentRight="true"
-        android:id="@+id/overlayView" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:id="@+id/blue_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@color/blue" />
+
+                <TextView
+                    android:id="@+id/title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:text="Connecting To Mount"
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="48sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:layout_marginStart="18dp" />
+
+                <TextView
+                    android:id="@+id/rep_count_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="       reps     "
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="48sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:background="@drawable/blue_rounded_textbox"
+                    android:padding="30dp"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="50dp"
+                    android:elevation="10dp"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/rep_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="   0:00   "
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:background="@drawable/pink_textbox"
+                    android:padding="10dp"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="30dp"
+                    android:elevation="10dp"
+                    android:visibility="gone"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextureView
+                        android:id="@+id/camera_feed"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="true"
+                        android:elevation="3dp"
+                        android:visibility="gone" />
+
+                    <com.example.physiokneeds_v3.OverlayView
+                        android:id="@+id/overlayView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:elevation="4dp"
+                        android:layout_alignParentEnd="true"
+                        android:visibility="gone" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/instructions_layout"
+                    android:layout_width="840dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <ImageView
+                        android:id="@+id/left_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:layout_marginTop="100dp"
+                        android:visibility="gone"
+                        android:src="@drawable/baseline_fitness_center_24" />
+
+                    <VideoView
+                        android:id="@+id/video"
+                        android:layout_width="match_parent"
+                        android:visibility="gone"
+                        android:layout_marginTop="100dp"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/tips_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="TIPS"
+                        android:fontFamily="@font/source_sans"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:padding="10dp"
+                        android:visibility="gone"
+                        android:layout_marginTop="30dp" />
+
+                    <TextView
+                        android:id="@+id/left_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Stand 2 m away from camera \n\nYour entire body should be visible on the screen \n\nYour first exercise will start automatically once tracking is completed"
+                        android:fontFamily="@font/source_sans"
+                        android:textSize="28sp"
+                        android:textColor="@color/black"
+                        android:padding="10dp"
+                        android:visibility="invisible"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginTop="30dp" />
+
+                    <ProgressBar
+                        android:id="@+id/progressBarMain"
+                        android:layout_width="match_parent"
+                        android:layout_height="300px"
+                        android:layout_marginTop="20dp"
+                        android:backgroundTint="@color/blue"
+                        android:visibility="gone"
+                        android:layout_gravity="center"/>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/popup_panel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:elevation="2dp"
+            android:visibility="gone">
+
+            <View
+                android:id="@+id/dark_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#99000000"
+                android:elevation="1dp"
+                android:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/exercise_number_text"
+                android:text="Exercise #1"
+                android:textSize="24sp"
+                android:padding="20dp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="@drawable/pink_rounded_textbox"
+                android:layout_gravity="center_horizontal"
+                android:elevation="6dp"
+                android:layout_marginTop="130dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/exercise_title"
+                android:text="Seated Leg Extension"
+                android:textSize="40sp"
+                android:padding="10dp"
+                android:layout_marginTop="140dp"
+                android:layout_marginBottom="140dp"
+                android:layout_marginRight="150dp"
+                android:layout_marginLeft="150dp"
+                android:textColor="@android:color/black"
+                android:background="@drawable/today_exercises_textbox"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:elevation="3dp" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="240dp"
+                android:layout_marginBottom="150dp"
+                android:layout_marginRight="350dp"
+                android:layout_marginLeft="350dp"
+                android:elevation="4dp"
+                android:progressDrawable="@drawable/countdown_exercise"
+                android:max="3000"/>
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/alert_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="700dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="650dp"
+            android:padding="30dp"
+            android:text="Extend Further!"
+            android:textSize="24sp"
+            android:textColor="@android:color/black"
+            android:fontFamily="@font/source_sans"
+            android:textStyle="bold"
+            android:background="@drawable/alert_box"
+            android:drawablePadding="70dp"
+            android:enabled="false"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/baseline_error_outline_24" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/kneeAngle"
@@ -25,7 +251,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:textSize="20dp"
-        android:text="Right Knee Angle: LANDSCAPE" />
+        android:text="Right Knee Angle: LANDSCAPE"
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/repsCount"
@@ -34,7 +261,8 @@
         android:layout_below="@id/kneeAngle"
         android:layout_margin="20dp"
         android:textSize="20dp"
-        android:text="Reps: " />
+        android:text="Reps: "
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/search_button"
@@ -44,7 +272,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="SEARCH DEVICES"/>
+        android:text="SEARCH DEVICES"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/bt_button"
@@ -54,7 +283,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="CONNECT TO MOUNT"/>
+        android:text="CONNECT TO MOUNT"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/send_coords"
@@ -64,7 +294,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="20dp"
-        android:text="SEND COORDS"/>
+        android:text="SEND COORDS"
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/status_text"
@@ -73,6 +304,7 @@
         android:layout_below="@id/bt_button"
         android:layout_margin="20dp"
         android:textSize="20dp"
-        android:text="NOT CONNECTED" />
+        android:text="NOT CONNECTED"
+        android:visibility="invisible"/>
 
 </RelativeLayout>

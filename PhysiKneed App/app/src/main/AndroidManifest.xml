@@ -21,6 +21,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".WorkoutSummary"
+            android:exported="false" />
+        <activity
+            android:name=".WorkoutComplete"
+            android:exported="false" />
+        <activity
+            android:name=".SetUpDevice"
+            android:exported="false" />
+        <activity
             android:name=".HomeScreen"
             android:exported="false" />
         <activity
