@@ -1,9 +1,28 @@
-// import { useState } from "react";
-
-import { GoogleLoginButton } from "../../components/googleLoginButton/googleLoginButton";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // TODO: This page
-const Signin: React.FC = () => {
+const SigninSuccess: React.FC = () => {
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    console.log(params)
+    console.log(token)
+    if (token) {
+      localStorage.setItem("authToken", token);
+      navigate("/");
+    } else if (localStorage.getItem("authToken")) {
+      navigate("/");
+    }
+    else {
+      navigate("/signin");
+    }
+  }, []);
+
   return (
     <div className="grid grid-cols-2">
       <div className="h-full bg-primary-darkblue">
@@ -16,8 +35,7 @@ const Signin: React.FC = () => {
       <div className="h-full bg-white">
         <div className="flex-col flex justify-center w-full h-full items-center">
           <div className="flex flex-col items-start text-left w-full px-20">
-            <div className="text-black text-xl font-semibold pb-6">Login to Dashboard</div>
-            <GoogleLoginButton />
+            <div className="text-black text-xl font-semibold pb-6">Login successful.  Now loading...</div>
           </div>
         </div>
       </div>
@@ -25,4 +43,4 @@ const Signin: React.FC = () => {
   );
 };
 
-export default Signin;
+export default SigninSuccess;
