@@ -583,9 +583,7 @@ class MainActivity : AppCompatActivity() {
                     exerciseNumberText.text = "Please Wait..."
 
                     state = -1
-                    val loadingDuration = connectingDelay + 5000
-
-                    moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
+                    progressBarPopup.isIndeterminate = true
                 }
                 else if (state == 0) {
                     loadingBar.visibility = View.VISIBLE
@@ -669,6 +667,7 @@ class MainActivity : AppCompatActivity() {
                     state = -1
                     val loadingDuration = 5000
 
+                    progressBarPopup.isIndeterminate = false;
                     moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
 
                     Handler(Looper.getMainLooper()).postDelayed({
@@ -888,7 +887,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     val routineData = RoutineDataUpload(routineConfig.id, routineDataList)
-//                    sendData(routineData)
+                    sendData(routineData)
 
                     // send routine data to next screen
                     val intentRoutine = Intent("com.example.ROUTINE_DATA_SEND")

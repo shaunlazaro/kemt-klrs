@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -20,9 +21,12 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,6 +39,8 @@ public class HomeScreen extends AppCompatActivity {
     public static final String ROUTINE_TAG = "ROUTINE";
 
     public static RoutineConfig routineConfig = new RoutineConfig();
+    public static List<RoutineData> routineData = new ArrayList<>();
+    public static boolean routineDataLoaded = false;
 
     public static String loginUsername = "";
 
@@ -115,9 +121,16 @@ public class HomeScreen extends AppCompatActivity {
         // iterate "created_at" field for last week (maybe library that will get day of week)
         // populate progress screen
 
-        // create retrofit instance
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build();
+
+        // create retrofit instance for both routine configs and routine data
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://140.238.151.117:8000/api/routine-configs/")
+                .baseUrl("http://140.238.151.117:8000/api/")
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -125,6 +138,7 @@ public class HomeScreen extends AppCompatActivity {
 
         // get routine
         Call<List<RoutineConfig>> call = apiService.getRoutine();
+        Call<List<RoutineData>> callData = apiService.getRoutineData(1);
 
         if (call != null) {
             call.enqueue(new Callback<List<RoutineConfig>>() {
@@ -164,6 +178,39 @@ public class HomeScreen extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<List<RoutineConfig>> call, Throwable t) {
+                    Log.e(TAG_API, t.toString());
+                }
+            });
+        }
+
+        if (callData != null) {
+            callData.enqueue(new Callback<List<RoutineData>>() {
+                @Override
+                public void onResponse(Call<List<RoutineData>> call, Response<List<RoutineData>> response) {
+                    if (!response.isSuccessful()) {
+                        // Handle the error scenario here
+                        Log.e(TAG_API, "Response Code: " + response.code());
+                        Log.d(TAG_API, call.request().url().toString());
+                        return;
+                    }
+
+                    assert response.body() != null;
+
+                    routineData = response.body();
+                    routineDataLoaded = true;
+
+                    if (bottomNavigationView.getSelectedItemId() == R.id.nav_progress) {
+                        ProgressFragment progressFragment = (ProgressFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_frame_layout);
+                        progressFragment.doneLoading();
+                    }
+
+                    Log.d(TAG_API, routineData.get(routineData.size()-1).getCreated_at());
+                    Log.d(TAG_API, String.valueOf(routineData.get(routineData.size()-1).getRoutineComponentData().size()));
+
+                }
+
+                @Override
+                public void onFailure(Call<List<RoutineData>> call, Throwable t) {
                     Log.e(TAG_API, t.toString());
                 }
             });
