@@ -18,6 +18,7 @@ If using local DB:
 Other:
     Make Migrations: `python manage.py makemigrations`
     Run Migrations: `python manage.py migrate`
+    Cache Table: `python manage.py createcachetable`
 
 Deployment:
 

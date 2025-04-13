@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.db.models import Prefetch
 from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -102,6 +104,10 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
         cache.set(cache_key, qs, timeout=9000)  # Cache timeout in seconds
 
         return qs
+
+    @method_decorator(cache_page(60 * 15))  # cache for 15 minutes
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         # Save the object
