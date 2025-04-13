@@ -53,6 +53,7 @@ def user_cache_page(timeout):
                 return response
 
             response = view_func(self, request, *args, **kwargs)
+            response.render()
             cache.set(cache_key, response, timeout)
             patch_response_headers(response, timeout)
             return response
