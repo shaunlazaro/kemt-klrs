@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
+from functools import wraps
 from .models import (
     Pose, 
     Routine, 
@@ -40,17 +41,18 @@ from .serializers import (
 
 def user_cache_page(timeout):
     def decorator(view_func):
-        def _wrapped_view(request, *args, **kwargs):
+        @wraps(view_func)
+        def _wrapped_view(self, request, *args, **kwargs):
             user = request.user
             if not user.is_authenticated:
-                return view_func(request, *args, **kwargs)
+                return view_func(self, request, *args, **kwargs)
 
             cache_key = f"user_cache:{user.id}:{request.get_full_path()}"
             response = cache.get(cache_key)
             if response:
                 return response
 
-            response = view_func(request, *args, **kwargs)
+            response = view_func(self, request, *args, **kwargs)
             cache.set(cache_key, response, timeout)
             patch_response_headers(response, timeout)
             return response
