@@ -1,4 +1,8 @@
 from django.shortcuts import render
+from django.db.models import Prefetch
+from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -67,6 +71,15 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
         """Pass request context to serializer."""
         kwargs.setdefault('context', self.get_serializer_context())
         return super().get_serializer(*args, **kwargs)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.select_related('routine_config').prefetch_related('routine_component_data__rep_data')
+        return qs
+
+    @method_decorator(cache_page(60 * 15))  # cache for 15 minutes
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 # Kinda sloppy way to do this, since we are skipping Users + Auth for patients atm.
 class PatientViewSet(viewsets.ModelViewSet):
