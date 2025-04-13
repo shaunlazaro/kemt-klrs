@@ -68,6 +68,15 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
         kwargs.setdefault('context', self.get_serializer_context())
         return super().get_serializer(*args, **kwargs)
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        return qs.select_related(
+            'routine_config'  # ForeignKey
+        ).prefetch_related(
+            'routine_component_data__rep_data'  # ManyToMany
+        )
+
 # Kinda sloppy way to do this, since we are skipping Users + Auth for patients atm.
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
