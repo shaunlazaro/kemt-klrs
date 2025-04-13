@@ -53,9 +53,12 @@ def user_cache_page(timeout):
                 return response
 
             response = view_func(self, request, *args, **kwargs)
-            response.render()
-            cache.set(cache_key, response, timeout)
-            patch_response_headers(response, timeout)
+            
+            # Defer caching until the response is fully rendered
+            def cache_after_render(r):
+                patch_response_headers(r, timeout)
+                cache.set(cache_key, r, timeout)
+            response.add_post_render_callback(cache_after_render)
             return response
         return _wrapped_view
     return decorator
