@@ -205,13 +205,29 @@ class RoutineComponentDataSerializer(serializers.ModelSerializer):
         return routine_component_data_instance
 
     def to_representation(self, instance):
-        """Ensure RepDataSerializer receives context."""
+        """Ensure RepDataSerializer receives context without loading poses on list views."""
         data = super().to_representation(instance)
-        
-        data['rep_data'] = RepDataSerializer(
-            instance.rep_data.all(), many=True, context=self.context
-        ).data
-        
+
+        request = self.context.get('request')
+        action = None
+        if request and request.parser_context:
+            view = request.parser_context.get('view')
+            if view:
+                action = getattr(view, 'action', None)
+
+        # If this is a retrieve request, serialize full rep_data (with poses)
+        if action == 'retrieve':
+            rep_data_qs = instance.rep_data.all()
+        else:
+            # List request or other action — skip loading poses
+            rep_data_qs = instance.rep_data.only(
+                'id', 'rep_number', 'max_flexion', 'max_extension',
+                'concentric_time', 'eccentric_time', 'total_time',
+                'goal_flexion_met', 'goal_extension_met', 'max_score', 'alerts'
+            )
+
+        data['rep_data'] = RepDataSerializer(rep_data_qs, many=True, context=self.context).data
+
         return data
 
 class RoutineDataSerializer(serializers.ModelSerializer):
