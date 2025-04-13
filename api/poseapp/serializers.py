@@ -119,25 +119,6 @@ class RoutineConfigSerializer(serializers.ModelSerializer):
 
         return instance
 
-# class RepDataSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = RepData
-#         fields = '__all__'
-
-# class RoutineComponentDataSerializer(serializers.ModelSerializer):
-#     rep_data = RepDataSerializer(many=True)
-
-#     class Meta:
-#         model = RoutineComponentData
-#         fields = '__all__'
-
-# class RoutineDataSerializer(serializers.ModelSerializer):
-#     routine_component_data = RoutineComponentDataSerializer(many=True)
-
-#     class Meta:
-#         model = RoutineData
-#         fields = '__all__'
-
 class PoseSerializer(serializers.ModelSerializer):
     """Serializer for Pose model."""
     class Meta:
@@ -153,6 +134,13 @@ class RepDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = RepData
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        view = self.context.get("view")
+        if view and view.action != "retrieve":
+            self.fields.pop("poses", None)
 
     def create(self, validated_data):
         """Custom create function for RepData with nested poses."""
