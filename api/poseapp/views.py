@@ -78,7 +78,7 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
                 queryset=RoutineComponentData.objects.prefetch_related(
                     Prefetch(
                         'rep_data',
-                        queryset=RepData.objects.select_related('exercise_detail').prefetch_related('custom_tracking_details')
+                        queryset=RepData.objects.all(),
                     )
                 )
             )
