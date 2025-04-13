@@ -3,7 +3,7 @@
 import { GoogleLoginButton } from "../../components/googleLoginButton/googleLoginButton";
 
 // TODO: This page
-const Signin: React.FC = () => {
+const SigninFail: React.FC = () => {
   return (
     <div className="grid grid-cols-2">
       <div className="h-full bg-primary-darkblue">
@@ -16,7 +16,7 @@ const Signin: React.FC = () => {
       <div className="h-full bg-white">
         <div className="flex-col flex justify-center w-full h-full items-center">
           <div className="flex flex-col items-start text-left w-full px-20">
-            <div className="text-black text-xl font-semibold pb-6">Login to Dashboard</div>
+            <div className="text-black text-xl font-semibold pb-6">Sign in failed.</div>
             <GoogleLoginButton />
           </div>
         </div>
@@ -25,4 +25,4 @@ const Signin: React.FC = () => {
   );
 };
 
-export default Signin;
+export default SigninFail;

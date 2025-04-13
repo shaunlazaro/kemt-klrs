@@ -11,6 +11,8 @@ from .views import (
     RoutineComponentDataViewSet,
     RoutineDataViewSet,
     PatientViewSet,
+    google_callback_web,
+    google_callback_android,
 )
 
 # Initialize the router and register your viewsets
@@ -29,4 +31,6 @@ router.register(r'patients', PatientViewSet)
 # Define the app's URL patterns
 urlpatterns = [
     path('', include(router.urls)),  # Include the router's URLs
+    path('auth/google/callback/', google_callback_web),  # Add callback manually
+    path('auth/google/android/', google_callback_android)
 ]

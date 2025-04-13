@@ -8,3 +8,5 @@ export const EXERCISES_PATH = "/exercises";
 export const ADDEDIT_EXERCISES_PATH = "/exercises/:id";
 export const ADDEDIT_EXERCISES_PATH_NEW = "/exercises/new";
 export const SIGNIN_PATH = "/signin";
+export const SIGNIN_FAILED_PATH = "/login-failed";
+export const SIGNIN_SUCCESS_PATH = "/login-success";
