@@ -28,6 +28,8 @@ const PoseVideo: React.FC<PoseVideoProps> = ({ posesRaw, fps = 10 }) => {
         landmarks: poseRaw.landmarks as Landmark[],
     }));
 
+    const VISIBILITY_THRESHOLD = 0
+
     const connections = [
         [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],
         [23, 24], [11, 23], [12, 24], [23, 25], [25, 27],
@@ -50,7 +52,7 @@ const PoseVideo: React.FC<PoseVideoProps> = ({ posesRaw, fps = 10 }) => {
             connections.forEach(([start, end]) => {
                 const startPoint = pose.landmarks.find(lm => lm.landmark_index === start);
                 const endPoint = pose.landmarks.find(lm => lm.landmark_index === end);
-                if (startPoint && endPoint && startPoint.visibility > 0.5 && endPoint.visibility > 0.5) {
+                if (startPoint && endPoint && startPoint.visibility > VISIBILITY_THRESHOLD && endPoint.visibility > VISIBILITY_THRESHOLD) {
                     ctx.beginPath();
                     ctx.moveTo(startPoint.x * canvas.width, startPoint.y * canvas.height);
                     ctx.lineTo(endPoint.x * canvas.width, endPoint.y * canvas.height);
@@ -60,7 +62,7 @@ const PoseVideo: React.FC<PoseVideoProps> = ({ posesRaw, fps = 10 }) => {
 
             // Draw landmarks
             pose.landmarks.forEach(lm => {
-                if (lm.visibility > 0.5) {
+                if (lm.visibility > VISIBILITY_THRESHOLD) {
                     ctx.beginPath();
                     ctx.arc(lm.x * canvas.width, lm.y * canvas.height, 3, 0, 2 * Math.PI);
                     ctx.fillStyle = "red";
@@ -84,7 +86,7 @@ const PoseVideo: React.FC<PoseVideoProps> = ({ posesRaw, fps = 10 }) => {
         };
     }, [poses, fps]);
 
-    return <canvas ref={canvasRef} width={500} height={500} style={{ border: "1px solid #000" }} />;
+    return <canvas ref={canvasRef} width={1000} height={1000} className="w-3/4 aspect-square" style={{ border: "1px solid #000" }} />;
 };
 
 export default PoseVideo;
