@@ -1,8 +1,5 @@
 from django.db import models
 from django.utils.safestring import mark_safe
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
-from django.core.cache import cache
 # ----
 # Workout Result Data  (DEPRECATED)
 # ----
@@ -108,18 +105,6 @@ class RoutineData(models.Model):
 
     def __str__(self):
         return f"{self.id} - Routine Data for {self.routine_config.name}"
-
-# Invalidate cache when a RoutineData object is saved
-@receiver(post_save, sender=RoutineData)
-def invalidate_routine_data_cache(sender, instance, **kwargs):
-    cache_key = f"routine_data:{instance.id}"  # Assuming routine_data is cached by instance.id
-    cache.delete(cache_key)
-
-# Invalidate cache when a RoutineData object is deleted
-@receiver(post_delete, sender=RoutineData)
-def invalidate_routine_data_cache_delete(sender, instance, **kwargs):
-    cache_key = f"routine_data:{instance.id}"
-    cache.delete(cache_key)
 
 # ----
 # Workout Routine/Config Data

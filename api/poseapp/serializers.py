@@ -152,22 +152,6 @@ class RepDataSerializer(serializers.ModelSerializer):
             rep_data_instance.poses.add(pose_instance)  # Link Pose objects to RepData instance
 
         return rep_data_instance
-    
-    # def to_representation(self, instance):
-    #     """Customize serialization to include poses only when a specific RoutineData is requested."""
-    #     data = super().to_representation(instance)
-        
-    #     # Get request from context
-    #     request = self.context.get('request', None)
-        
-    #     if request and request.parser_context:
-    #         # Check if this is a retrieve action (single instance request)
-    #         view = request.parser_context.get('view', None)
-    #         if view and getattr(view, 'action', None) != 'retrieve':
-    #             data.pop('poses', None)  # Remove poses for list requests
-
-    #     return data
-
 
 class RoutineComponentDataSerializer(serializers.ModelSerializer):
     """Serializer for RoutineComponentData with nested RepData."""
