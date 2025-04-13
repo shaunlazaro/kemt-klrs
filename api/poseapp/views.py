@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Prefetch
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -71,10 +72,16 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         qs = super().get_queryset()
 
-        return qs.select_related(
-            'routine_config'  # ForeignKey
-        ).prefetch_related(
-            'routine_component_data__rep_data'  # ManyToMany
+        return qs.select_related('routine_config').prefetch_related(
+            Prefetch(
+                'routine_component_data',
+                queryset=RoutineComponentData.objects.prefetch_related(
+                    Prefetch(
+                        'rep_data',
+                        queryset=RepData.objects.select_related('exercise_detail').prefetch_related('custom_tracking_details')
+                    )
+                )
+            )
         )
 
 # Kinda sloppy way to do this, since we are skipping Users + Auth for patients atm.

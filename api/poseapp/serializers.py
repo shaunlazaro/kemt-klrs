@@ -153,20 +153,20 @@ class RepDataSerializer(serializers.ModelSerializer):
 
         return rep_data_instance
     
-    def to_representation(self, instance):
-        """Customize serialization to include poses only when a specific RoutineData is requested."""
-        data = super().to_representation(instance)
+    # def to_representation(self, instance):
+    #     """Customize serialization to include poses only when a specific RoutineData is requested."""
+    #     data = super().to_representation(instance)
         
-        # Get request from context
-        request = self.context.get('request', None)
+    #     # Get request from context
+    #     request = self.context.get('request', None)
         
-        if request and request.parser_context:
-            # Check if this is a retrieve action (single instance request)
-            view = request.parser_context.get('view', None)
-            if view and getattr(view, 'action', None) != 'retrieve':
-                data.pop('poses', None)  # Remove poses for list requests
+    #     if request and request.parser_context:
+    #         # Check if this is a retrieve action (single instance request)
+    #         view = request.parser_context.get('view', None)
+    #         if view and getattr(view, 'action', None) != 'retrieve':
+    #             data.pop('poses', None)  # Remove poses for list requests
 
-        return data
+    #     return data
 
 
 class RoutineComponentDataSerializer(serializers.ModelSerializer):
