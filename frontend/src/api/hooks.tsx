@@ -187,13 +187,13 @@ export const useAddRoutineData = () => {
     });
 };
 
-export const useGetRoutineData = () => {
+export const useGetRoutineData = (patientId: string) => {
     return useQuery({
         queryKey: [QueryKeys.ROUTINE_DATA],
         queryFn: () =>
-            request.get(`/routine-data`) as Promise<RoutineData[]>,
+            request.get(`/routine-data/patient/${patientId}`) as Promise<RoutineData[]>,
         staleTime: 10000,
-        // enabled: !!routineDataId && routineDataId != ""
+        enabled: !!patientId && patientId != ""
     });
 };
 

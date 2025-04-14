@@ -1,9 +1,11 @@
 from django.db import models
+from django.conf import settings
 from django.utils.safestring import mark_safe
+from datetime import date
 # ----
 # Workout Result Data  (DEPRECATED)
 # ----
-# Not deprecated
+# Pose Model is not deprecated, reused later.
 class Pose(models.Model):
     # Store the entire list of landmarks as a JSON field
     landmarks = models.JSONField(default=list)
@@ -94,6 +96,7 @@ class RoutineComponentData(models.Model):
     # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHH
     exercise_detail = models.ForeignKey('ExerciseDetail', on_delete=models.CASCADE, null=True) # Don't null this...
     rep_data = models.ManyToManyField(RepData)
+    rating = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.id} - Routine Component {self.exercise_detail}"
@@ -101,7 +104,13 @@ class RoutineComponentData(models.Model):
 class RoutineData(models.Model):
     routine_config = models.ForeignKey('RoutineConfig', on_delete=models.CASCADE)
     routine_component_data = models.ManyToManyField(RoutineComponentData)
+    notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        # editable=False  # Prevent editing in admin
+    )
 
     def __str__(self):
         return f"{self.id} - Routine Data for {self.routine_config.name}"
@@ -182,10 +191,15 @@ class Patient(models.Model):
     ]
 
     # user_id = models.CharField(max_length=255)  # External user identifier
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='patient_profile',
+    )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(default=date.today)
     sex = models.CharField(max_length=1, choices=SEX_CHOICES)
     condition = models.TextField()
     exercises = models.ForeignKey(RoutineConfig, on_delete=models.SET_NULL, null=True, blank=True)
