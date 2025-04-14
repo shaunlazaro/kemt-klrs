@@ -310,70 +310,73 @@ def google_callback_web(request):
 # -------------
 # DASHBOARD:
 # -------------
+from .models import Patient, RoutineData, RoutineExercise
+
 class PatientDashboardView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        data = []
+        results = []
 
-        for patient in Patient.objects.select_related('user').all():
-            user = patient.user
-            routine_data_qs = RoutineData.objects.filter(user=user).prefetch_related(
-                'routine_component_data__rep_data',
-                'routine_component_data__exercise_detail',
-                'routine_config__routineexercise_set'
+        patients = Patient.objects.select_related('user', 'exercises').all()
+
+        for patient in patients:
+            routine_datas = RoutineData.objects.filter(user=patient.user).prefetch_related(
+                'routine_component_data__rep_data', 'routine_component_data__exercise_detail', 'routine_config__exercises'
             )
 
-            total_scores = []
-            total_ratings = []
-            completion_ratios = []
+            # Default values
+            avg_score = 0.0
+            avg_completion = 0.0
+            avg_rating = 0.0
 
-            for routine_data in routine_data_qs:
-                component_data_list = routine_data.routine_component_data.all()
+            if routine_datas.exists():
+                total_routine_scores = []
+                total_completion = []
+                total_ratings = []
 
-                routine_score_accum = []
-                for comp_data in component_data_list:
-                    rep_data_list = comp_data.rep_data.all()
-                    max_scores = [rep.max_score for rep in rep_data_list]
-                    if max_scores:
-                        comp_avg_score = sum(max_scores) / len(max_scores)
-                        routine_score_accum.append(comp_avg_score)
+                for routine_data in routine_datas:
+                    component_data_list = routine_data.routine_component_data.all()
 
-                    # ---- 2: Completion Percent ----
-                    # Find prescribed reps from RoutineExercise
-                    prescribed_reps = None
-                    if routine_data.routine_config:
-                        try:
-                            routine_exercise = RoutineExercise.objects.get(
-                                routine=routine_data.routine_config,
-                                exercise=comp_data.exercise_detail
-                            )
-                            prescribed_reps = routine_exercise.reps
-                        except RoutineExercise.DoesNotExist:
-                            prescribed_reps = None
+                    routine_scores = []
+                    completion_percents = []
+                    ratings = []
 
-                    if prescribed_reps:
-                        completion = len(rep_data_list) / prescribed_reps
-                        completion_ratios.append(completion)
+                    for component in component_data_list:
+                        rep_data_qs = component.rep_data.all()
+                        max_scores = [rep.max_score for rep in rep_data_qs]
+                        if max_scores:
+                            avg_component_score = sum(max_scores) / len(max_scores)
+                            routine_scores.append(avg_component_score)
 
-                    # ---- 3: Ratings ----
-                    total_ratings.append(comp_data.rating)
+                        expected_reps = RoutineExercise.objects.filter(
+                            routine=routine_data.routine_config,
+                            exercise=component.exercise_detail
+                        ).first()
+                        expected_rep_count = expected_reps.reps if expected_reps and expected_reps.reps is not None else 0
 
-                if routine_score_accum:
-                    avg_routine_score = sum(routine_score_accum) / len(routine_score_accum)
-                    total_scores.append(avg_routine_score)
+                        if expected_rep_count > 0:
+                            completion = len(rep_data_qs) / expected_rep_count
+                            completion_percents.append(completion)
 
-            # Final Aggregates for patient
-            avg_score = sum(total_scores) / len(total_scores) if total_scores else None
-            avg_completion = sum(completion_ratios) / len(completion_ratios) if completion_ratios else None
-            avg_rating = sum(total_ratings) / len(total_ratings) if total_ratings else None
+                        ratings.append(component.rating)
 
-            data.append({
-                "patient_id": patient.id,
-                "patient_name": f"{patient.first_name} {patient.last_name}",
-                "avg_score": avg_score,
-                "avg_completion_percent": avg_completion * 100 if avg_completion is not None else None,
-                "avg_rating": avg_rating,
+                    if routine_scores:
+                        total_routine_scores.append(sum(routine_scores) / len(routine_scores))
+                    if completion_percents:
+                        total_completion.append(sum(completion_percents) / len(completion_percents))
+                    if ratings:
+                        total_ratings.extend(ratings)
+
+                avg_score = sum(total_routine_scores) / len(total_routine_scores) if total_routine_scores else 0.0
+                avg_completion = sum(total_completion) / len(total_completion) if total_completion else 0.0
+                avg_rating = sum(total_ratings) / len(total_ratings) if total_ratings else 0.0
+
+            results.append({
+                'patient': str(patient),
+                'average_score': round(avg_score, 2),
+                'completion_percent': round(avg_completion * 100, 2),
+                'average_rating': round(avg_rating, 2),
             })
 
-        return Response(data)
+        return Response(results)
