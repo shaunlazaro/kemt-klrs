@@ -195,6 +195,7 @@ def google_callback_android(request):
     })
     print("c")
     if token_res.status_code != 200:
+        print("Token exchange failed:", token_res.status_code, token_res.text)
         return Response({'error': 'Failed to get tokens'}, status=400)
     print("d")
     token_data = token_res.json()
