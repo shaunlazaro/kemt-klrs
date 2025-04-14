@@ -136,7 +136,7 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='patient/(?P<patient_id>\d+)', permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'], url_path=r'patient/(?P<patient_id>\d+)', permission_classes=[IsAuthenticated])
     @user_cache_page(60 * 15)
     def patient_routine_data(self, request, patient_id=None, *args, **kwargs):
         # Filter routine data by patient's user
