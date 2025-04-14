@@ -181,10 +181,10 @@ GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
 @permission_classes([AllowAny])
 def google_callback_android(request):
     code = request.query_params.get('code')
-
+    print("a")
     if not code:
         return Response({'error': 'No code provided'}, status=400)
-
+    print("b")
     # Exchange code for tokens
     token_res = requests.post(GOOGLE_TOKEN_URL, data={
         'code': code,
@@ -193,21 +193,21 @@ def google_callback_android(request):
         'redirect_uri': settings.GOOGLE_ANDROID_REDIRECT_URI,
         'grant_type': 'authorization_code',
     })
-
+    print("c")
     if token_res.status_code != 200:
         return Response({'error': 'Failed to get tokens'}, status=400)
-
+    print("d")
     token_data = token_res.json()
     access_token = token_data.get('access_token')
-
+    print("e")
     # Use access token to get user info
     userinfo_res = requests.get(GOOGLE_USERINFO_URL, headers={
         'Authorization': f'Bearer {access_token}'
     })
-
+    print("f")
     if userinfo_res.status_code != 200:
         return Response({'error': 'Failed to fetch user info'}, status=400)
-
+    print("g")
     userinfo = userinfo_res.json()
     email = userinfo.get('email')
     name = userinfo.get('name')
