@@ -383,6 +383,7 @@ class PatientDashboardView(APIView):
 
             results.append({
                 'patient': str(patient),
+                'injury': str(patient.condition) if patient.condition else "",
                 'average_score': round(avg_score, 2),
                 'completion_percent': round(avg_completion * 100, 2),
                 'average_rating': round(avg_rating, 2),

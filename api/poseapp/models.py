@@ -93,7 +93,6 @@ class RepData(models.Model):
 
 class RoutineComponentData(models.Model):
     # routine_component = models.ForeignKey('RoutineExercise', on_delete=models.CASCADE)
-    # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHH
     exercise_detail = models.ForeignKey('ExerciseDetail', on_delete=models.CASCADE, null=True) # Don't null this...
     rep_data = models.ManyToManyField(RepData)
     rating = models.IntegerField(default=0)
