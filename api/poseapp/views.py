@@ -114,31 +114,25 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.select_related('routine_config').prefetch_related('routine_component_data__rep_data')
-        return qs
-
-    # @method_decorator(cache_page(60 * 15, key_prefix="routine_data_list"), name="list")  # cache for 15 minutes
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, *args, **kwargs)
+        qs = qs.select_related('routine_config') \
+               .prefetch_related('routine_component_data__rep_data')
+        return qs.filter(user=self.request.user)
 
     @user_cache_page(60 * 15)
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        invalidate_user_list_cache(request)
-        return response
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        invalidate_user_list_cache(self.request)
 
-    def update(self, request, *args, **kwargs):
-        response = super().update(request, *args, **kwargs)
-        invalidate_user_list_cache(request)
-        return response
+    def perform_update(self, serializer):
+        serializer.save()
+        invalidate_user_list_cache(self.request)
 
-    def destroy(self, request, *args, **kwargs):
-        response = super().destroy(request, *args, **kwargs)
-        invalidate_user_list_cache(request)
-        return response
+    def perform_destroy(self, instance):
+        instance.delete()
+        invalidate_user_list_cache(self.request)
 
 # Kinda sloppy way to do this, since we are skipping Users + Auth for patients atm.
 class PatientViewSet(viewsets.ModelViewSet):
@@ -181,10 +175,8 @@ GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
 @permission_classes([AllowAny])
 def google_callback_android(request):
     code = request.query_params.get('code')
-    print("a")
     if not code:
         return Response({'error': 'No code provided'}, status=400)
-    print("b")
     # Exchange code for tokens
     token_res = requests.post(GOOGLE_TOKEN_URL, data={
         'code': code,
@@ -193,28 +185,44 @@ def google_callback_android(request):
         'redirect_uri': settings.GOOGLE_ANDROID_REDIRECT_URI,
         'grant_type': 'authorization_code',
     })
-    print("c")
     if token_res.status_code != 200:
         print("Token exchange failed:", token_res.status_code, token_res.text)
         return Response({'error': 'Failed to get tokens'}, status=400)
-    print("d")
     token_data = token_res.json()
     access_token = token_data.get('access_token')
-    print("e")
     # Use access token to get user info
     userinfo_res = requests.get(GOOGLE_USERINFO_URL, headers={
         'Authorization': f'Bearer {access_token}'
     })
-    print("f")
     if userinfo_res.status_code != 200:
         return Response({'error': 'Failed to fetch user info'}, status=400)
-    print("g")
     userinfo = userinfo_res.json()
+
     email = userinfo.get('email')
-    name = userinfo.get('name')
+    first_name = userinfo.get('given_name', '')
+    last_name = userinfo.get('family_name', '')
 
     # Create or get user
-    user, _ = User.objects.get_or_create(username=email, defaults={'first_name': name, 'email': email})
+    user, created = User.objects.get_or_create(
+        email=email,
+        defaults={
+            "username": email,
+            "first_name": first_name,
+            "last_name": last_name,
+        }
+    )
+
+    # If the user was just created, also create a corresponding Patient
+    if created:
+        # Create a Patient associated with the new user
+        Patient.objects.create(
+            user=user,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            sex='O',
+            condition='', 
+        )
 
     # Generate DRF token
     token, _ = Token.objects.get_or_create(user=user)
