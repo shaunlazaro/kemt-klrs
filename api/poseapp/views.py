@@ -73,7 +73,7 @@ def invalidate_user_list_cache(request):
     cache_key = f"user_cache:{user.id}:{request.get_full_path()}"
     print(f"clear cache: {cache_key}")
     cache.delete(cache_key)
-    cache_key = f"user_cache:{user.id}:{request.get_full_path()}/app"
+    cache_key = f"user_cache:{user.id}:{request.get_full_path()}app"
     print(f"clear cache: {cache_key}")
     cache.delete(cache_key)
 
