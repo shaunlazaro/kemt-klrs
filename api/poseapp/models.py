@@ -1,10 +1,11 @@
 from django.db import models
 from django.conf import settings
 from django.utils.safestring import mark_safe
+from datetime import date
 # ----
 # Workout Result Data  (DEPRECATED)
 # ----
-# Not deprecated
+# Pose Model is not deprecated, reused later.
 class Pose(models.Model):
     # Store the entire list of landmarks as a JSON field
     landmarks = models.JSONField(default=list)
@@ -200,7 +201,7 @@ class Patient(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(default=date.today)
     sex = models.CharField(max_length=1, choices=SEX_CHOICES)
     condition = models.TextField()
     exercises = models.ForeignKey(RoutineConfig, on_delete=models.SET_NULL, null=True, blank=True)
