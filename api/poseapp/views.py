@@ -348,8 +348,8 @@ class PatientDashboardView(APIView):
                         adjusted_scores = []
 
                         for rep in rep_data_qs:
-                            alerts = rep.num_alerts or 0
-                            reached = rep.reached_threshold_angle
+                            alerts = len(rep.alerts) or 0
+                            reached = rep.goal_flexion_met and rep.goal_extension_met
                             deduction_alerts = max(alerts - 1, 0) if not reached else alerts
                             score = rep.max_score - (0.2 * deduction_alerts)
                             adjusted_scores.append(max(score, 0.0))  # Ensure no negative scores
