@@ -231,7 +231,7 @@ def google_callback_android(request):
             last_name=last_name,
             email=email,
             sex='O',
-            condition='', 
+            condition='Not Specified', 
         )
 
     # Generate DRF token
