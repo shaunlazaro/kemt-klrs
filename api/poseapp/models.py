@@ -109,7 +109,6 @@ class RoutineData(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        null=True, # TODO: TEMPORARY, remove after backfill
         # editable=False  # Prevent editing in admin
     )
 
@@ -196,7 +195,6 @@ class Patient(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='patient_profile',
-        null=True, # TODO: TEMPORARY, remove after backfill
     )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
