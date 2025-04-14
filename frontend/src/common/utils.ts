@@ -20,6 +20,9 @@ export const getUniqueInjuryValues = (routineConfigs: RoutineConfig[]): string[]
   if (!uniqueInjuries.includes("Knee")) {
     uniqueInjuries.push("Knee");
   }
+  if (!uniqueInjuries.includes("Not Specified")) {
+    uniqueInjuries.push("Not Specified");
+  }
 
   return uniqueInjuries;
 }
@@ -124,6 +127,9 @@ export function getPercentCompleted(routineData: RoutineData): number {
 
 // Not straightforward to do this, since we need to match exerciseDetails.
 export const getRoutineConfigRepsByComponentData = (componentData: RoutineComponentData, routineData: RoutineData) => {
+  console.log(componentData?.exercise_detail?.display_name ?? "")
+  console.log(routineData?.routine_config?.exercises?.find((component) => component?.exercise?.display_name ?? ""
+    == componentData?.exercise_detail?.display_name ?? ""))
   return routineData?.routine_config?.exercises?.find((component) => component?.exercise?.display_name ?? ""
     == componentData?.exercise_detail?.display_name ?? "")?.reps ?? 0;
 }

@@ -118,13 +118,21 @@ export const useAddEditPatient = () => {
             const patientCleaned = {
                 ...patient,
                 date_of_birth: patient.date_of_birth.toISOString().split('T')[0], // Ensure proper date format
-                exercises_id: patient.exercises ? patient.exercises.id : null, // Extract only the ID
+                exercises_id: patient.exercises ? patient.exercises.id : null, // Extract only the ID,
+                condition: patient.condition != "" ? patient.condition : "Not Specified",
             };
-
-            const { id, exercises, ...rest } = patientCleaned;
-            return id === "TEMP" || id === "new"
-                ? request.post(`/patients/`, rest) // Create new patient
-                : request.put(`/patients/${id}/`, rest); // Update existing
+            if (patientCleaned.exercises_id == null) {
+                const { id, exercises, exercises_id, ...rest } = patientCleaned;
+                return id === "TEMP" || id === "new"
+                    ? request.post(`/patients/`, rest) // Create new patient
+                    : request.put(`/patients/${id}/`, rest); // Update existing
+            }
+            else {
+                const { id, exercises, ...rest } = patientCleaned;
+                return id === "TEMP" || id === "new"
+                    ? request.post(`/patients/`, rest) // Create new patient
+                    : request.put(`/patients/${id}/`, rest); // Update existing
+            }
         },
         onSuccess: (_, patient) => {
             queryClient.invalidateQueries({ queryKey: [QueryKeys.PATIENTS] });
@@ -189,7 +197,7 @@ export const useAddRoutineData = () => {
 
 export const useGetRoutineData = (patientId: string) => {
     return useQuery({
-        queryKey: [QueryKeys.ROUTINE_DATA],
+        queryKey: [QueryKeys.ROUTINE_DATA, patientId],
         queryFn: () =>
             request.get(`/routine-data/patient/${patientId}`) as Promise<RoutineData[]>,
         staleTime: 10000,
