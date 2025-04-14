@@ -189,7 +189,7 @@ def google_callback_android(request):
     token_res = requests.post(GOOGLE_TOKEN_URL, data={
         'code': code,
         'client_id': settings.GOOGLE_ANDROID_CLIENT_ID,
-        # 'client_secret': settings.GOOGLE_ANDROID_CLIENT_SECRET,
+        'client_secret': settings.GOOGLE_ANDROID_CLIENT_SECRET,
         'redirect_uri': settings.GOOGLE_ANDROID_REDIRECT_URI,
         'grant_type': 'authorization_code',
     })
