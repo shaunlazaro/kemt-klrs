@@ -178,6 +178,7 @@ GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def google_callback_android(request):
     code = request.query_params.get('code')
 
