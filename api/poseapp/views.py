@@ -48,6 +48,7 @@ def user_cache_page(timeout):
                 return view_func(self, request, *args, **kwargs)
 
             cache_key = f"user_cache:{user.id}:{request.get_full_path()}"
+            print(f"grabbing from cache: {cache_key}")
             response = cache.get(cache_key)
             if response:
                 return response
@@ -56,6 +57,7 @@ def user_cache_page(timeout):
             
             # Defer caching until the response is fully rendered
             def cache_after_render(r):
+                print(f"caching: {cache_key}")
                 patch_response_headers(r, timeout)
                 cache.set(cache_key, r, timeout)
             response.add_post_render_callback(cache_after_render)
@@ -129,6 +131,20 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
     def app_list(self, request, *args, **kwargs):
         # Custom action to filter routine data by current user
         qs = self.get_queryset().filter(user=request.user)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='patient/(?P<patient_id>\d+)', permission_classes=[IsAuthenticated])
+    @user_cache_page(60 * 15)
+    def patient_routine_data(self, request, patient_id=None, *args, **kwargs):
+        # Filter routine data by patient's user
+        try:
+            patient = Patient.objects.get(id=patient_id)
+        except Patient.DoesNotExist:
+            return Response({"detail": "Patient not found."}, status=404)
+
+        # Retrieve routine data where user matches the patient
+        qs = self.get_queryset().filter(user=patient.user)
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 

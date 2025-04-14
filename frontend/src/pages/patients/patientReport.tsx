@@ -20,7 +20,7 @@ const PatientReport: React.FC = () => {
 
     // const routineDataReturn = useTestRoutineData();
 
-    const { data: routineDataReturn, isLoading: routineDataLoading } = useGetRoutineData();
+    const { data: routineDataReturn, isLoading: routineDataLoading } = useGetRoutineData(patientId ?? "");
     const { data: patientData, isLoading: patientLoading } = useGetPatientById(patientId ?? "");
 
     const [patient, setPatient] = useState<Patient>(BLANK_PATIENT);
@@ -157,7 +157,7 @@ const PatientReport: React.FC = () => {
                                         {new Date(routineData.created_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                                     </div>
                                     <div className="col-start-4 col-end-6">{getTotalAlerts(routineData)}</div>
-                                    <div className="col-start-6 col-end-9">{getPercentCompleted(routineData)}</div>
+                                    <div className="col-start-6 col-end-9">{getPercentCompleted(routineData).toFixed(0)}</div>
                                     <div className="col-start-9 col-end-11">{getAverageScore(routineData).toFixed(0)}</div>
                                     <div className="col-start-12 cursor-pointer h-auto align-middle" onClick={() => onClickReport(routineData)}> <FaChevronRight /></div>
                                 </>))}
