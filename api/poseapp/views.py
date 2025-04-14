@@ -12,7 +12,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from functools import wraps
 from .models import (
     Pose, 
@@ -70,6 +70,8 @@ def invalidate_user_list_cache(request):
         return
     cache_key = f"user_cache:{user.id}:{request.get_full_path()}"
     cache.delete(cache_key)
+    cache_key = f"user_cache:{user.id}:{request.get_full_path()}/app"
+    cache.delete(cache_key)
 
 class PoseViewSet(viewsets.ModelViewSet):
     queryset = Pose.objects.all()
@@ -116,11 +118,19 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
         qs = super().get_queryset()
         qs = qs.select_related('routine_config') \
                .prefetch_related('routine_component_data__rep_data')
-        return qs.filter(user=self.request.user)
+        return qs
 
     @user_cache_page(60 * 15)
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+    @action(detail=False, methods=['get'], url_path='app', permission_classes=[IsAuthenticated])
+    @user_cache_page(60 * 15)
+    def app_list(self, request, *args, **kwargs):
+        # Custom action to filter routine data by current user
+        qs = self.get_queryset().filter(user=request.user)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
