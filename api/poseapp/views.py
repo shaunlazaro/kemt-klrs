@@ -310,7 +310,7 @@ def google_callback_web(request):
 # -------------
 # DASHBOARD:
 # -------------
-from .models import Patient, RoutineData, RoutineExercise
+# from .models import Patient, RoutineData, RoutineExercise
 
 class PatientDashboardView(APIView):
     permission_classes = [AllowAny]
@@ -318,14 +318,15 @@ class PatientDashboardView(APIView):
     def get(self, request):
         results = []
 
-        patients = Patient.objects.select_related('user', 'exercises').all()
+        patients = Patient.objects.select_related('user').all()
 
         for patient in patients:
             routine_datas = RoutineData.objects.filter(user=patient.user).prefetch_related(
-                'routine_component_data__rep_data', 'routine_component_data__exercise_detail', 'routine_config__exercises'
+                'routine_component_data__rep_data', 
+                'routine_component_data__exercise_detail', 
+                'routine_config__exercises'
             )
 
-            # Default values
             avg_score = 0.0
             avg_completion = 0.0
             avg_rating = 0.0
@@ -344,9 +345,17 @@ class PatientDashboardView(APIView):
 
                     for component in component_data_list:
                         rep_data_qs = component.rep_data.all()
-                        max_scores = [rep.max_score for rep in rep_data_qs]
-                        if max_scores:
-                            avg_component_score = sum(max_scores) / len(max_scores)
+                        adjusted_scores = []
+
+                        for rep in rep_data_qs:
+                            alerts = rep.num_alerts or 0
+                            reached = rep.reached_threshold_angle
+                            deduction_alerts = max(alerts - 1, 0) if not reached else alerts
+                            score = rep.max_score - (0.2 * deduction_alerts)
+                            adjusted_scores.append(max(score, 0.0))  # Ensure no negative scores
+
+                        if adjusted_scores:
+                            avg_component_score = sum(adjusted_scores) / len(adjusted_scores)
                             routine_scores.append(avg_component_score)
 
                         expected_reps = RoutineExercise.objects.filter(
