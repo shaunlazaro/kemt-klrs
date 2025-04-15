@@ -9,10 +9,11 @@ from django.utils.cache import patch_response_headers
 from django.utils.decorators import method_decorator, decorator_from_middleware_with_args
 from django.views.decorators.cache import cache_page
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from functools import wraps
 from .models import (
     Pose, 
@@ -48,6 +49,7 @@ def user_cache_page(timeout):
                 return view_func(self, request, *args, **kwargs)
 
             cache_key = f"user_cache:{user.id}:{request.get_full_path()}"
+            print(f"grabbing from cache: {cache_key}")
             response = cache.get(cache_key)
             if response:
                 return response
@@ -56,6 +58,7 @@ def user_cache_page(timeout):
             
             # Defer caching until the response is fully rendered
             def cache_after_render(r):
+                print(f"caching: {cache_key}")
                 patch_response_headers(r, timeout)
                 cache.set(cache_key, r, timeout)
             response.add_post_render_callback(cache_after_render)
@@ -69,6 +72,10 @@ def invalidate_user_list_cache(request):
     if not user.is_authenticated:
         return
     cache_key = f"user_cache:{user.id}:{request.get_full_path()}"
+    print(f"clear cache: {cache_key}")
+    cache.delete(cache_key)
+    cache_key = f"user_cache:{user.id}:{request.get_full_path()}app/"
+    print(f"clear cache: {cache_key}")
     cache.delete(cache_key)
 
 class PoseViewSet(viewsets.ModelViewSet):
@@ -114,31 +121,47 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.select_related('routine_config').prefetch_related('routine_component_data__rep_data')
+        qs = qs.select_related('routine_config') \
+               .prefetch_related('routine_component_data__rep_data')
         return qs
-
-    # @method_decorator(cache_page(60 * 15, key_prefix="routine_data_list"), name="list")  # cache for 15 minutes
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, *args, **kwargs)
 
     @user_cache_page(60 * 15)
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        invalidate_user_list_cache(request)
-        return response
+    @action(detail=False, methods=['get'], url_path='app', permission_classes=[IsAuthenticated])
+    @user_cache_page(60 * 15)
+    def app_list(self, request, *args, **kwargs):
+        # Custom action to filter routine data by current user
+        qs = self.get_queryset().filter(user=request.user)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
-    def update(self, request, *args, **kwargs):
-        response = super().update(request, *args, **kwargs)
-        invalidate_user_list_cache(request)
-        return response
+    @action(detail=False, methods=['get'], url_path=r'patient/(?P<patient_id>\d+)', permission_classes=[IsAuthenticated])
+    @user_cache_page(60 * 15)
+    def patient_routine_data(self, request, patient_id=None, *args, **kwargs):
+        # Filter routine data by patient's user
+        try:
+            patient = Patient.objects.get(id=patient_id)
+        except Patient.DoesNotExist:
+            return Response({"detail": "Patient not found."}, status=404)
 
-    def destroy(self, request, *args, **kwargs):
-        response = super().destroy(request, *args, **kwargs)
-        invalidate_user_list_cache(request)
-        return response
+        # Retrieve routine data where user matches the patient
+        qs = self.get_queryset().filter(user=patient.user)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        invalidate_user_list_cache(self.request)
+
+    def perform_update(self, serializer):
+        serializer.save()
+        invalidate_user_list_cache(self.request)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        invalidate_user_list_cache(self.request)
 
 # Kinda sloppy way to do this, since we are skipping Users + Auth for patients atm.
 class PatientViewSet(viewsets.ModelViewSet):
@@ -178,12 +201,11 @@ GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def google_callback_android(request):
     code = request.query_params.get('code')
-
     if not code:
         return Response({'error': 'No code provided'}, status=400)
-
     # Exchange code for tokens
     token_res = requests.post(GOOGLE_TOKEN_URL, data={
         'code': code,
@@ -192,27 +214,44 @@ def google_callback_android(request):
         'redirect_uri': settings.GOOGLE_ANDROID_REDIRECT_URI,
         'grant_type': 'authorization_code',
     })
-
     if token_res.status_code != 200:
+        print("Token exchange failed:", token_res.status_code, token_res.text)
         return Response({'error': 'Failed to get tokens'}, status=400)
-
     token_data = token_res.json()
     access_token = token_data.get('access_token')
-
     # Use access token to get user info
     userinfo_res = requests.get(GOOGLE_USERINFO_URL, headers={
         'Authorization': f'Bearer {access_token}'
     })
-
     if userinfo_res.status_code != 200:
         return Response({'error': 'Failed to fetch user info'}, status=400)
-
     userinfo = userinfo_res.json()
+
     email = userinfo.get('email')
-    name = userinfo.get('name')
+    first_name = userinfo.get('given_name', '')
+    last_name = userinfo.get('family_name', '')
 
     # Create or get user
-    user, _ = User.objects.get_or_create(username=email, defaults={'first_name': name, 'email': email})
+    user, created = User.objects.get_or_create(
+        email=email,
+        defaults={
+            "username": email,
+            "first_name": first_name,
+            "last_name": last_name,
+        }
+    )
+
+    # If the user was just created, also create a corresponding Patient
+    if created:
+        # Create a Patient associated with the new user
+        Patient.objects.create(
+            user=user,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            sex='O',
+            condition='Not Specified', 
+        )
 
     # Generate DRF token
     token, _ = Token.objects.get_or_create(user=user)
@@ -266,3 +305,88 @@ def google_callback_web(request):
 
     # Redirect to frontend with token
     return redirect(f"{settings.FRONTEND_URL}/login-success?token={token.key}")
+
+
+# -------------
+# DASHBOARD:
+# -------------
+# from .models import Patient, RoutineData, RoutineExercise
+
+class PatientDashboardView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        results = []
+
+        patients = Patient.objects.select_related('user').all()
+
+        for patient in patients:
+            routine_datas = RoutineData.objects.filter(user=patient.user).prefetch_related(
+                'routine_component_data__rep_data', 
+                'routine_component_data__exercise_detail', 
+                'routine_config__exercises'
+            )
+
+            avg_score = 0.0
+            avg_completion = 0.0
+            avg_rating = 0.0
+
+            if routine_datas.exists():
+                total_routine_scores = []
+                total_completion = []
+                total_ratings = []
+
+                for routine_data in routine_datas:
+                    component_data_list = routine_data.routine_component_data.all()
+
+                    routine_scores = []
+                    completion_percents = []
+                    ratings = []
+
+                    for component in component_data_list:
+                        rep_data_qs = component.rep_data.all()
+                        adjusted_scores = []
+
+                        for rep in rep_data_qs:
+                            alerts = len(rep.alerts) or 0
+                            reached = rep.goal_flexion_met and rep.goal_extension_met
+                            deduction_alerts = max(alerts - 1, 0) if not reached else alerts
+                            score = rep.max_score - (0.2 * deduction_alerts)
+                            adjusted_scores.append(max(score, 0.0))  # Ensure no negative scores
+
+                        if adjusted_scores:
+                            avg_component_score = sum(adjusted_scores) / len(adjusted_scores)
+                            routine_scores.append(avg_component_score)
+
+                        expected_reps = RoutineExercise.objects.filter(
+                            routine=routine_data.routine_config,
+                            exercise=component.exercise_detail
+                        ).first()
+                        expected_rep_count = expected_reps.reps if expected_reps and expected_reps.reps is not None else 0
+
+                        if expected_rep_count > 0:
+                            completion = len(rep_data_qs) / expected_rep_count
+                            completion_percents.append(completion)
+
+                        ratings.append(component.rating)
+
+                    if routine_scores:
+                        total_routine_scores.append(sum(routine_scores) / len(routine_scores))
+                    if completion_percents:
+                        total_completion.append(sum(completion_percents) / len(completion_percents))
+                    if ratings:
+                        total_ratings.extend(ratings)
+
+                avg_score = sum(total_routine_scores) / len(total_routine_scores) if total_routine_scores else 0.0
+                avg_completion = sum(total_completion) / len(total_completion) if total_completion else 0.0
+                avg_rating = sum(total_ratings) / len(total_ratings) if total_ratings else 0.0
+
+            results.append({
+                'patient': str(patient),
+                'injury': str(patient.condition) if patient.condition else "",
+                'average_score': round(avg_score, 2),
+                'completion_percent': round(avg_completion * 100, 2),
+                'average_rating': round(avg_rating, 2),
+            })
+
+        return Response(results)

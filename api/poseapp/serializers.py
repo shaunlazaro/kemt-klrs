@@ -163,7 +163,7 @@ class RoutineComponentDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RoutineComponentData
-        fields = ['id', 'exercise_detail', 'exercise_detail_id', 'rep_data']
+        fields = ['id', 'exercise_detail', 'exercise_detail_id', 'rep_data', 'rating']
 
     def create(self, validated_data):
         """Custom create function for RoutineComponentData with nested RepData."""
@@ -214,7 +214,7 @@ class RoutineDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RoutineData
-        fields = ['id', 'routine_config', 'routineConfig_id', 'routine_component_data', 'created_at']
+        fields = ['id', 'routine_config', 'routineConfig_id', 'routine_component_data', 'created_at', 'notes']
 
     def create(self, validated_data):
         """Custom create function for RoutineData with nested RoutineComponentData."""

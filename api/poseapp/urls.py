@@ -11,6 +11,7 @@ from .views import (
     RoutineComponentDataViewSet,
     RoutineDataViewSet,
     PatientViewSet,
+    PatientDashboardView,
     google_callback_web,
     google_callback_android,
 )
@@ -32,5 +33,6 @@ router.register(r'patients', PatientViewSet)
 urlpatterns = [
     path('', include(router.urls)),  # Include the router's URLs
     path('auth/google/callback/', google_callback_web),  # Add callback manually
-    path('auth/google/android/', google_callback_android)
+    path('auth/google/android/', google_callback_android),
+    path("dashboard/patient-stats/", PatientDashboardView.as_view(), name="patient-dashboard")
 ]

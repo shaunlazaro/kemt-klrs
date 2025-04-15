@@ -20,7 +20,7 @@ const PatientReport: React.FC = () => {
 
     // const routineDataReturn = useTestRoutineData();
 
-    const { data: routineDataReturn, isLoading: routineDataLoading } = useGetRoutineData();
+    const { data: routineDataReturn, isLoading: routineDataLoading } = useGetRoutineData(patientId ?? "");
     const { data: patientData, isLoading: patientLoading } = useGetPatientById(patientId ?? "");
 
     const [patient, setPatient] = useState<Patient>(BLANK_PATIENT);
@@ -86,7 +86,7 @@ const PatientReport: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-7 gap-4">
+                <div className="grid grid-cols-7 gap-4 items-start">
                     <div className="rounded-lg shadow-[0px_4px_4px_rgba(0,0,0,0.25)] col-span-3 flex flex-col p-5 gap-4 items-start">
                         <div className="flex items-center space-x-2 text-primary-darkblue font-semibold">
                             <GiProgression className="w-6 h-6" />
@@ -157,7 +157,7 @@ const PatientReport: React.FC = () => {
                                         {new Date(routineData.created_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                                     </div>
                                     <div className="col-start-4 col-end-6">{getTotalAlerts(routineData)}</div>
-                                    <div className="col-start-6 col-end-9">{getPercentCompleted(routineData)}</div>
+                                    <div className="col-start-6 col-end-9">{getPercentCompleted(routineData).toFixed(0)}</div>
                                     <div className="col-start-9 col-end-11">{getAverageScore(routineData).toFixed(0)}</div>
                                     <div className="col-start-12 cursor-pointer h-auto align-middle" onClick={() => onClickReport(routineData)}> <FaChevronRight /></div>
                                 </>))}
