@@ -144,7 +144,7 @@ const Home: React.FC = () => {
                 {/* Data Rows */}
                 {dashboardData
                   ?.filter(p => p.average_score < SCORE_THRESHOLD || p.completion_percent < ADHERENCE_THRESHOLD) // Customize thresholds
-                  .map((patient, index) => (
+                  .map((patient) => (
                     <>
                       <div className="col-span-3 text-left">{patient.patient}</div>
                       <div className="col-span-2 flex justify-center items-center">
