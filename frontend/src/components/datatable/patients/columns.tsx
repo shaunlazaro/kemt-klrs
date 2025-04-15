@@ -90,7 +90,7 @@ export const PatientTableColumnDef: ColumnDef<Patient>[] = [
             <div
                 className={`rounded-md py-1 font-semibold text-sm flex`}
             >
-                <div className="rounded-2xl border text-white bg-secondary-darkpink px-4 py-1">{`${(cell.getValue() as RoutineConfig)?.name}`}</div>
+                <div className="rounded-2xl border text-white bg-secondary-darkpink px-4 py-1">{`${(cell.getValue() as RoutineConfig)?.name ?? "None assigned"}`}</div>
             </div>
         ),
     },
