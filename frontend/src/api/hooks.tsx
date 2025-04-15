@@ -14,6 +14,7 @@ import { Patient } from "../interfaces/patient.interface";
 import { RoutineConfig } from "../interfaces/exercisePlan.interface";
 import { ExerciseDetail } from "../interfaces/exerciseDetail.interface";
 import { RoutineData } from "../interfaces/routineData.interface";
+import { PatientDashboardEntry } from "../interfaces/dashboard.interface";
 
 
 export const useGetRoutineConfigs = () => {
@@ -214,3 +215,13 @@ export const useGetRoutineDataById = (routineDataId: string) => {
         enabled: !!routineDataId && routineDataId != ""
     });
 };
+
+export const useGetDashboardData = () => {
+    return useQuery({
+        queryKey: [QueryKeys.DASHBOARD],
+        queryFn: () =>
+            request.get(`/dashboard/patient-stats`) as Promise<PatientDashboardEntry[]>,
+        staleTime: 10000,
+        // enabled: !!routineDataId && routineDataId != ""
+    });
+}

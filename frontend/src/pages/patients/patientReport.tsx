@@ -86,7 +86,7 @@ const PatientReport: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-7 gap-4">
+                <div className="grid grid-cols-7 gap-4 items-start">
                     <div className="rounded-lg shadow-[0px_4px_4px_rgba(0,0,0,0.25)] col-span-3 flex flex-col p-5 gap-4 items-start">
                         <div className="flex items-center space-x-2 text-primary-darkblue font-semibold">
                             <GiProgression className="w-6 h-6" />
