@@ -58,7 +58,7 @@ const AddEditPatients: React.FC = () => {
     useEffect(
         () => {
             const newPatient: Patient = {
-                id: patient.id,
+                id: patientId ?? "NEW",
                 // user_id: patient.user_id,
                 // weeklyProgress: patient.weeklyProgress,
                 // -------
@@ -78,7 +78,11 @@ const AddEditPatients: React.FC = () => {
     useEffect(() => {
         if (allExercisePlanData && allExercisePlanData.length > 0) {
             setRoutineConfigs(allExercisePlanData);
-            setInjuryValueList(getUniqueInjuryValues(allExercisePlanData));
+            const uniqueVals = getUniqueInjuryValues(allExercisePlanData);
+            setInjuryValueList(uniqueVals);
+            if (!uniqueVals.includes(patientInjury)) {
+                setPatientInjury(uniqueVals[0]);
+            }
         }
     }, [allExercisePlanData]);
 
@@ -126,18 +130,19 @@ const AddEditPatients: React.FC = () => {
                     </div>
                     <div className="pb-4">
                         <div className="font-base text-sm text-primary-gray pb-1"> Condition </div>
-                        <WideSelect items={injuryValueList} value={patientInjury ?? defaultInjuryValueList[0]} onChange={(e) => setPatientInjury(e.target.value)} />
+                        <WideSelect items={injuryValueList} value={patientInjury} onChange={(e) => setPatientInjury(e.target.value)} />
                         {/* <Input className="border-2 border-primary-gray" placeholder="CON TODO" /> */}
                     </div>
                     <div className="pb-4">
                         <div className="font-base text-sm text-primary-gray pb-1"> Exercise </div>
                         <WideSelect
-                            items={routineConfigs}
+                            // items={routineConfigs}
+                            items={[{ name: "", label: "Select an exercise plan" }, ...routineConfigs]} // Add blank option at the start
                             valueKey="name"
                             label="name"
                             value={patient.exercises?.name ?? ""}
                             onChange={(e) => {
-                                setPatientExercise(routineConfigs.find((ex) => ex.name == e.target.value) ?? routineConfigs[0])
+                                setPatientExercise(routineConfigs.find((ex) => ex.name == e.target.value) ?? undefined)
                             }}
                         />
                     </div>

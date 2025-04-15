@@ -5,4 +5,5 @@ export enum QueryKeys {
     ROUTINE_CONFIG = "routineConfig",
     EXERCISE_DETAILS = "exerciseDetails",
     ROUTINE_DATA = "routineData",
+    DASHBOARD = "dashboard",
 }

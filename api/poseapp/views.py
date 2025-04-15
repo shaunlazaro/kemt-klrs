@@ -9,6 +9,7 @@ from django.utils.cache import patch_response_headers
 from django.utils.decorators import method_decorator, decorator_from_middleware_with_args
 from django.views.decorators.cache import cache_page
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.authtoken.models import Token
@@ -71,8 +72,10 @@ def invalidate_user_list_cache(request):
     if not user.is_authenticated:
         return
     cache_key = f"user_cache:{user.id}:{request.get_full_path()}"
+    print(f"clear cache: {cache_key}")
     cache.delete(cache_key)
-    cache_key = f"user_cache:{user.id}:{request.get_full_path()}/app"
+    cache_key = f"user_cache:{user.id}:{request.get_full_path()}app/"
+    print(f"clear cache: {cache_key}")
     cache.delete(cache_key)
 
 class PoseViewSet(viewsets.ModelViewSet):
@@ -134,7 +137,7 @@ class RoutineDataViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='patient/(?P<patient_id>\d+)', permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'], url_path=r'patient/(?P<patient_id>\d+)', permission_classes=[IsAuthenticated])
     @user_cache_page(60 * 15)
     def patient_routine_data(self, request, patient_id=None, *args, **kwargs):
         # Filter routine data by patient's user
@@ -302,3 +305,88 @@ def google_callback_web(request):
 
     # Redirect to frontend with token
     return redirect(f"{settings.FRONTEND_URL}/login-success?token={token.key}")
+
+
+# -------------
+# DASHBOARD:
+# -------------
+# from .models import Patient, RoutineData, RoutineExercise
+
+class PatientDashboardView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        results = []
+
+        patients = Patient.objects.select_related('user').all()
+
+        for patient in patients:
+            routine_datas = RoutineData.objects.filter(user=patient.user).prefetch_related(
+                'routine_component_data__rep_data', 
+                'routine_component_data__exercise_detail', 
+                'routine_config__exercises'
+            )
+
+            avg_score = 0.0
+            avg_completion = 0.0
+            avg_rating = 0.0
+
+            if routine_datas.exists():
+                total_routine_scores = []
+                total_completion = []
+                total_ratings = []
+
+                for routine_data in routine_datas:
+                    component_data_list = routine_data.routine_component_data.all()
+
+                    routine_scores = []
+                    completion_percents = []
+                    ratings = []
+
+                    for component in component_data_list:
+                        rep_data_qs = component.rep_data.all()
+                        adjusted_scores = []
+
+                        for rep in rep_data_qs:
+                            alerts = len(rep.alerts) or 0
+                            reached = rep.goal_flexion_met and rep.goal_extension_met
+                            deduction_alerts = max(alerts - 1, 0) if not reached else alerts
+                            score = rep.max_score - (0.2 * deduction_alerts)
+                            adjusted_scores.append(max(score, 0.0))  # Ensure no negative scores
+
+                        if adjusted_scores:
+                            avg_component_score = sum(adjusted_scores) / len(adjusted_scores)
+                            routine_scores.append(avg_component_score)
+
+                        expected_reps = RoutineExercise.objects.filter(
+                            routine=routine_data.routine_config,
+                            exercise=component.exercise_detail
+                        ).first()
+                        expected_rep_count = expected_reps.reps if expected_reps and expected_reps.reps is not None else 0
+
+                        if expected_rep_count > 0:
+                            completion = len(rep_data_qs) / expected_rep_count
+                            completion_percents.append(completion)
+
+                        ratings.append(component.rating)
+
+                    if routine_scores:
+                        total_routine_scores.append(sum(routine_scores) / len(routine_scores))
+                    if completion_percents:
+                        total_completion.append(sum(completion_percents) / len(completion_percents))
+                    if ratings:
+                        total_ratings.extend(ratings)
+
+                avg_score = sum(total_routine_scores) / len(total_routine_scores) if total_routine_scores else 0.0
+                avg_completion = sum(total_completion) / len(total_completion) if total_completion else 0.0
+                avg_rating = sum(total_ratings) / len(total_ratings) if total_ratings else 0.0
+
+            results.append({
+                'patient': str(patient),
+                'injury': str(patient.condition) if patient.condition else "",
+                'average_score': round(avg_score, 2),
+                'completion_percent': round(avg_completion * 100, 2),
+                'average_rating': round(avg_rating, 2),
+            })
+
+        return Response(results)
