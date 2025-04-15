@@ -37,11 +37,15 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.IsoFields;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -53,6 +57,7 @@ public class ProgressFragment extends Fragment {
     LinearLayout progressLayout;
     LinearLayout layout;
     ProgressBar loading;
+    TextView weekTitle;
     int currentWeek = 0;
     int maxWeek = 0;
 
@@ -67,6 +72,7 @@ public class ProgressFragment extends Fragment {
         progressLayout = view.findViewById(R.id.cards_layout);
         layout = view.findViewById(R.id.progress_linear_layout);
         loading = view.findViewById(R.id.loading_progress);
+        weekTitle = view.findViewById(R.id.title_week_text);
 
         ImageButton lastWeek = view.findViewById(R.id.back_button);
         ImageButton nextWeek = view.findViewById(R.id.next_button);
@@ -81,9 +87,14 @@ public class ProgressFragment extends Fragment {
 
         lastWeek.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (currentWeek > 0) {
+                if (currentWeek > 1) {
                     currentWeek--;
+                    if (currentWeek == 1) {
+                        lastWeek.setVisibility(View.INVISIBLE);
+                    }
+                    nextWeek.setVisibility(View.VISIBLE);
                     progressLayout.removeAllViews();
+                    setWeekText(2025, currentWeek);
                     doneLoading();
                 }
             }
@@ -93,11 +104,20 @@ public class ProgressFragment extends Fragment {
             public void onClick(View v) {
                 if (currentWeek < maxWeek) {
                     currentWeek++;
+                    if (currentWeek == maxWeek) {
+                        weekTitle.setText("This Week");
+                        nextWeek.setVisibility(View.INVISIBLE);
+                    } else {
+                        setWeekText(2025, currentWeek);
+                    }
+                    lastWeek.setVisibility(View.VISIBLE);
                     progressLayout.removeAllViews();
                     doneLoading();
                 }
             }
         });
+
+        Log.d("LOADING_BAR_DEBUG", String.valueOf(routineDataLoaded));
 
         if (routineDataLoaded) {
             doneLoading();
@@ -138,7 +158,7 @@ public class ProgressFragment extends Fragment {
                 }
             }
 
-            List<String> daysOfWeek = Arrays.asList("SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY");
+            List<String> daysOfWeek = Arrays.asList("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY");
 
             // Data points for scores
             for (int index = 0; index < daysOfWeek.size(); index++) {
@@ -184,7 +204,10 @@ public class ProgressFragment extends Fragment {
             return;
         }
 
-        for (RoutineData workout : workouts) {
+        List<RoutineData> dataOfTheWeek = new ArrayList<>(workouts);
+        Collections.reverse(dataOfTheWeek);
+
+        for (RoutineData workout : dataOfTheWeek) {
             FrameLayout frameLayout = new FrameLayout(getContext());
             frameLayout.setLayoutParams(new FrameLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -280,6 +303,8 @@ public class ProgressFragment extends Fragment {
 
     public void doneLoading() {
 
+        Log.d("LOADING_BAR_DEBUG", "doneLoading called");
+
         loading.setVisibility(View.GONE);
         layout.setVisibility(View.VISIBLE);
 
@@ -301,7 +326,7 @@ public class ProgressFragment extends Fragment {
         updateGraph(dataWeeksSorted, currentWeek);
 
         // Customize X-axis labels
-        String[] labels = {"S", "M", "T", "W", "T", "F", "S"};
+        String[] labels = {"M", "T", "W", "T", "F", "S", "S"};
         XAxis xAxis = barChart.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -330,6 +355,33 @@ public class ProgressFragment extends Fragment {
 
         // show past workouts
         showPastWorkouts(dataWeeksSorted.get(currentWeek));
+    }
+
+    private void setWeekText(int year, int isoWeek) {
+        WeekFields weekFields;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            weekFields = WeekFields.ISO;
+
+            // January 4th is always in the first ISO week
+            LocalDate jan4 = LocalDate.of(year, 1, 4);
+
+            // Create a base ZonedDateTime in the desired time zone
+            ZonedDateTime base = jan4.atStartOfDay(ZoneId.of("UTC"));
+
+            // Calculate Monday of the given ISO week
+            ZonedDateTime monday = base
+                    .with(weekFields.weekOfWeekBasedYear(), isoWeek)
+                    .with(weekFields.dayOfWeek(), 1); // 1 = Monday
+
+            // Sunday is 6 days after Monday
+            ZonedDateTime sunday = monday.plusDays(6);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d", Locale.ENGLISH);
+            String mondayFormatted = monday.format(formatter);
+            String sundayFormatted = sunday.format(formatter);
+
+            weekTitle.setText(mondayFormatted + " - " + sundayFormatted);
+        }
     }
 
     private Double calculateScore(RoutineData data) {

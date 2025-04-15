@@ -102,7 +102,7 @@ public class WorkoutComplete extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // store the data
-                routineData.getRoutineComponentData().get(exerciseIndex).setRating(scoreBar.getProgress());
+                routineData.getRoutineComponentData().get(exerciseIndex).setRating(scoreBar.getProgress()+1);
 
                 exerciseIndex++;
                 if (exerciseIndex == exerciseList.size()) {
@@ -169,7 +169,7 @@ public class WorkoutComplete extends AppCompatActivity {
 
         backText.setOnClickListener(v -> {
             // store data if hit back too
-            routineData.getRoutineComponentData().get(exerciseIndex).setRating(scoreBar.getProgress());
+            routineData.getRoutineComponentData().get(exerciseIndex).setRating(scoreBar.getProgress()+1);
 
             exerciseIndex--;
 
@@ -178,7 +178,7 @@ public class WorkoutComplete extends AppCompatActivity {
             }
 
             if (routineData.getRoutineComponentData().get(exerciseIndex).getRating() != null){
-                scoreBar.setProgress(routineData.getRoutineComponentData().get(exerciseIndex).getRating());
+                scoreBar.setProgress(routineData.getRoutineComponentData().get(exerciseIndex).getRating()-1);
             } else {
                 scoreBar.setProgress(1);
                 nextButton.setVisibility(View.GONE);

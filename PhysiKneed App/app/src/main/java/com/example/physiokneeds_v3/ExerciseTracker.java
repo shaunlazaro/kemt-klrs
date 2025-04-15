@@ -106,7 +106,6 @@ public class ExerciseTracker {
             Log.d("ROUTINE_DEBUG", "Main Detail:" + mainTrackingDetail.getKeypoints().toString());
             Log.d("ROUTINE_DEBUG", "Angle: " + entry.getAngle().toString());
 
-            // REVISIT
             if (entry.getDetail().getTrackingType().equals(mainTrackingDetail.getTrackingType())) {
                 return entry.getAngle();
             }

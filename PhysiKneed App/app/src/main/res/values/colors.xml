@@ -8,5 +8,6 @@
     <color name="nav_blue">#061A40</color>
     <color name="green">#5ABA01</color>
     <color name="light_green">#BBFF01</color>
+    <color name="gray">#808080</color>
 
 </resources>

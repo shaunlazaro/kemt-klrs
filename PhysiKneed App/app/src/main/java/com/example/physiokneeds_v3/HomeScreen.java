@@ -42,8 +42,6 @@ public class HomeScreen extends AppCompatActivity {
     public static List<RoutineData> routineData = new ArrayList<>();
     public static boolean routineDataLoaded = false;
 
-    public static String loginUsername = "";
-
     BottomNavigationView bottomNavigationView;
 
     ImageButton exerciseButton;
@@ -64,6 +62,8 @@ public class HomeScreen extends AppCompatActivity {
             return insets;
         });
 
+        routineDataLoaded = false;
+
         exerciseButton = findViewById(R.id.exercise_button);
         exerciseTextButton = findViewById(R.id.exercise_text_button);
         usernameText = findViewById(R.id.username);
@@ -83,11 +83,9 @@ public class HomeScreen extends AppCompatActivity {
             return true;
         });
 
-        // for now just display the username that was entered in the login screen
-        loginUsername = getIntent().getStringExtra(MainMenu.USERNAME_TAG);
-        if (loginUsername != null) {
-            usernameText.setText(loginUsername);
-        }
+        // update welcome back user
+        String firstName = MainMenu.name != null ? MainMenu.name.split(" ")[0] : "";
+        usernameText.setText(firstName);
 
         // implement button to get to today's exercises
         exerciseButton.setOnClickListener(new View.OnClickListener() {
@@ -137,8 +135,8 @@ public class HomeScreen extends AppCompatActivity {
         ApiService apiService = retrofit.create(ApiService.class);
 
         // get routine
-        Call<List<RoutineConfig>> call = apiService.getRoutine();
-        Call<List<RoutineData>> callData = apiService.getRoutineData(1);
+        Call<List<RoutineConfig>> call = apiService.getRoutine(MainMenu.tokenId);
+        Call<List<RoutineData>> callData = apiService.getRoutineData(MainMenu.tokenId);
 
         if (call != null) {
             call.enqueue(new Callback<List<RoutineConfig>>() {
@@ -157,7 +155,6 @@ public class HomeScreen extends AppCompatActivity {
                             .findFirst().orElse(null); // hardcode id
                     Log.d("TESTNICK", routineConfig.getId());
 
-                    // TODO When pulling a routine, set username to api username
 
                     String exerciseList = "\n";
                     for (int i = 0; i < routineConfig.getExercises().size(); i++) {
@@ -203,10 +200,6 @@ public class HomeScreen extends AppCompatActivity {
                         ProgressFragment progressFragment = (ProgressFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_frame_layout);
                         progressFragment.doneLoading();
                     }
-
-                    Log.d(TAG_API, routineData.get(routineData.size()-1).getCreated_at());
-                    Log.d(TAG_API, String.valueOf(routineData.get(routineData.size()-1).getRoutineComponentData().size()));
-
                 }
 
                 @Override

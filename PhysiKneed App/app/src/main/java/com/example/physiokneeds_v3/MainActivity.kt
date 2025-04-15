@@ -99,13 +99,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var reps_text: TextView
 
     lateinit var instructionsLayout : LinearLayout
-//    lateinit var start_button: Button
-//    lateinit var camera_button: Button
 
     lateinit var cameraDevice: CameraDevice
     lateinit var cameraCaptureSession: CameraCaptureSession
     val FRONT_CAMERA = 1
-    val BACK_CAMERA = 0
 
     val CONFIDENCE_THRESHOLD = 0.6f
 
@@ -137,7 +134,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var search_button: Button
     lateinit var bt_button: Button
     lateinit var connection_text: TextView
-    lateinit var send_coords: Button
 
     lateinit var titleText: TextView
     lateinit var popupMenu: FrameLayout
@@ -177,9 +173,6 @@ class MainActivity : AppCompatActivity() {
     var state = 100
     var trackUserCount = 0
     var currentExerciseIndex = 0
-
-    // set which camera the app opens first (FOR DEBUGGING)
-    var current_camera = 0
 
     // FPS verification test
     var fpsData = mutableListOf<Int>()
@@ -290,7 +283,6 @@ class MainActivity : AppCompatActivity() {
         bt_button = findViewById(R.id.bt_button)
         bt_button.isEnabled = false
         connection_text = findViewById(R.id.status_text)
-        send_coords = findViewById(R.id.send_coords)
 
         leftText = findViewById(R.id.left_text)
 
@@ -340,7 +332,6 @@ class MainActivity : AppCompatActivity() {
                     isConnected = true
                     btButtonCount++
 
-//                    // connecting delay
                     state = 1 // start next state
 
                     // We subscribe to the observable until the onComplete() is called
@@ -416,27 +407,14 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        send_coords.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(p0: View?) {
-                if (::connectedThreadWrite.isInitialized) {
-                    connectedThreadWrite.write("0,0")
-                }
-            }
-
-        })
-
         // define global variables
         textureView = findViewById(R.id.camera_feed)
         textureView.isOpaque = false
-//        textureView.scaleX = -1f // mirror since front camera
-//        textureView.rotation = 90f // Rotate 90 degrees clockwise
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
         handlerThread = HandlerThread("videoThread")
         handlerThread.start()
         handler = Handler(handlerThread.looper)
         overlayView = findViewById(R.id.overlayView)
-//        overlayView.scaleX = -1f // mirror since front camera
-//        overlayView.rotation = 90f // Rotate 90 degrees clockwise
         poseLandmarker = PoseLandmarker.createFromOptions(this, options)
 
         textView_knee = findViewById(R.id.kneeAngle)
@@ -459,12 +437,6 @@ class MainActivity : AppCompatActivity() {
         angleBar = findViewById(R.id.angle_bar)
 
         val videoFeed = findViewById<VideoView>(R.id.video)
-        val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.get_position_01)
-        videoFeed.setVideoURI(videoUri)
-        videoFeed.start()
-        videoFeed.setOnCompletionListener {
-            videoFeed.start()
-        }
 
         // for sound effects
         soundPool = SoundPool.Builder()
@@ -481,7 +453,6 @@ class MainActivity : AppCompatActivity() {
         val errorSound = soundPool.load(applicationContext, R.raw.error, 1)
         val singleRepSound = soundPool.load(applicationContext, R.raw.single_rep, 1)
         val repsCompleteSound = soundPool.load(applicationContext, R.raw.reps_complete, 1)
-
 
         // set the camera resolution to half the width
         val screenHeight = resources.displayMetrics.heightPixels
@@ -524,23 +495,6 @@ class MainActivity : AppCompatActivity() {
         val layoutParams = textureView.layoutParams
         frameHeight = layoutParams.height
         frameWidth = layoutParams.width
-
-//        start_button = findViewById(R.id.start_button)
-//
-//        // set up switch camera button (FOR DEBUGGING)
-//        camera_button = findViewById(R.id.camera_button)
-//        camera_button.setOnClickListener(object : View.OnClickListener {
-//            override fun onClick(view: View?) {
-//                close_camera()
-//                if (current_camera == 0) {
-//                    open_camera(1)
-//                    current_camera = 1
-//                } else {
-//                    open_camera(0)
-//                    current_camera = 0
-//                }
-//            }
-//        })
 
         // adjust camera preview
         textureView.surfaceTextureListener = object:TextureView.SurfaceTextureListener {
@@ -671,9 +625,7 @@ class MainActivity : AppCompatActivity() {
                     moveProgressBar(0,progressBarPopup.max,loadingDuration.toLong())
 
                     Handler(Looper.getMainLooper()).postDelayed({
-//                        state = 0 // start next state
-                        //                     For Debug without mount
-                        state = 2
+                        state = 0 // start next state
                         popupMenu.visibility = View.GONE // hide pop up
                     }, loadingDuration.toLong())  // update progress
 
@@ -715,7 +667,6 @@ class MainActivity : AppCompatActivity() {
 
                     // perform exercise
                     if (result != null && result.landmarks().size > 0) {
-//                        Log.d("PORT_DEBUG", result.landmarks().toString())
                         val landmarks = result.landmarks()[0]
                         val visibility = getLandmarksVisibility(landmarks)
                         val exerciseDetail = routineConfig.exercises[currentExerciseIndex].exercise
@@ -725,8 +676,6 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         if (keypointVisible) {
-//                            Log.d("ROUTINE_DEBUG", landmarks.size.toString())
-
                             val trackingResults = processExerciseMetrics(
                                 landmarks, exerciseDetail
                             )
@@ -755,13 +704,11 @@ class MainActivity : AppCompatActivity() {
                             if (repData != null) {
                                 soundPool.play(singleRepSound, 1f, 1f, 0, 0, 1f)
 
-//                                Log.d("NICK_AHHHH", repData.poses.size.toString())
                                 Log.d("POSE_FRAME_DEBUG", "Total Time: " + repData.totalTime.toString())
 
                                 Log.d("SYMMETRIC_DEBUG", "Rep Number: " + repData.repNumber)
 
                                 repDataLists[currentExerciseIndex].add(repData)
-                                Log.d("NICK_AHHHH", repDataLists[currentExerciseIndex][repDataLists[currentExerciseIndex].size - 1].poses.size.toString())
 
                                 // show alerts from repData (kinda jank)
                                 Log.d("ALERT_LOG", "Rep Number: " + repData.repNumber)
@@ -842,7 +789,6 @@ class MainActivity : AppCompatActivity() {
                     Handler(Looper.getMainLooper()).postDelayed({
                         state = 1 // start next state
                         exerciseNumberText.visibility = View.VISIBLE
-//                        popupMenu.visibility = View.GONE // hide pop up
                     }, loadingDuration.toLong())  // update progress
                 }
                 else if (state == 4) {
@@ -887,7 +833,6 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     val routineData = RoutineDataUpload(routineConfig.id, routineDataList)
-                    sendData(routineData)
 
                     // send routine data to next screen
                     val intentRoutine = Intent("com.example.ROUTINE_DATA_SEND")
@@ -1017,15 +962,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }, handler)
-    }
-
-    fun close_camera() {
-        try {
-            cameraCaptureSession.close()
-            cameraDevice.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     fun track_user(result: PoseLandmarkerResult, height: Int, width: Int, changeState: Boolean) {
@@ -1225,58 +1161,5 @@ class MainActivity : AppCompatActivity() {
         } else {
             return null
         }
-    }
-
-    private fun sendData(data: RoutineDataUpload) {
-        // create retrofit instance
-        val retrofit = Retrofit.Builder()
-            .baseUrl("http://140.238.151.117:8000/api/routine-data/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val apiService = retrofit.create(ApiService::class.java)
-
-        // send routine-data
-        val call = apiService.sendData(data)
-
-//        val gson = Gson()
-//        val jsonData = gson.toJson(data) // Serialize the data
-//
-//        try {
-//            // Save to internal storage
-//            // serialize
-//            val file = File(getExternalFilesDir("debug"), "json_data.json")
-//            val fos = FileOutputStream(file)
-//            val oos = ObjectOutputStream(fos)
-//            oos.writeObject(jsonData)
-//            oos.close()
-//            fos.close()
-//
-//        } catch (e: IOException) {
-//            Log.e("FileSave", "Error saving data: ${e.message}")
-//        }
-
-        call?.enqueue(object : Callback<RoutineDataUpload> {
-            override fun onResponse(
-                call: Call<RoutineDataUpload>,
-                response: Response<RoutineDataUpload>
-            ) {
-                if (!response.isSuccessful) {
-                    // Handle the error scenario here
-                    Log.e(HomeScreen.TAG_API, "Response Code: " + response.code())
-                    Log.e(HomeScreen.TAG_API, "Response Message: " + response.errorBody())
-                    Log.e(HomeScreen.TAG_API, "Response Message: " + (response.errorBody()?.string()
-                        ?: ""))
-                    Log.d(HomeScreen.TAG_API, call.request().url.toString())
-                    return
-                } else {
-                    Log.d(HomeScreen.TAG_API, "Data Sent Successfully")
-                }
-            }
-
-            override fun onFailure(call: Call<RoutineDataUpload>, t: Throwable) {
-                Log.e(HomeScreen.TAG_API, t.toString())
-            }
-        })
     }
 }

@@ -44,12 +44,6 @@ public class HomeFragment extends Fragment {
         exerciseTextButton = view.findViewById(R.id.exercise_text_button);
         usernameText = view.findViewById(R.id.username);
 
-        // for now just display the username that was entered in the login screen
-        String loginUsername = HomeScreen.loginUsername;
-        if (loginUsername != null) {
-            usernameText.setText(loginUsername);
-        }
-
         // implement button to get to today's exercises
         exerciseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -61,6 +55,10 @@ public class HomeFragment extends Fragment {
                 startActivity(exerciseIntent);
             }
         });
+
+        // update welcome back user
+        String firstName = MainMenu.name != null ? MainMenu.name.split(" ")[0] : "";
+        usernameText.setText(firstName);
 
         exerciseTextButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -81,6 +79,11 @@ public class HomeFragment extends Fragment {
 
     private void loadData() {
         String exerciseList = "\n";
+
+        if (routineConfig.getExercises() == null) {
+            return;
+        }
+
         for (int i = 0; i < routineConfig.getExercises().size(); i++) {
             // formatting example
             // android:text="\n\nSeated Leg Extension x 8\nSquat x 6\nStanding Quad Stretch x 10\nCalf Raise x 10"

@@ -1,5 +1,7 @@
 package com.example.physiokneeds_v3;
 
+import static com.example.physiokneeds_v3.HomeScreen.TAG_API;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -34,6 +36,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WorkoutSummary extends AppCompatActivity {
 
@@ -240,10 +248,10 @@ public class WorkoutSummary extends AppCompatActivity {
             linearLayoutCard.addView(frameLayout);
             linearLayoutCard.addView(linearLayoutCard2);
 
-            for (String item : alerts.get(i)) {
+            if (alerts.get(i).isEmpty()) {
                 TextView textView4 = new TextView(this);
                 textView4.setLayoutParams(layoutParamsCard);
-                textView4.setText(item);
+                textView4.setText("No Errors");
                 textView4.setTextSize(14);
                 textView4.setTypeface(ResourcesCompat.getFont(this, R.font.source_sans));
                 textView4.setTypeface(null, Typeface.ITALIC);
@@ -251,10 +259,25 @@ public class WorkoutSummary extends AppCompatActivity {
                 textView4.setGravity(Gravity.START);
                 textView4.setBackgroundColor(ContextCompat.getColor(this, R.color.light_blue));
                 textView4.setPadding(dpToPx(20), dpToPx(10), dpToPx(20), dpToPx(10));
-                textView4.setCompoundDrawablePadding(dpToPx(10));
-                TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(textView4, ContextCompat.getDrawable(this, R.drawable.baseline_error_outline_pink), null, null, null);
 
                 linearLayoutCard2.addView(textView4);
+            } else {
+                for (String item : alerts.get(i)) {
+                    TextView textView4 = new TextView(this);
+                    textView4.setLayoutParams(layoutParamsCard);
+                    textView4.setText(item);
+                    textView4.setTextSize(14);
+                    textView4.setTypeface(ResourcesCompat.getFont(this, R.font.source_sans));
+                    textView4.setTypeface(null, Typeface.ITALIC);
+                    textView4.setTextColor(ContextCompat.getColor(this, R.color.black));
+                    textView4.setGravity(Gravity.START);
+                    textView4.setBackgroundColor(ContextCompat.getColor(this, R.color.light_blue));
+                    textView4.setPadding(dpToPx(20), dpToPx(10), dpToPx(20), dpToPx(10));
+                    textView4.setCompoundDrawablePadding(dpToPx(10));
+                    TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(textView4, ContextCompat.getDrawable(this, R.drawable.baseline_error_outline_pink), null, null, null);
+
+                    linearLayoutCard2.addView(textView4);
+                }
             }
 
             cardView.setOnClickListener(v -> {
@@ -271,10 +294,14 @@ public class WorkoutSummary extends AppCompatActivity {
             linearLayoutScore.addView(cardView, i);
         }
 
+        RoutineDataUpload finalRoutineData = routineData;
+
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(WorkoutSummary.this, HomeScreen.class);
-                WorkoutSummary.this.startActivity(intent);
+                sendData(finalRoutineData);
+                Log.d("RATING_NOTES", finalRoutineData.getNotes());
+                Log.d("RATING_NOTES", finalRoutineData.getRoutineComponentData().get(0).getRating().toString());
+                Log.d("RATING_NOTES", finalRoutineData.getRoutineComponentData().get(1).getRating().toString());
             }
         });
 
@@ -283,6 +310,42 @@ public class WorkoutSummary extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void sendData(RoutineDataUpload data) {
+        // create retrofit instance
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://140.238.151.117:8000/api/routine-data/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+
+        // send routine-data
+        Call<RoutineDataUpload> call = apiService.sendData(MainMenu.tokenId, data);
+
+        if (call != null) {
+            call.enqueue(new Callback<RoutineDataUpload>() {
+                @Override
+                public void onResponse(Call<RoutineDataUpload> call, Response<RoutineDataUpload> response) {
+                    if (!response.isSuccessful()) {
+                        // Handle the error scenario here
+                        Log.e(TAG_API, "Response Code: " + response.code());
+                        Log.d(TAG_API, call.request().url().toString());
+                        return;
+                    }
+                    Log.d(HomeScreen.TAG_API, "Data Sent Successfully");
+                    Intent intent = new Intent(WorkoutSummary.this, HomeScreen.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    WorkoutSummary.this.startActivity(intent);
+                }
+
+                @Override
+                public void onFailure(Call<RoutineDataUpload> call, Throwable t) {
+                    Log.e(TAG_API, t.toString());
+                }
+            });
+        }
     }
 
     private int dpToPx(int dp) {
