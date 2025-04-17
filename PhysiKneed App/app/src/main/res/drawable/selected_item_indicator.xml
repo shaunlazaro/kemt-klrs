@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/light_blue"/> <!-- Background color of the indicator -->
+    <corners android:radius="50dp"/>   <!-- Rounded corners for the indicator -->
+</shape>

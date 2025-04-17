@@ -286,6 +286,53 @@
             android:layout_marginTop="100dp"
             android:layout_height="wrap_content" />
 
+        <TextView
+            android:id="@+id/exercise_subtext"
+            android:text="Tap your phone to exit"
+            android:textSize="24sp"
+            android:padding="10dp"
+            android:layout_marginTop="240dp"
+            android:layout_marginBottom="150dp"
+            android:layout_marginRight="350dp"
+            android:layout_marginLeft="350dp"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="4dp" />
+
+        <TextView
+            android:id="@+id/getPositionedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="700dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="600dp"
+            android:padding="20dp"
+            android:text="Get Positioned in Frame to Begin\n"
+            android:textSize="28sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/source_sans"
+            android:textStyle="bold"
+            android:background="@drawable/blue_button"
+            android:drawablePadding="70dp"
+            android:enabled="false"
+            android:gravity="center"
+            />
+
+        <ProgressBar
+            android:id="@+id/angle_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:rotation="270"
+            android:layout_width="500px"
+            android:layout_height="30px"
+            android:layout_marginStart="1050dp"
+            android:layout_marginEnd="100dp"
+            android:layout_marginTop="450dp"
+            android:elevation="4dp"
+            android:progressDrawable="@drawable/rep_angle_bar"
+            android:max="3000"/>
+
     </RelativeLayout>
 
     </RelativeLayout>

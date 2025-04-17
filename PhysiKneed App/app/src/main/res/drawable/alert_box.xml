@@ -9,7 +9,7 @@
 
     <item
         android:gravity="start"
-        android:width="80dp">
+        android:width="90dp">
         <shape>
             <solid android:color="@color/pink"/>
             <corners android:topLeftRadius="16dp"

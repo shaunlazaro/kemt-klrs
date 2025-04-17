@@ -64,7 +64,7 @@ def get_motor_coords_offset(midpoint, frame_size):
     MOTOR_RATIO = 23/(frame_size / 2) # distance from center to edge of screen in motor coords (angle)
     return (midpoint - frame_size / 2)*MOTOR_RATIO
 
-def get_coords(all_points, h, w, current):
+def get_coords(all_points, h, w):
 
     FRAME_WIDTH = w
     FRAME_HEIGHT = h
@@ -72,32 +72,16 @@ def get_coords(all_points, h, w, current):
     Log.d("COORDS_TAG", "w = " + str(w))
     Log.d("COORDS_TAG", "h = " + str(h))
 
-    TOLERANCE_X = 80*23/(FRAME_WIDTH / 2)  # Motor coords from the center where no updates are sent
-    TOLERANCE_Y = 80*23/(FRAME_HEIGHT / 2)  # Motor coords from the center where no updates are sent
+    TOLERANCE_X = 80 #*23/(FRAME_WIDTH / 2)  # Motor coords from the center where no updates are sent
+    TOLERANCE_Y = 80#*23/(FRAME_HEIGHT / 2)  # Motor coords from the center where no updates are sent
 
     Log.d("COORDS_TAG", "TOLERANCE_X = " + str(TOLERANCE_X))
     Log.d("COORDS_TAG", "TOLERANCE_Y = " + str(TOLERANCE_Y))
-
-    MAX_MOVE_DISTANCE = 25 # Move no more than 10 units.
-    # DENOMINATOR = 20
-
-    current_x, current_y = map(int, current[1:-1].split(','))
-
-
-    Log.d("COORDS_TAG", "current_x = " + str(current_x))
-    Log.d("COORDS_TAG", "current_y = " + str(current_y))
-
-    # Initialize motors at center positions
-    motor_x = current_x  # Horizontal motor
-    motor_y = current_y  # Vertical motor
 
     # Calculate the midpoint of all landmarks
     x_coords, y_coords = zip(*all_points)  # Separate x and y coordinates
     midpoint = (sum(x_coords) / len(x_coords), sum(y_coords) / len(y_coords))
 
-    Log.d("COORDS_TAG", "midpoint = " + str(midpoint))
-
-# Convert midpoint to pixel coordinates
     pixel_midpoint = (int(midpoint[0] * w), int(midpoint[1] * h))
 
     Log.d("COORDS_TAG", "pixel_midpoint = " + str(pixel_midpoint))
@@ -105,46 +89,26 @@ def get_coords(all_points, h, w, current):
     midpoint_x = pixel_midpoint[0]
     midpoint_y = pixel_midpoint[1]
 
-    # Calculate offsets from frame center
-    offset_x = get_motor_coords_offset(midpoint_x, FRAME_WIDTH)
-    offset_y = get_motor_coords_offset(midpoint_y, FRAME_HEIGHT)
-
-    Log.d("COORDS_TAG", "offset_x = " + str(offset_x))
-    Log.d("COORDS_TAG", "offset_y = " + str(offset_y))
-
-    center_frame = (FRAME_WIDTH / 2, FRAME_HEIGHT / 2)
+    # calculate offset
+    offset_x = (midpoint_x - FRAME_WIDTH / 2)
+    offset_y = (midpoint_y - FRAME_HEIGHT / 2)
 
     # Check if offsets exceed tolerance
     if abs(offset_x) > TOLERANCE_X or abs(offset_y) > TOLERANCE_Y:
-        # Update motor positions
-        if offset_x > TOLERANCE_X and motor_x > 0:
-            Log.d("COORDS_TAG", "Branch 1 " + str(offset_x))
-            motor_x += min(round(offset_x), MAX_MOVE_DISTANCE)
-        elif offset_x < -TOLERANCE_X and motor_x < 180:
-            Log.d("COORDS_TAG", "Branch 2 " + str(offset_x))
-            motor_x += max(round(offset_x), -MAX_MOVE_DISTANCE)
-
-        if offset_y > TOLERANCE_Y and motor_y > 0:
-            Log.d("COORDS_TAG", "Branch 3 = " + str(offset_y))
-            motor_y -= min(round(offset_y), MAX_MOVE_DISTANCE)
-        elif offset_y < -TOLERANCE_Y and motor_y < 180:
-            Log.d("COORDS_TAG", "Branch 4 = " + str(offset_y))
-            motor_y -= max(round(offset_y), -MAX_MOVE_DISTANCE)
-
-        if motor_y > 180:
-            motor_y = current_y
-        if motor_y < 0:
-            motor_y = current_y
-        if motor_x > 180:
-            motor_x = current_x
-        if motor_x < 0:
-            motor_x = current_x
-
         # Send motor commands (replace with actual communication code)
-        msg = "[{},{}]".format(motor_x, motor_y)
+        if abs(offset_x) > TOLERANCE_X:
+            motor_x = offset_x
+        else:
+            motor_x = 0
+
+        if abs(offset_y) > TOLERANCE_Y:
+            motor_y = offset_y
+        else:
+            motor_y = 0
+
+        msg = f"[{motor_x},{motor_y}]"
 
         Log.d("COORDS_TAG", "msg = " + str(msg))
-
 
         return msg
     else:

@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:background="@drawable/blue_button"
+                android:background="@drawable/greyed_out_button"
                 android:textSize="20sp"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
@@ -69,6 +69,23 @@
                 android:padding="10dp"
                 android:text="Login"
                 android:id="@+id/login_button" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/outline_button"
+                android:textSize="20sp"
+                android:textAllCaps="false"
+                android:textColor="@color/blue"
+                android:fontFamily="@font/source_sans"
+                android:padding="10dp"
+                android:gravity="center"
+                android:text="Sign in With Google"
+                android:paddingStart="30dp"
+                android:drawablePadding="-20dp"
+                android:drawableStart="@drawable/_993685_brand_brands_google_logo_logos_icon"
+                android:id="@+id/login_google_button" />
 
 
         </LinearLayout>

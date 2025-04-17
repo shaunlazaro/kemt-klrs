@@ -131,25 +131,6 @@
                 android:visibility="gone"
                 android:hint="Track your thoughts about today's workout to remind you or your physiotherapist." />
 
-
-            <TextView
-                android:id="@+id/back_text"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Back"
-                android:fontFamily="@font/source_sans"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:padding="10dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="40dp"
-                android:drawablePadding="10dp"
-                app:drawableStartCompat="@drawable/baseline_arrow_back_24"
-                android:layout_gravity="start"
-                android:visibility="gone"
-                android:gravity="center"/>
-
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/next_button"
                 android:layout_width="match_parent"
@@ -167,22 +148,78 @@
                 android:padding="10dp"
                 android:visibility="gone"/>
 
-            <TextView
-                android:id="@+id/skip_button"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Skip to summary"
-                android:fontFamily="@font/source_sans"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:padding="10dp"
-                android:layout_marginTop="20dp"
-                android:layout_gravity="center"
-                android:gravity="center"/>
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/back_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Back"
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="40dp"
+                    android:drawablePadding="10dp"
+                    app:drawableStartCompat="@drawable/baseline_arrow_back_24"
+                    android:layout_gravity="start"
+                    android:visibility="gone"
+                    android:gravity="center"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/next_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Next"
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="40dp"
+                    android:drawablePadding="10dp"
+                    app:drawableEndCompat="@drawable/baseline_arrow_forward_black"
+                    android:layout_gravity="end"
+                    android:visibility="gone"
+                    android:gravity="center"/>
+
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="bottom" >
+
+        <TextView
+            android:id="@+id/skip_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Skip to summary"
+            android:fontFamily="@font/source_sans"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:padding="10dp"
+            android:layout_marginBottom="50dp"
+            android:gravity="center"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

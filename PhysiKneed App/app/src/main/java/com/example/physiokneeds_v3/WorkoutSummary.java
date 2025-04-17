@@ -1,14 +1,19 @@
 package com.example.physiokneeds_v3;
 
+import static com.example.physiokneeds_v3.HomeScreen.TAG_API;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -16,6 +21,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.Insets;
@@ -23,12 +29,25 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.widget.TextViewCompat;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WorkoutSummary extends AppCompatActivity {
 
+    int LL_INDEX = 6;
+
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,9 +71,37 @@ public class WorkoutSummary extends AppCompatActivity {
 
         Button finishButton = findViewById(R.id.finish_button);
 
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        TextView title = findViewById(R.id.summary_title);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        TextView dateTitle = findViewById(R.id.summary_title_action_bar);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        LinearLayout actionBar = findViewById(R.id.action_bar_summary);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        View blueBar = findViewById(R.id.blue_action_bar);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        ImageButton backButton = findViewById(R.id.back_button);
+
         // get routine from previous screen
         RoutineConfig routineConfig = (RoutineConfig) getIntent().getSerializableExtra(HomeScreen.ROUTINE_TAG);
         RoutineDataUpload routineData = (RoutineDataUpload) getIntent().getSerializableExtra("RoutineData");
+        String displayDate = getIntent().getStringExtra("FromProgress");
+        RoutineData routineDataFromProgress = (RoutineData) getIntent().getSerializableExtra("RoutineDataFromProgress");
+
+        // if from progress screen change a few things
+        if (displayDate != null || routineData == null) {
+            finishButton.setVisibility(View.GONE);
+            actionBar.setVisibility(View.VISIBLE);
+            blueBar.setVisibility(View.GONE);
+            title.setVisibility(View.GONE);
+            dateTitle.setText(displayDate);
+
+            List<RoutineComponentDataUpload> routineComponentDataUploadList = new ArrayList<>();
+            for (RoutineComponentData routineComponentData : routineDataFromProgress.getRoutineComponentData()) {
+                routineComponentDataUploadList.add(new RoutineComponentDataUpload("0", routineComponentData.getRepData()));
+            }
+            routineData = new RoutineDataUpload("0", routineComponentDataUploadList);
+        }
 
         List<Double> exerciseScores = new ArrayList<>();
         double repScore;
@@ -62,8 +109,11 @@ public class WorkoutSummary extends AppCompatActivity {
 
         double totalTime = 0;
 
+        List<Set<String>> alerts = new ArrayList<>();
+
         for(int i = 0; i < routineData.getRoutineComponentData().size(); i++) {
             exerciseScore = 0;
+            Set<String> alertsExercise = new HashSet<>();
             for (int j = 0; j < routineData.getRoutineComponentData().get(i).getRepData().size(); j++) {
                 RepData repData = routineData.getRoutineComponentData().get(i).getRepData().get(j);
                 boolean romPenalty = !repData.isGoalExtensionMet() || !repData.isGoalFlexionMet();
@@ -78,6 +128,9 @@ public class WorkoutSummary extends AppCompatActivity {
                 repScore -= repData.getAlerts().size()*0.2;
                 Log.d("SCORE_DEBUG", "repScore: " + String.valueOf(repScore));
 
+                // get alerts
+                alertsExercise.addAll(repData.getAlerts());
+
                 exerciseScore += repScore;
                 Log.d("SCORE_DEBUG", "exerciseScore: " + String.valueOf(exerciseScore));
                 // total time
@@ -88,6 +141,7 @@ public class WorkoutSummary extends AppCompatActivity {
             Log.d("SCORE_DEBUG", "Average rep scores: " + String.valueOf(exerciseScore));
 
             exerciseScores.add(exerciseScore);
+            alerts.add(alertsExercise);
         }
 
         // calculate overall score
@@ -116,7 +170,7 @@ public class WorkoutSummary extends AppCompatActivity {
             frameLayout.setLayoutParams(new FrameLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
-            frameLayout.setPadding(0, dpToPx(10), 0, 0);
+            frameLayout.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
 
             // Create exercise textviews
             TextView textView = new TextView(this);
@@ -148,30 +202,150 @@ public class WorkoutSummary extends AppCompatActivity {
 
             TextView textView3 = new TextView(this);
             FrameLayout.LayoutParams textParamsEnd = new FrameLayout.LayoutParams(
-                    dpToPx(22),
-                    dpToPx(22));
+                    dpToPx(26),
+                    dpToPx(26));
             textParamsEnd.gravity = Gravity.END;
             textView3.setLayoutParams(textParamsEnd);
             textView3.setText(String.valueOf((int) Math.round(exerciseScores.get(i)*100)));
-            textView3.setTextSize(12);
+            textView3.setTextSize(14);
             textView3.setTypeface(ResourcesCompat.getFont(this, R.font.source_sans), Typeface.BOLD);
             textView3.setTextColor(ContextCompat.getColor(this, R.color.white));
             textView3.setBackground(ContextCompat.getDrawable(this, R.drawable.score_circle));
             textView3.setGravity(Gravity.CENTER);
 
+            LinearLayout.LayoutParams layoutParamsCard = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+            );
+
+            // create cardView for each exercise
+            CardView cardView = new CardView(this);
+            ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            layoutParams.setMargins(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
+            cardView.setLayoutParams(layoutParams);
+            cardView.setCardElevation(dpToPx(4));
+            cardView.setRadius(dpToPx(12));
+            cardView.setClickable(true);
+            cardView.setFocusable(true);
+            cardView.setCardBackgroundColor(Color.WHITE);
+
+            // linear layout for expandable cardView
+            LinearLayout linearLayoutCard = new LinearLayout(this);
+            linearLayoutCard.setOrientation(LinearLayout.VERTICAL);
+            linearLayoutCard.setLayoutParams(layoutParamsCard);
+
+            LinearLayout linearLayoutCard2 = new LinearLayout(this);
+            linearLayoutCard2.setOrientation(LinearLayout.VERTICAL);
+            linearLayoutCard2.setLayoutParams(layoutParamsCard);
+//            linearLayoutCard2.setVisibility(View.GONE); // Toggle if errors show up by default
+
             frameLayout.addView(textView2);
             frameLayout.addView(textView3);
 
-            linearLayoutSummary.addView(textView, 3+i);
-            linearLayoutScore.addView(frameLayout, 4+i);
+            linearLayoutCard.addView(frameLayout);
+            linearLayoutCard.addView(linearLayoutCard2);
+
+            if (alerts.get(i).isEmpty()) {
+                TextView textView4 = new TextView(this);
+                textView4.setLayoutParams(layoutParamsCard);
+                textView4.setText("No Errors");
+                textView4.setTextSize(14);
+                textView4.setTypeface(ResourcesCompat.getFont(this, R.font.source_sans));
+                textView4.setTypeface(null, Typeface.ITALIC);
+                textView4.setTextColor(ContextCompat.getColor(this, R.color.black));
+                textView4.setGravity(Gravity.START);
+                textView4.setBackgroundColor(ContextCompat.getColor(this, R.color.light_blue));
+                textView4.setPadding(dpToPx(20), dpToPx(10), dpToPx(20), dpToPx(10));
+
+                linearLayoutCard2.addView(textView4);
+            } else {
+                for (String item : alerts.get(i)) {
+                    TextView textView4 = new TextView(this);
+                    textView4.setLayoutParams(layoutParamsCard);
+                    textView4.setText(item);
+                    textView4.setTextSize(14);
+                    textView4.setTypeface(ResourcesCompat.getFont(this, R.font.source_sans));
+                    textView4.setTypeface(null, Typeface.ITALIC);
+                    textView4.setTextColor(ContextCompat.getColor(this, R.color.black));
+                    textView4.setGravity(Gravity.START);
+                    textView4.setBackgroundColor(ContextCompat.getColor(this, R.color.light_blue));
+                    textView4.setPadding(dpToPx(20), dpToPx(10), dpToPx(20), dpToPx(10));
+                    textView4.setCompoundDrawablePadding(dpToPx(10));
+                    TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(textView4, ContextCompat.getDrawable(this, R.drawable.baseline_error_outline_pink), null, null, null);
+
+                    linearLayoutCard2.addView(textView4);
+                }
+            }
+
+            cardView.setOnClickListener(v -> {
+                if (linearLayoutCard2.getVisibility() == View.GONE) {
+                    linearLayoutCard2.setVisibility(View.VISIBLE);
+                } else {
+                    linearLayoutCard2.setVisibility(View.GONE);
+                }
+            });
+
+            cardView.addView(linearLayoutCard);
+
+            linearLayoutSummary.addView(textView, LL_INDEX+i);
+            linearLayoutScore.addView(cardView, i);
         }
+
+        RoutineDataUpload finalRoutineData = routineData;
 
         finishButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(WorkoutSummary.this, HomeScreen.class);
-                WorkoutSummary.this.startActivity(intent);
+                sendData(finalRoutineData);
+                Log.d("RATING_NOTES", finalRoutineData.getNotes());
+                Log.d("RATING_NOTES", finalRoutineData.getRoutineComponentData().get(0).getRating().toString());
+                Log.d("RATING_NOTES", finalRoutineData.getRoutineComponentData().get(1).getRating().toString());
             }
         });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    private void sendData(RoutineDataUpload data) {
+        // create retrofit instance
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://140.238.151.117:8000/api/routine-data/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+
+        // send routine-data
+        Call<RoutineDataUpload> call = apiService.sendData(MainMenu.tokenId, data);
+
+        if (call != null) {
+            call.enqueue(new Callback<RoutineDataUpload>() {
+                @Override
+                public void onResponse(Call<RoutineDataUpload> call, Response<RoutineDataUpload> response) {
+                    if (!response.isSuccessful()) {
+                        // Handle the error scenario here
+                        Log.e(TAG_API, "Response Code: " + response.code());
+                        Log.d(TAG_API, call.request().url().toString());
+                        return;
+                    }
+                    Log.d(HomeScreen.TAG_API, "Data Sent Successfully");
+                    Intent intent = new Intent(WorkoutSummary.this, HomeScreen.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    WorkoutSummary.this.startActivity(intent);
+                }
+
+                @Override
+                public void onFailure(Call<RoutineDataUpload> call, Throwable t) {
+                    Log.e(TAG_API, t.toString());
+                }
+            });
+        }
     }
 
     private int dpToPx(int dp) {

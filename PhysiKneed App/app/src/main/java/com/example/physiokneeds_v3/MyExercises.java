@@ -46,6 +46,11 @@ public class MyExercises extends AppCompatActivity {
         // get routine from previous screen
         RoutineConfig routineConfig = (RoutineConfig) getIntent().getSerializableExtra(HomeScreen.ROUTINE_TAG);
 
+        // see if from in progress exercises screen
+        if (getIntent().getSerializableExtra("FROM_EXERCISES") != null) {
+            startExercises.setVisibility(View.GONE);
+        }
+
         // Set the text and images to the correct routine
         layoutEx = findViewById(R.id.linear_layout_exercises);
 
@@ -67,7 +72,6 @@ public class MyExercises extends AppCompatActivity {
 //            linearLayoutText.setPadding(0, dpToPx(25), 0, 0);
 
             // Create ImageView
-            // TODO make imageViews buttons for more exercise instructions and custom images
             ImageView imageView = new ImageView(this);
             LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
                     dpToPx(58),
@@ -88,12 +92,23 @@ public class MyExercises extends AppCompatActivity {
             imageView.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10));
             imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
+            int finalI = i;
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MyExercises.this, WorkoutInstructions.class);
+                    intent.putExtra("EXERCISE_NAME", finalI);
+                    intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig);
+                    MyExercises.this.startActivity(intent);
+                }
+            });
+
             // Create TextView
             TextView textView = new TextView(this);
             LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.MATCH_PARENT);
-            textParams.setMargins(dpToPx(10), 0, 0, 0); // layout_marginStart="10dp"
+            textParams.setMargins(dpToPx(10), 0, dpToPx(40), 0); // layout_marginStart="10dp"
             textView.setLayoutParams(textParams);
             textView.setText(routineConfig.getExercises().get(i).getExercise().getDisplayName());
             textView.setTextSize(20);
@@ -132,9 +147,7 @@ public class MyExercises extends AppCompatActivity {
 
         backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MyExercises.this, HomeScreen.class);
-
-                MyExercises.this.startActivity(intent);
+                finish();
             }
         });
     }

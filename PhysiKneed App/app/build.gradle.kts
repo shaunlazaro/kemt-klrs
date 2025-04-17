@@ -79,12 +79,22 @@ dependencies {
     implementation(libs.tasks.vision)
     implementation(libs.coil)
 
-    implementation("io.reactivex.rxjava3:rxjava:3.1.10")
-    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
-    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
+    implementation(libs.rxjava)
+    implementation(libs.rxandroid)
+    implementation(libs.rxkotlin)
 
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.google.code.gson:gson:2.8.8")
-    implementation("com.tbuonomo:dotsindicator:4.3")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.gson)
+    implementation(libs.dotsindicator)
+    implementation(libs.androidx.fragment)
+
+    implementation(libs.mpandroidchart)
+
+    implementation(libs.androidx.cardview)
+
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
 }

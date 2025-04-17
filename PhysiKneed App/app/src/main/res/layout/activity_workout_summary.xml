@@ -17,6 +17,7 @@
             android:layout_height="wrap_content">
 
             <View
+                android:id="@+id/blue_action_bar"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:background="@color/blue" />
@@ -28,7 +29,41 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
+                <LinearLayout
+                    android:id="@+id/action_bar_summary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginBottom="20dp"
+                    android:visibility="gone"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/back_button"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:background="@color/white"
+                        android:src="@drawable/baseline_arrow_back_24"
+                        android:contentDescription="Next"
+                        android:layout_marginStart="24dp" />
+
+                    <TextView
+                        android:id="@+id/summary_title_action_bar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Today's Exercises"
+                        android:fontFamily="@font/source_sans"
+                        android:textSize="24sp"
+                        android:textColor="@color/nav_blue"
+                        android:textStyle="bold"
+                        android:padding="10dp"
+                        android:layout_marginStart="10dp"/>
+
+                </LinearLayout>
+
                 <TextView
+                    android:id="@+id/summary_title"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Workout Summary"
@@ -39,13 +74,61 @@
                     android:padding="10dp"
                     android:layout_gravity="left"
                     android:layout_marginTop="25dp"
+                    android:layout_marginBottom="20dp"
                     android:layout_marginStart="30dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Overall Score"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:fontFamily="@font/source_sans"
+                    android:textColor="@color/black"
+                    android:gravity="center"/>
+
+                <ProgressBar
+                    android:id="@+id/progress_circular"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progressDrawable="@drawable/circular_progress"
+                    android:progress="85" />
+
+                <TextView
+                    android:id="@+id/score_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="85"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:fontFamily="@font/source_sans"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="-70dp" />
+
+                <TextView
+                    android:id="@+id/exercise_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Stretches Completed"
+                    android:fontFamily="@font/source_sans"
+                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:layout_marginTop="45dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_gravity="start" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="40dp" >
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -57,6 +140,7 @@
                         android:textStyle="bold"
                         android:padding="10dp"
                         android:layout_marginStart="40dp"
+                        android:layout_marginTop="10dp"
                         android:layout_gravity="start" />
 
                     <TextView
@@ -73,25 +157,11 @@
 
                 </FrameLayout>
 
-                <TextView
-                    android:id="@+id/exercise_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Stretches Completed"
-                    android:fontFamily="@font/source_sans"
-                    android:textSize="14sp"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:padding="10dp"
-                    android:layout_marginStart="40dp"
-                    android:layout_gravity="start" />
-
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
                     android:layout_marginStart="50dp"
                     android:layout_marginEnd="50dp"
-                    android:layout_marginTop="20dp"
 
                     android:background="@color/black" />
 
@@ -100,84 +170,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginStart="50dp"
-                    android:layout_marginEnd="50dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_marginTop="20dp"
                     android:gravity="center">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Overall Score"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="20dp"
-                        android:fontFamily="@font/source_sans"
-                        android:textColor="@color/black"
-                        android:gravity="center"/>
-
-                    <ProgressBar
-                        android:id="@+id/progress_circular"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:indeterminate="false"
-                        android:max="100"
-                        android:progressDrawable="@drawable/circular_progress"
-                        android:progress="85" />
-
-                    <TextView
-                        android:id="@+id/score_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="85"
-                        android:textSize="32sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:fontFamily="@font/source_sans"
-                        android:textColor="@color/black"
-                        android:layout_marginTop="-70dp" />
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="60dp">
-
-                        <TextView
-                            android:text="Stretch"
-                            android:textStyle="bold"
-                            android:textSize="14sp"
-                            android:fontFamily="@font/source_sans"
-                            android:textColor="@color/black"
-                            android:layout_height="wrap_content"
-                            android:layout_width="match_parent"/>
-
-                        <TextView
-                            android:text="Score"
-                            android:textStyle="bold"
-                            android:gravity="end"
-                            android:textSize="14sp"
-                            android:fontFamily="@font/source_sans"
-                            android:textColor="@color/black"
-                            android:layout_height="wrap_content"
-                            android:layout_width="match_parent"/>
-
-                    </FrameLayout>
-
                 </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Common errors"
-                    android:fontFamily="@font/source_sans"
-                    android:textSize="14sp"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:padding="10dp"
-                    android:layout_marginStart="40dp"
-                    android:layout_gravity="start" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/finish_button"

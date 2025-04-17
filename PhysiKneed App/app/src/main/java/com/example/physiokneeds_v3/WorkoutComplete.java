@@ -38,7 +38,13 @@ public class WorkoutComplete extends AppCompatActivity {
 
         // get routine data
         RoutineDataUpload routineData = (RoutineDataUpload) getIntent().getSerializableExtra("RoutineData");
-        Log.d("SEND_DATA", String.valueOf(routineData.getRoutineComponentData().get(0).getRepData().get(0).getScore()));
+        if (routineData == null || routineData.getRoutineComponentData().isEmpty() || routineData.getRoutineComponentData().get(0).getRepData().isEmpty()) {
+            // if workout was not completed, go back to home screen
+            Intent intent = new Intent(WorkoutComplete.this, HomeScreen.class);
+            WorkoutComplete.this.startActivity(intent);
+        } else {
+            Log.d("SEND_DATA", String.valueOf(routineData.getRoutineComponentData().get(0).getRepData().get(0).getScore()));
+        }
 
         TextView questionText = findViewById(R.id.question_text);
         ImageView exerciseImage = findViewById(R.id.exercise_image);
@@ -46,7 +52,10 @@ public class WorkoutComplete extends AppCompatActivity {
 
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
         SeekBar scoreBar = findViewById(R.id.seekBar);
-        Button nextButton = findViewById(R.id.next_button);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        TextView nextButton = findViewById(R.id.next_text);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+        Button nextButtonFinal = findViewById(R.id.next_button);
         TextView skipText = findViewById(R.id.skip_button);
 
         @SuppressLint({"MissingInflatedId", "LocalSuppress"})
@@ -92,10 +101,14 @@ public class WorkoutComplete extends AppCompatActivity {
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // TODO store the data somewhere,
-                //  make it display the stored data since the back button can be pressed
+                // store the data
+                routineData.getRoutineComponentData().get(exerciseIndex).setRating(scoreBar.getProgress()+1);
+
                 exerciseIndex++;
                 if (exerciseIndex == exerciseList.size()) {
+                    if (routineData.getNotes() != null) {
+                        editText.setText(routineData.getNotes());
+                    }
                     questionText.setText("Any thoughts to record?");
                     exerciseImage.setVisibility(View.GONE);
                     exerciseText.setVisibility(View.GONE);
@@ -103,6 +116,8 @@ public class WorkoutComplete extends AppCompatActivity {
                     backText.setVisibility(View.VISIBLE);
                     faces.setVisibility(View.GONE);
                     editText.setVisibility(View.VISIBLE);
+                    nextButton.setVisibility(View.GONE);
+                    nextButtonFinal.setVisibility(View.VISIBLE);
                 } else if (exerciseIndex < exerciseList.size()){
                     switch (exerciseList.get(exerciseIndex).getExercise().getDisplayName()) {
                         case "Seated Leg Extension (Right)":
@@ -133,8 +148,18 @@ public class WorkoutComplete extends AppCompatActivity {
             }
         });
 
+        nextButtonFinal.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                routineData.setNotes(String.valueOf(editText.getText()));
+                Intent intent = new Intent(WorkoutComplete.this, WorkoutSummary.class);
+                intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig);
+                intent.putExtra("RoutineData", routineData);
+
+                WorkoutComplete.this.startActivity(intent);
+            }
+        });
+
         skipText.setOnClickListener(v -> {
-            // TODO send user to workout summary
             Intent intent = new Intent(WorkoutComplete.this, WorkoutSummary.class);
             intent.putExtra(HomeScreen.ROUTINE_TAG, routineConfig);
             intent.putExtra("RoutineData", routineData);
@@ -143,11 +168,22 @@ public class WorkoutComplete extends AppCompatActivity {
         });
 
         backText.setOnClickListener(v -> {
+            // store data if hit back too
+            routineData.getRoutineComponentData().get(exerciseIndex).setRating(scoreBar.getProgress()+1);
+
             exerciseIndex--;
+
             if (exerciseIndex == 0) {
                 backText.setVisibility(View.GONE);
             }
-            scoreBar.setProgress(1);
+
+            if (routineData.getRoutineComponentData().get(exerciseIndex).getRating() != null){
+                scoreBar.setProgress(routineData.getRoutineComponentData().get(exerciseIndex).getRating()-1);
+            } else {
+                scoreBar.setProgress(1);
+                nextButton.setVisibility(View.GONE);
+            }
+
             questionText.setText("How easy did that feel?");
             exerciseImage.setVisibility(View.VISIBLE);
             switch (exerciseList.get(exerciseIndex).getExercise().getDisplayName()) {
@@ -166,11 +202,10 @@ public class WorkoutComplete extends AppCompatActivity {
             }
             exerciseText.setVisibility(View.VISIBLE);
             scoreBar.setVisibility(View.VISIBLE);
-            nextButton.setVisibility(View.GONE);
             editText.setVisibility(View.GONE);
+            nextButtonFinal.setVisibility(View.GONE);
             faces.setVisibility(View.VISIBLE);
             exerciseText.setText(exerciseList.get(exerciseIndex).getExercise().getDisplayName());
-            nextButton.setVisibility(View.GONE);
         });
     }
 }

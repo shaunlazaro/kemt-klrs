@@ -8,7 +8,8 @@
     android:layout_height="match_parent"
     tools:context=".HomeScreen">
 
-    <ScrollView
+    <FrameLayout
+        android:id="@+id/fragment_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -65,7 +66,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="200dp"
                     android:layout_marginTop="100dp"
                     android:background="@color/blue" />
 
@@ -79,7 +80,7 @@
                         android:id="@+id/exercise_text_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="20dp"
                         android:background="@drawable/today_exercises_textbox"
                         android:padding="16dp"
                         android:text="\n\n\n"
@@ -126,29 +127,141 @@
                         android:layout_height="match_parent"
                         android:text="Your Exercise Streak"
                         android:fontFamily="@font/source_sans"
-                        android:textSize="28sp"
+                        android:textSize="20sp"
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         android:padding="10dp"
-                        android:layout_marginTop="160dp"
+                        android:layout_marginTop="140dp"
                         android:layout_gravity="center"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="5 of 7 Days"
+                        android:text="1 of 7 Days"
                         android:fontFamily="@font/source_sans"
-                        android:textSize="26sp"
+                        android:textSize="20sp"
                         android:textColor="@color/white"
-                        android:padding="10dp"
                         android:layout_gravity="center"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="40dp"
+                        android:layout_marginEnd="40dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Mon"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Tue"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:textColor="@color/nav_blue"
+                            android:layout_marginStart="2dp"
+                            android:background="@drawable/circle_button"/>
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Wed"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:layout_marginStart="2dp"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Th"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"
+                            android:layout_marginStart="2dp"
+                            />
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Fri"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:layout_marginStart="2dp"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Sat"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:layout_marginStart="2dp"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Sun"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:layout_marginStart="2dp"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="60dp"
+                        android:paddingLeft="40dp"
+                        android:paddingRight="40dp"
+                        android:layout_gravity="left"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/source_sans"
+                        android:text="About Knee Replacement" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="10dp"
+                        android:paddingLeft="40dp"
+                        android:paddingRight="40dp"
+                        android:layout_gravity="left"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/source_sans"
+                        android:text="It usually takes around a year to recover fully after a knee replacement. But you should be able to resume most of your usual activities six weeks after surgery." />
 
 
                 </LinearLayout>
 
             </FrameLayout>
         </LinearLayout>
-    </ScrollView>
+    </FrameLayout>
 
     <View
         android:layout_width="match_parent"
@@ -163,9 +276,13 @@
         android:layout_marginBottom="-40dp"
         android:background="@color/white"
         app:itemTextColor="@color/nav_blue"
-        app:itemIconTint="@color/nav_blue"
-        app:itemActiveIndicatorStyle="@color/blue"
         app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled"
+        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
+        app:itemIconTint="@color/nav_blue"
+        app:itemIconSize="35dp"
+        app:itemTextAppearanceActive="@style/BottomNavTextActive"
+        app:itemTextAppearanceInactive="@style/BottomNavTextInactive"
         android:id="@+id/bottom_nav"/>
 
 </RelativeLayout>

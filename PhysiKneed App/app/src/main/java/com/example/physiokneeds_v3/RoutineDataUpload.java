@@ -6,6 +6,7 @@ import java.util.List;
 public class RoutineDataUpload implements Serializable {
     private String routineConfig_id;
     private List<RoutineComponentDataUpload> routine_component_data;
+    private String notes;
 
     // Constructor
     public RoutineDataUpload(String routineConfig, List<RoutineComponentDataUpload> routineComponentData) {
@@ -16,4 +17,8 @@ public class RoutineDataUpload implements Serializable {
     // Getters
     public String getRoutineConfig() { return routineConfig_id; }
     public List<RoutineComponentDataUpload> getRoutineComponentData() { return routine_component_data; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
 }
