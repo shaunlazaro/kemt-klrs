@@ -137,7 +137,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="7 of 7 Days"
+                        android:text="1 of 7 Days"
                         android:fontFamily="@font/source_sans"
                         android:textSize="20sp"
                         android:textColor="@color/white"
@@ -155,56 +155,12 @@
                         <TextView
                             android:layout_width="35dp"
                             android:layout_height="35dp"
-                            android:text="Th"
-                            android:gravity="center"
-                            android:fontFamily="@font/source_sans"
-                            android:textStyle="bold"
-                            android:textColor="@color/nav_blue"
-                            android:background="@drawable/circle_button"/>
-
-                        <TextView
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:text="Fr"
-                            android:gravity="center"
-                            android:fontFamily="@font/source_sans"
-                            android:textStyle="bold"
-                            android:textColor="@color/nav_blue"
-                            android:layout_marginStart="2dp"
-                            android:background="@drawable/circle_button"/>
-
-                        <TextView
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:text="Sat"
-                            android:gravity="center"
-                            android:fontFamily="@font/source_sans"
-                            android:textStyle="bold"
-                            android:textColor="@color/nav_blue"
-                            android:layout_marginStart="2dp"
-                            android:background="@drawable/circle_button"/>
-
-                        <TextView
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:text="Sun"
-                            android:gravity="center"
-                            android:fontFamily="@font/source_sans"
-                            android:textStyle="bold"
-                            android:textColor="@color/nav_blue"
-                            android:layout_marginStart="2dp"
-                            android:background="@drawable/circle_button"/>
-
-                        <TextView
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
                             android:text="Mon"
                             android:gravity="center"
                             android:fontFamily="@font/source_sans"
                             android:textStyle="bold"
-                            android:textColor="@color/nav_blue"
-                            android:layout_marginStart="2dp"
-                            android:background="@drawable/circle_button"/>
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
 
                         <TextView
                             android:layout_width="35dp"
@@ -225,8 +181,53 @@
                             android:fontFamily="@font/source_sans"
                             android:textStyle="bold"
                             android:layout_marginStart="2dp"
-                            android:textColor="@color/nav_blue"
-                            android:background="@drawable/circle_button"/>
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Th"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"
+                            android:layout_marginStart="2dp"
+                            />
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Fri"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:layout_marginStart="2dp"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Sat"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:layout_marginStart="2dp"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
+
+                        <TextView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:text="Sun"
+                            android:gravity="center"
+                            android:fontFamily="@font/source_sans"
+                            android:textStyle="bold"
+                            android:layout_marginStart="2dp"
+                            android:textColor="@color/pink"
+                            android:background="@drawable/exercise_streak"/>
 
                     </LinearLayout>
 
